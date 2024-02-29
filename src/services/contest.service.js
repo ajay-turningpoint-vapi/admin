@@ -8,7 +8,7 @@ export const addContest = (formData) => {
 };
 
 export const getContest = (query) => {
-  return axios.get(`${serverUrl}/getContest?${query}`);
+  return axios.get(`${serverUrl}/getContestAdmin?${query}`);
 };
 
 export const deleteContest = (id) => {

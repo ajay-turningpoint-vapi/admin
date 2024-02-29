@@ -1,24 +1,31 @@
 import React, { useState } from "react";
 import CustomButton from "./Button";
 
-function FileUpload({ getVideoDuration, onFileChange }) {
+function FileUpload({ getVideoDuration, onFileChange, currentImage }) {
   const [file, setFile] = useState("");
-
+  const [fileInfo, setFileInfo] = useState("");
   const getBase64 = (file, cb) => {
     let reader = new FileReader();
-    var duration = 0
+    var duration = 0;
     reader.readAsDataURL(file);
     reader.onload = function () {
-      console.log(reader)
+      console.log(reader);
       var media = new Audio(reader.result);
       media.onloadedmetadata = function () {
-        duration = media.duration
-        cb({ result: reader.result, file: file, duration: duration && duration != 0 ? duration : 0 });
+        duration = media.duration;
+        cb({
+          result: reader.result,
+          file: file,
+          duration: duration && duration != 0 ? duration : 0,
+        });
       };
       if (getVideoDuration) {
-        cb({ result: reader.result, file: file, duration: duration && duration != 0 ? duration : 0 });
-      }
-      else {
+        cb({
+          result: reader.result,
+          file: file,
+          duration: duration && duration != 0 ? duration : 0,
+        });
+      } else {
         cb(reader.result);
       }
     };
@@ -28,29 +35,28 @@ function FileUpload({ getVideoDuration, onFileChange }) {
   };
   const handleFileSelection = (event) => {
     if (event.target.files[0]) {
-
-
-      var video = document.createElement('video');
-      video.preload = 'metadata';
-      console.log("asdsd")
-      video.onloadedmetadata = function () {
-        window.URL.revokeObjectURL(video.src);
-        var duration = video.duration;
-        console.log(duration, "duration")
-      }
       getBase64(event.target.files[0], (result) => {
-        setFile(event.target.files[0]);
-        let tempResult = result;
+        // Directly set the base64-encoded image string in the state
+        setFile(result.result);
 
-        tempResult.files = event.target.files[0]
-        onFileChange(tempResult);
+        // You can also set other properties from the result if needed
+        onFileChange(result);
       });
     }
   };
   return (
     <div className="position-relative">
-      <input type="file" onChange={(event) => handleFileSelection(event)} className="form-control" />
-      <CustomButton isLink extraClass="position-absolute start-0 top-0 h-100 text-uppercase rounded-0" noIcon btnName="Browse" />
+      <input
+        type="file"
+        onChange={(event) => handleFileSelection(event)}
+        className="form-control"
+      />
+      <CustomButton
+        isLink
+        extraClass="position-absolute start-0 top-0 h-100 text-uppercase rounded-0"
+        noIcon
+        btnName="Browse"
+      />
     </div>
   );
 }

@@ -48,7 +48,7 @@ const Contest = () => {
       name: "Status",
       button: true,
       width: "20%",
-      cell: (row) => <CustomButton greenBtn btnName="Active" />,
+      cell: (row) => <CustomButton greenBtn btnName={row.status} />,
     },
     {
       name: "Action",
@@ -64,78 +64,7 @@ const Contest = () => {
       } deletePath="/Contests" remove edit Uniquekey={row.id} />,
     },
   ];
-  const contest_data = [
-    {
-      id: "1",
-      Seq: "1",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "2",
-      Seq: "2",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "3",
-      Seq: "3",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "4",
-      Seq: "4",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "5",
-      Seq: "5",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "6",
-      Seq: "6",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "7",
-      Seq: "7",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "8",
-      Seq: "8",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "9",
-      Seq: "9",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-    {
-      id: "10",
-      Seq: "10",
-      title: "Beauty Treatmen...",
-      author: "Super Admin",
-      published: "Fri, May 20, 2022 4:18 PM",
-    },
-  ];
+
 
   return (
     <main>

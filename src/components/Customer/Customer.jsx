@@ -10,7 +10,10 @@ import SearchBox from "../Utility/SearchBox";
 import tabClick from "../Utility/TabClick";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
-import { updateUserKycStatus, updateUserStatus } from "../../services/users.service";
+import {
+  updateUserKycStatus,
+  updateUserStatus,
+} from "../../services/users.service";
 import Box from "@mui/material/Box";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -31,7 +34,7 @@ function Customer() {
   const [inActiveUsersArr, setInActiveUsersArr] = useState([]);
   const userArr = useSelector((state) => state.users.users);
   const [selectedData, setSelectedData] = useState(null);
-  const [search, setSearch] = useState("")
+  const [search, setSearch] = useState("");
 
   const handleChangeActiveStatus = async (id, value) => {
     try {
@@ -88,7 +91,15 @@ function Customer() {
     },
     {
       name: "AVATAR",
-      cell: (row) => row.image && row.image != "" ? <img src={generateFilePath(row.image)} alt={row.firstname} /> : <img src={images.customer} alt={row.firstname} />,
+      cell: (row) =>
+        row.image && row.image != "" ? (
+          <img
+            src={generateFilePath(row.image) || row.image}
+            alt={row.firstname}
+          />
+        ) : (
+          <img src={images.customer} alt={row.firstname} />
+        ),
       width: "10%",
     },
     {
@@ -114,18 +125,42 @@ function Customer() {
     {
       name: "IS ACTIVE",
       button: true,
-      cell: (row) => <Switch onChange={(e) => handleChangeActiveStatus(row._id, e.target.checked)} checked={row.isActive} />,
+      cell: (row) => (
+        <Switch
+          onChange={(e) => handleChangeActiveStatus(row._id, e.target.checked)}
+          checked={row.isActive}
+        />
+      ),
       width: "10%",
     },
-
 
     {
       name: "Action",
       cell: (row) => (
         <>
-          <CustomButton btntype="button" ClickEvent={(e) => handleModalSet(e, row)} isBtn iconName="fa-solid fa-check" btnName="View" />
-          <Link to={`/user-point-history/${row?._id}`} className="btn btn-secondary ms-2 text-white">Point History</Link>
-          {selectedData && <EditModal ModalBox={ModalBox} data={selectedData} setModalBox={setModalBox} name={ModalName} ModalType={ModalType} width="max-content" />}
+          <CustomButton
+            btntype="button"
+            ClickEvent={(e) => handleModalSet(e, row)}
+            isBtn
+            iconName="fa-solid fa-check"
+            btnName="View"
+          />
+          <Link
+            to={`/user-point-history/${row?._id}`}
+            className="btn btn-secondary ms-2 text-white"
+          >
+            Point History
+          </Link>
+          {selectedData && (
+            <EditModal
+              ModalBox={ModalBox}
+              data={selectedData}
+              setModalBox={setModalBox}
+              name={ModalName}
+              ModalType={ModalType}
+              width="max-content"
+            />
+          )}
         </>
       ),
       width: "20%",
@@ -154,8 +189,11 @@ function Customer() {
     if (userArr && userArr.length) {
       setUsersArr(userArr);
       setDisplayUsersArr(userArr);
-      console.log(userArr, "userArr")
-      console.log(usersArr.filter((el) => !el.isActive), "usersArr.filter((el) => el.isActive)")
+      console.log(userArr, "userArr");
+      console.log(
+        usersArr.filter((el) => !el.isActive),
+        "usersArr.filter((el) => el.isActive)"
+      );
       setActiveUsersArr(usersArr.filter((el) => el.isActive));
       setInActiveUsersArr(usersArr.filter((el) => !el.isActive));
     }
@@ -166,22 +204,50 @@ function Customer() {
   }, []);
 
   const handleSearch = (q) => {
-    console.log(search, "search", q)
-    console.log(activeUsersArr, "activeUsersArr")
-    setSearch(q)
+    console.log(search, "search", q);
+    console.log(activeUsersArr, "activeUsersArr");
+    setSearch(q);
     if (q) {
-      let searchArr = userArr.filter((el) => `${el.name}`.toLowerCase().includes(`${q}`.toLowerCase()) || `${el.phone}`.toLowerCase().includes(`${q}`.toLowerCase()) || `${el.email}`.toLowerCase().includes(`${q}`.toLowerCase()))
-      console.log(searchArr, "searchArr")
-      setUsersArr(searchArr)
+      let searchArr = userArr.filter(
+        (el) =>
+          `${el.name}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
+          `${el.phone}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
+          `${el.email}`.toLowerCase().includes(`${q}`.toLowerCase())
+      );
+      console.log(searchArr, "searchArr");
+      setUsersArr(searchArr);
     }
-  }
+  };
   const handleGetTselectedTable = () => {
     if (tabList.filter((el) => el.active)[0].tabName == "All Customer") {
-      return <DataTable paginationPerPage={20} columns={users_columns} data={usersArr} pagination />;
-    } else if (tabList.filter((el) => el.active)[0].tabName == "Active Customer") {
-      return <DataTable paginationPerPage={100} columns={users_columns} data={activeUsersArr} pagination />;
+      return (
+        <DataTable
+          paginationPerPage={20}
+          columns={users_columns}
+          data={usersArr}
+          pagination
+        />
+      );
+    } else if (
+      tabList.filter((el) => el.active)[0].tabName == "Active Customer"
+    ) {
+      return (
+        <DataTable
+          paginationPerPage={100}
+          columns={users_columns}
+          data={activeUsersArr}
+          pagination
+        />
+      );
     } else {
-      return <DataTable paginationPerPage={100} columns={users_columns} data={inActiveUsersArr} pagination />;
+      return (
+        <DataTable
+          paginationPerPage={100}
+          columns={users_columns}
+          data={inActiveUsersArr}
+          pagination
+        />
+      );
     }
   };
 
@@ -190,7 +256,11 @@ function Customer() {
       <section className="product-category">
         <div className="container-fluid p-0">
           <div className="d-flex align-items-center justify-content-between mb-3">
-            <ul className="nav nav-pills dashboard-pills justify-content-end" id="pills-tab" role="tablist">
+            <ul
+              className="nav nav-pills dashboard-pills justify-content-end"
+              id="pills-tab"
+              role="tablist"
+            >
               {tabList.map((item, i) => {
                 return (
                   <li key={i}>
@@ -216,13 +286,19 @@ function Customer() {
               <div className="d-flex align-items-center gap-3">
                 <div className="search-field">
                   <form action="#" className="form">
-                    <div
-                      className="input-group"
-                    >
+                    <div className="input-group">
                       <div className="input-group-text">
                         <i className="ion-ios-search-strong blue-1"></i>
                       </div>
-                      <input type="text" className="form-control" placeholder="Search" value={search} onChange={(e) => { handleSearch(e.target.value) }} />
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search"
+                        value={search}
+                        onChange={(e) => {
+                          handleSearch(e.target.value);
+                        }}
+                      />
                     </div>
                   </form>
                 </div>

@@ -1,4 +1,9 @@
-import { addContest, deleteContest, getContest, updateContest } from "../../../services/contest.service";
+import {
+  addContest,
+  deleteContest,
+  getContest,
+  updateContest,
+} from "../../../services/contest.service";
 
 export const CONTEST_ADD = "CONTEST_ADD";
 export const CONTEST_ADD_SUCCESS = "CONTEST_ADD_SUCCESS";
@@ -86,7 +91,7 @@ export const CONTESTUpdate = (formData, id) => async (dispatch) => {
       console.log(response);
       dispatch({
         type: UPDATE_CONTEST_BY_ID_SUCCESS,
-        payload: { data: null, message: response.message }
+        payload: { data: null, message: response.message },
       });
     }
   } catch (err) {

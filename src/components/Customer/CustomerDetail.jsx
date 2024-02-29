@@ -8,6 +8,8 @@ import ActionIcon from "../Utility/ActionIcon";
 import DataTable from "react-data-table-component";
 import { downloadCSV } from "../Utility/CSV";
 import { generateFilePath } from "../Utility/utils";
+import { Switch } from "@mui/material";
+import { updateUserKycStatus } from "../../services/users.service";
 
 function CustomerDetail({ customerData }) {
   // ==============================================================================================
@@ -66,7 +68,14 @@ function CustomerDetail({ customerData }) {
     },
     {
       name: "Action",
-      cell: (row) => <ActionIcon approve detail detailpath="/Order/Sale-Detail" Uniquekey={row.id} />,
+      cell: (row) => (
+        <ActionIcon
+          approve
+          detail
+          detailpath="/Order/Sale-Detail"
+          Uniquekey={row.id}
+        />
+      ),
     },
   ];
 
@@ -217,7 +226,24 @@ function CustomerDetail({ customerData }) {
   ];
 
   // ==============================================================================================
+  const handleChangeKycStatus = async (id, value) => {
+    try {
+      let { data: res } = await updateUserKycStatus(id, { kycStatus: value });
+      if (res.message) {
+        alert(res.message);
+      }
+    } catch (err) {
+      if (err.response.data.message) {
+        console.error(err.response.data.message);
+        alert(err.response.data.message);
+      } else {
+        console.error(err.message);
+        alert(err.message);
+      }
+    }
 
+    console.log(id, value);
+  };
   return (
     <main>
       <section className="product-category">
@@ -227,8 +253,19 @@ function CustomerDetail({ customerData }) {
             <div className="row">
               <div className="col-12 col-md-12">
                 <div className="customer-profile">
-                  <a href={generateFilePath(customerData.image)}><img src={customerData?.image ? generateFilePath(customerData.image) : images.customer} alt="" /></a>
-                  <h6 className="blue-1 text-capitalize my-3">{customerData.firstName}</h6>
+                  <a href={generateFilePath(customerData.image)}>
+                    <img
+                      src={
+                        customerData?.image
+                          ? generateFilePath(customerData.image)
+                          : images.customer
+                      }
+                      alt=""
+                    />
+                  </a>
+                  <h6 className="blue-1 text-capitalize my-3">
+                    {customerData.firstName}
+                  </h6>
                   <ul className="blue-1 fs-14">
                     <li>
                       <span className="fw-600">
@@ -252,7 +289,9 @@ function CustomerDetail({ customerData }) {
                       <span className="fw-600">
                         Business Name <span>:</span>
                       </span>
-                      {customerData.shopName}
+                      {!customerData.shopName
+                        ? "No Business"
+                        : customerData.shopName}
                     </li>
                     <li>
                       <span className="fw-600">
@@ -279,131 +318,95 @@ function CustomerDetail({ customerData }) {
                 <h5 className="blue-1 mb-4">KYC Details</h5>
 
                 <ul className="blue-1 fs-14">
-                  <li> <span className="fw-600">Id Front Image <span>: </span></span>
+                  <li>
+                    {" "}
+                    <span className="fw-600">
+                      Id Front Image <span>: </span>
+                    </span>
                     <br />
-                    <a href={generateFilePath(customerData.idFrontImage)}><img src={generateFilePath(customerData?.idFrontImage)} alt="" style={{ height: 100, width: 100 }} /></a>
+                    <a href={generateFilePath(customerData.idFrontImage)}>
+                      <img
+                        src={generateFilePath(customerData?.idFrontImage)}
+                        alt=""
+                        style={{ height: 100, width: 100 }}
+                      />
+                    </a>
                   </li>
-                  <li> <span className="fw-600">Id Back Image <span>: </span></span>
+
+                  <li>
+                    {" "}
+                    <span className="fw-600">
+                      Id Back Image <span>: </span>
+                    </span>
                     <br />
-                    <a href={generateFilePath(customerData.idFrontImage)}><img src={generateFilePath(customerData?.idBackImage)} alt="" style={{ height: 100, width: 100 }} /></a>
+                    <a href={generateFilePath(customerData.idFrontImage)}>
+                      <img
+                        src={generateFilePath(customerData?.idBackImage)}
+                        alt=""
+                        style={{ height: 100, width: 100 }}
+                      />
+                    </a>
                   </li>
+                  <li>
+                    <span className="fw-600">
+                      KYC status <span>: </span>
+                    </span>
 
-                  {customerData?.bankDetails?.length > 0 && customerData?.bankDetails?.map((bank, i) =>
-                  (<>
-                    <li> <span className="fw-600">Bank Name <span>: </span></span>
-                      {bank?.bank}
-                    </li>
-                    <li> <span className="fw-600">Bank Type <span>: </span></span>
-                      {bank?.banktype.charAt(0).toUpperCase() + bank?.banktype.slice(1)}
-                    </li>
+                    <Switch
+                      onChange={(e) =>
+                        handleChangeKycStatus(
+                          customerData._id,
+                          e.target.checked
+                        )
+                      }
+                      checked={customerData.kycStatus}
+                    />
+                  </li>
+                  {customerData?.bankDetails?.length > 0 &&
+                    customerData?.bankDetails?.map((bank, i) => (
+                      <>
+                        <li>
+                          {" "}
+                          <span className="fw-600">
+                            Bank Name <span>: </span>
+                          </span>
+                          {bank?.bank}
+                        </li>
+                        <li>
+                          {" "}
+                          <span className="fw-600">
+                            Bank Type <span>: </span>
+                          </span>
+                          {bank?.banktype.charAt(0).toUpperCase() +
+                            bank?.banktype.slice(1)}
+                        </li>
 
-                    <li> <span className="fw-600">Account Number <span>: </span></span>
-                      {bank?.accountNo}
-                    </li>
+                        <li>
+                          {" "}
+                          <span className="fw-600">
+                            Account Number <span>: </span>
+                          </span>
+                          {bank?.accountNo}
+                        </li>
 
-                    <li> <span className="fw-600">Account Name <span>: </span></span>
-                      {bank?.accountName}
-                    </li>
+                        <li>
+                          {" "}
+                          <span className="fw-600">
+                            Account Name <span>: </span>
+                          </span>
+                          {bank?.accountName}
+                        </li>
 
-                    <li> <span className="fw-600">IFSC Code <span>: </span></span>
-                      {bank?.ifsc}
-                    </li>
-                  </>
-                  )
-                  )}
+                        <li>
+                          {" "}
+                          <span className="fw-600">
+                            IFSC Code <span>: </span>
+                          </span>
+                          {bank?.ifsc}
+                        </li>
+                      </>
+                    ))}
                 </ul>
-                <div className="col-12 col-md-3">
-                  {/* <div className="customer-profile bg-light border-3 border-start border-dark border-opacity-50 p-4"> */}
-                  {/* <h5 className="blue-1 text-capitalize mb-3">Online Portal </h5>
-                  <img src={generateFilePath(customerData.onlinePortal)} alt={customerData?.firstName} /> */}
-                  {/* <ul className="blue-1 fs-14">
-                      <li>
-                        <span className="fw-600">
-                          Total Orders<span>:</span>
-                        </span>
-                        0
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Confirmed Order<span>:</span>
-                        </span>
-                        0
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Pending Order<span>:</span>
-                        </span>
-                        0
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Completed Order<span>:</span>
-                        </span>
-                        0
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Cancelled Order<span>:</span>
-                        </span>
-                        0
-                      </li>
-                    </ul> */}
-                  {/* </div> */}
-                </div>
-                <div className="col-12 col-md-3 ml-2">
-                  {/* <div className="customer-profile bg-light border-3 border-start border-dark border-opacity-50 p-4"> */}
-                  {/* <h5 className="blue-1 text-capitalize mb-3">Visiting Card</h5>
-                  <img src={generateFilePath(customerData.visitingCard)} alt={customerData?.firstName} /> */}
-
-                  {/* <ul className="blue-1 fs-14">
-                      <li>
-                        <span className="fw-600">
-                          Total Recharge<span>:</span>
-                        </span>
-                        ₹ 0.00
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Pending Balance Approval<span>:</span>
-                        </span>
-                        ₹ 0.00
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Total Balance<span>:</span>
-                        </span>
-                        ₹ 0.00
-                      </li>
-                    </ul> */}
-                  {/* </div> */}
-                </div>
-                <div className="col-12 col-md-3 ml-2 mr-2">
-                  {/* <div className="customer-profile bg-light border-3 border-start border-dark border-opacity-50 p-4"> */}
-                  {/* <h5 className="blue-1 text-capitalize mb-3">Shop Image</h5>
-                  <img src={generateFilePath(customerData.shopImage)} alt={customerData?.firstName} /> */}
-
-                  {/* <ul className="blue-1 fs-14">
-                      <li>
-                        <span className="fw-600">
-                          Total Recharge<span>:</span>
-                        </span>
-                        ₹ 0.00
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Pending Balance Approval<span>:</span>
-                        </span>
-                        ₹ 0.00
-                      </li>
-                      <li>
-                        <span className="fw-600">
-                          Total Balance<span>:</span>
-                        </span>
-                        ₹ 0.00
-                      </li>
-                    </ul> */}
-                  {/* </div> */}
-                </div>
               </div>
             </div>
           </DashboardBox>

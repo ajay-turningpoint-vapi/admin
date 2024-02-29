@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { CONTESTAdd, CONTESTUpdate, SetCONTESTObj } from "../../redux/actions/Contest/Contest.actions";
+import {
+  CONTESTAdd,
+  CONTESTUpdate,
+  SetCONTESTObj,
+} from "../../redux/actions/Contest/Contest.actions";
 import { ReelsAdd, ReelsUpdate } from "../../redux/actions/Reels/reels.actions";
 import { toastError } from "../../utils/toastUtils";
 import CustomButton from "../Utility/Button";
@@ -9,9 +13,8 @@ import { DashboardBox } from "../Utility/DashboardBox";
 import FileUpload from "../Utility/FileUpload";
 import MultiFileUpload from "../Utility/MultipleFileUpload";
 
-
 const AddReels = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -23,47 +26,40 @@ const AddReels = () => {
   const [isVideo, setIsVideo] = useState(false);
   const [filesArr, setFilesArr] = useState([]);
 
-
-
   const handleAddTimeOut = (value, index) => {
     let tempArr = filesArr;
-    tempArr[index].displayLikeAfter = value
+    tempArr[index].displayLikeAfter = value;
 
-
-    setFilesArr([...tempArr])
-
-  }
-
+    setFilesArr([...tempArr]);
+  };
 
   const handleAddPoints = (value, index) => {
     let tempArr = filesArr;
-    tempArr[index].points = value
+    tempArr[index].points = value;
 
-
-    setFilesArr([...tempArr])
-
-  }
+    setFilesArr([...tempArr]);
+  };
 
   const handleDeleteItem = (index) => {
-    setFilesArr([...filesArr.filter((el, i) => i != index)])
-  }
-
-
-
+    setFilesArr([...filesArr.filter((el, i) => i != index)]);
+  };
 
   const handleFileChange = (event) => {
     console.log(event, "ASDASD");
-    setFilesArr([...event.map(el => `${el.base64}`.includes("video") ? { ...el, isVideo: true, displayLikeAfter: 0, points: 0 } : { ...el, isVideo: false, displayLikeAfter: 0, points: 0 })])
-    // handleUploadImage(event)
+    setFilesArr([
+      ...event.map((el) =>
+        `${el.base64}`.includes("video")
+          ? { ...el, isVideo: true, displayLikeAfter: 0, points: 0 }
+          : { ...el, isVideo: false, displayLikeAfter: 0, points: 0 }
+      ),
+    ]);
   };
-
 
   useEffect(() => {
     if (filesArr) {
-      console.log(filesArr, "filesArr")
+      console.log(filesArr, "filesArr");
     }
-  }, [filesArr])
-
+  }, [filesArr]);
 
   useEffect(() => {
     if (reelsObj) {
@@ -106,20 +102,13 @@ const AddReels = () => {
     //   }
     // }
 
-
-
     // if (isUpdateContest) {
     //   dispatch(ReelsUpdate(obj, reelsObj._id));
     // } else {
     dispatch(ReelsAdd(filesArr));
     // }
-    navigate(-1)
-
-
+    navigate(-1);
   };
-
-
-
 
   return (
     <main>
@@ -149,59 +138,102 @@ const AddReels = () => {
 
                     <div className="col-md-6 mb-3">
                       <label className="mb-2">
-                        Image/Video {isVideo ? "Video" : "Image"}<span className="red">*</span>
+                        Image/Video {isVideo ? "Video" : "Image"}
+                        <span className="red">*</span>
                       </label>
-                      <MultiFileUpload onFileChange={handleFileChange} getVideoDuration={true} acceptImage={true} multiple={true} />
+                      <MultiFileUpload
+                        onFileChange={handleFileChange}
+                        getVideoDuration={true}
+                        acceptImage={true}
+                        multiple={true}
+                      />
                     </div>
 
                     <hr />
 
-                    {
-                      filesArr && filesArr.length > 0 && filesArr.map((el, index) => {
+                    {filesArr &&
+                      filesArr.length > 0 &&
+                      filesArr.map((el, index) => {
                         return (
-                          <div className="row d-flex" style={{ display: "flex", flexDirection: "row", marginLeft: 10 }}>
+                          <div
+                            className="row d-flex"
+                            style={{
+                              display: "flex",
+                              flexDirection: "row",
+                              marginLeft: 10,
+                            }}
+                          >
                             <div className="col-12">
                               <div className="row">
-                                <button className="ms-auto col-1" style={{ border: "none", outline: "none", backgroundColor: "white" }} onClick={() => handleDeleteItem(index)}>x</button>
+                                <button
+                                  className="ms-auto col-1"
+                                  style={{
+                                    border: "none",
+                                    outline: "none",
+                                    backgroundColor: "white",
+                                  }}
+                                  onClick={() => handleDeleteItem(index)}
+                                >
+                                  x
+                                </button>
                                 <div className="row d-flex justify-content-between">
-
                                   <div className="col-5">
                                     <div className="row">
-                                      <label htmlFor="">Enter Time in seconds to display like button after ({el?.link?.name})</label>
-                                      <input className="border rounded me-3 py-2" type={"number"} onChange={(e) => handleAddTimeOut(e.target.value, index)} value={el?.displayLikeAfter} />
+                                      <label htmlFor="">
+                                        Enter Time in seconds to display like
+                                        button after ({el?.link?.name})
+                                      </label>
+                                      <input
+                                        className="border rounded me-3 py-2"
+                                        type={"number"}
+                                        onChange={(e) =>
+                                          handleAddTimeOut(
+                                            e.target.value,
+                                            index
+                                          )
+                                        }
+                                        value={el?.displayLikeAfter}
+                                      />
                                     </div>
                                   </div>
                                   <div className="col-5">
                                     <div className="row">
                                       <label htmlFor="">Points</label>
-                                      <input className="border rounded me-3 py-2" type={"number"} onChange={(e) => handleAddPoints(e.target.value, index)} value={el?.points} />
+                                      <input
+                                        className="border rounded me-3 py-2"
+                                        type={"number"}
+                                        onChange={(e) =>
+                                          handleAddPoints(e.target.value, index)
+                                        }
+                                        value={el?.points}
+                                      />
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-
                           </div>
-                        )
-                      })
-                    }
-
-
+                        );
+                      })}
 
                     <div className="col-12 mt-2">
-                      <CustomButton btntype="button" ClickEvent={handleSubmit} isBtn iconName="fa-solid fa-check" btnName={"Add New "} />
+                      <CustomButton
+                        btntype="button"
+                        ClickEvent={handleSubmit}
+                        isBtn
+                        iconName="fa-solid fa-check"
+                        btnName={"Add New "}
+                      />
                     </div>
                   </div>
                 </DashboardBox>
               </div>
             </div>
-
           </form>
-        </div >
-      </section >
-    </main >
+        </div>
+      </section>
+    </main>
   );
-}
+};
 
 export default AddReels;
-

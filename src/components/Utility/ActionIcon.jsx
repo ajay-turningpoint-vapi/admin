@@ -7,7 +7,6 @@ const CustomButtonButton = React.forwardRef(function ForwardRef(props, ref) {
 });
 
 function ActionIcon({ remove, edit, disable, detailpath, detailClick, detail, deletePath, onDeleteClick, onEditClick, Uniquekey, approve, decline, onClick, editPath = "/", isRedirected }) {
-  console.log(edit, editPath, onEditClick);
   return (
     <ul className="d-flex align-items-center gap-2 add-delete-icon" key={Uniquekey}>
       {disable && (

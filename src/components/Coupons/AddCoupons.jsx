@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import { useDispatch, useSelector } from "react-redux";
-import { COUPONAdd, COUPONUpdate, SetCOUPONObj ,CouponMultipleAdd} from "../../redux/actions/Coupon/Coupon.actions";
+import {
+  COUPONAdd,
+  COUPONUpdate,
+  SetCOUPONObj,
+  CouponMultipleAdd,
+} from "../../redux/actions/Coupon/Coupon.actions";
 import CustomButton from "../Utility/Button";
 import { generalModelStatuses } from "../Utility/constants";
 import { DashboardBox } from "../Utility/DashboardBox";
 import FileUpload from "../Utility/FileUpload";
 import Select from "react-select";
 import { generateFilePath } from "../Utility/utils";
-import moment from "moment"
+import moment from "moment";
 import { PRODUCTGet } from "../../redux/actions/Product/Product.actions";
 import { toastError } from "../Utility/ToastUtils";
 import { useNavigate } from "react-router-dom";
@@ -29,20 +34,17 @@ function AddCoupons() {
   const bannerObj = useSelector((state) => state.coupon.couponObj);
   const [previousImage, setPreviousImage] = useState("");
 
-
   const [discountTypeArr, setDiscountTypeArr] = useState([
-    { label: "PERCENTAGEOFF", value: "PERCENTAGEOFF", },
-    { label: "AMOUNTOFF", value: "AMOUNTOFF", },
-
+    { label: "PERCENTAGEOFF", value: "PERCENTAGEOFF" },
+    { label: "AMOUNTOFF", value: "AMOUNTOFF" },
   ]);
 
   // Multiple  Coupon Add
-  const [couponVal, setCouponVal] = useState(""); 
-  const [totalCoupon, setTotalCoupon] = useState(); 
-  const [coupons, setCoupons] = useState([{ value: 0, count :0 }])
-  const [productId, setproductId] = useState("")
-  const [productList, setproductList] = useState("")
-
+  const [couponVal, setCouponVal] = useState("");
+  const [totalCoupon, setTotalCoupon] = useState();
+  const [coupons, setCoupons] = useState([{ value: 0, count: 0 }]);
+  const [productId, setproductId] = useState("");
+  const [productList, setproductList] = useState("");
 
   const handleFileSet = (value) => {
     // console.log(value);
@@ -51,7 +53,7 @@ function AddCoupons() {
 
   useEffect(() => {
     if (bannerObj) {
-      console.log(bannerObj, "bannerObj")
+      console.log(bannerObj, "bannerObj");
       // setselectedCouponId(bannerObj._id);
       // setName(bannerObj.name);
       // setDescription(bannerObj.description);
@@ -72,16 +74,12 @@ function AddCoupons() {
 
   useEffect(() => {
     dispatch(PRODUCTGet());
-
   }, []);
   useEffect(() => {
-    if(productArr){
-      setproductList(productArr)
-
-    } 
-
+    if (productArr) {
+      setproductList(productArr);
+    }
   }, [productArr]);
- 
 
   const handleSubmit = () => {
     let obj = {
@@ -102,22 +100,20 @@ function AddCoupons() {
   };
 
   const handleMultipleSubmit = () => {
-    
-
-    if(`${productId}` == ''){
-        toastError("Please Select Product");
-       return
+    if (`${productId}` == "") {
+      toastError("Please Select Product");
+      return;
     }
-    if(`${couponVal}` == ''){
+    if (`${couponVal}` == "") {
       toastError("Please fill Total Coupon Value");
-     return
-  }
-    let obj = {
-      amount:couponVal,
-      count:totalCoupon,
-      coupons,
-      productId
+      return;
     }
+    let obj = {
+      amount: couponVal,
+      count: totalCoupon,
+      coupons,
+      productId,
+    };
     console.log(obj);
 
     if (isUpdateBanner) {
@@ -125,54 +121,52 @@ function AddCoupons() {
     } else {
       dispatch(CouponMultipleAdd(obj));
 
-      navigate('/Coupon/ViewCoupons');
+      navigate("/Coupon/ViewCoupons");
     }
   };
 
+  let handleCouponArrayAdd = () => {
+    setCoupons([...coupons, { value: "", count: "" }]);
+  };
 
+  let handleChangeCouponArr = (i, e) => {
+    let newCoupons = [...coupons];
+    newCoupons[i][e.target.name] = e.target.value;
+    setCoupons(newCoupons);
+  };
 
- let handleCouponArrayAdd = () => {
-  setCoupons([...coupons, { value: "", count: "" }])
-}
-
-let handleChangeCouponArr = (i, e) => {
-  let newCoupons = [...coupons];
-  newCoupons[i][e.target.name] = e.target.value;
-  setCoupons(newCoupons);
-}
-
-let removeCouponFields = (i) => {
-  let newCoupons = [...coupons];
-  newCoupons.splice(i, 1);
-  setCoupons(newCoupons)
-}
+  let removeCouponFields = (i) => {
+    let newCoupons = [...coupons];
+    newCoupons.splice(i, 1);
+    setCoupons(newCoupons);
+  };
 
   const handleCoupnValueAdd = (event) => {
-    console.log(event.target.value, discountType)
+    console.log(event.target.value, discountType);
     if (discountType != "" && discountType.value == "PERCENTAGEOFF") {
       if (!(event.target.value > 100)) {
         console.log("Asdas");
-        setValue(event.target.value)
+        setValue(event.target.value);
+      } else {
+        alert("cannot be more than 100");
+        setValue(100);
       }
-      else {
-        alert("cannot be more than 100")
-        setValue(100)
-      }
+    } else {
+      setValue(event.target.value);
     }
-    else {
-      setValue(event.target.value)
-    }
-  }
+  };
 
   return (
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
-          <h5 className="blue-1 mb-4">{isUpdateBanner ? "Update" : "Add New "} Coupon</h5>
+          <h5 className="blue-1 mb-4">
+            {isUpdateBanner ? "Update" : "Add New "} Coupon
+          </h5>
           <form action="#" className="form">
-             {/* Multiple Coupon Create */}
+            {/* Multiple Coupon Create */}
 
-             <div className="row">
+            <div className="row">
               <div className="col-12 col-md-8 mb-0">
                 <DashboardBox>
                   <div className="row">
@@ -181,66 +175,116 @@ let removeCouponFields = (i) => {
                       <label>
                         Product List <span className="red">*</span>
                       </label>
-                      <select className="form-control" value={productId} onChange={(e)=>{setproductId(e.target.value)}}>
+                      <select
+                        className="form-control"
+                        value={productId}
+                        onChange={(e) => {
+                          setproductId(e.target.value);
+                        }}
+                      >
                         <option value="">Please Select Product</option>
-                        {
-                          productList && productList.map(product =>(<option value={product?._id}>{product?.name}</option>) )
-                        }
+                        {productList &&
+                          productList.map((product) => (
+                            <option value={product?._id}>
+                              {product?.name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div className="col-md-6">
                       <label>
                         Total Coupon Value <span className="red">*</span>
                       </label>
-                      <input value={couponVal}  onChange={(event) => setCouponVal(event.target.value)} type="text" className="form-control" />
+                      <input
+                        value={couponVal}
+                        onChange={(event) => setCouponVal(event.target.value)}
+                        type="text"
+                        className="form-control"
+                      />
                     </div>
                     <div className="col-md-6">
                       <label>
                         No of Coupon <span className="red">*</span>
                       </label>
-                      <input value={totalCoupon} name="count" onChange={(event) => setTotalCoupon(event.target.value)} type="text" className="form-control" />
+                      <input
+                        value={totalCoupon}
+                        name="count"
+                        onChange={(event) => setTotalCoupon(event.target.value)}
+                        type="text"
+                        className="form-control"
+                      />
                     </div>
 
                     <div className="col-md-12">
-                      <h6 className="blue-1 my-2">
-                        Coupons
-                      </h6>
-                      { coupons.map((element, index) => (
-                      <div className="row" key={index}>
+                      <h6 className="blue-1 my-2">Coupons</h6>
+                      {coupons.map((element, index) => (
+                        <div className="row" key={index}>
                           <div className="col-md-4">
-                          <label>Coupon Value <span className="red">*</span> </label>
-                          <input name="value" type="text" value={element.value} onChange={e => handleChangeCouponArr(index, e)} className="form-control" required />
+                            <label>
+                              Coupon Value <span className="red">*</span>{" "}
+                            </label>
+                            <input
+                              name="value"
+                              type="text"
+                              value={element.value}
+                              onChange={(e) => handleChangeCouponArr(index, e)}
+                              className="form-control"
+                              required
+                            />
                           </div>
                           <div className="col-md-4">
-                          <label>No of Coupon <span className="red">*</span> </label>
+                            <label>
+                              No of Coupon <span className="red">*</span>{" "}
+                            </label>
 
-                          <input name="count"   type="number" value={element.count} min="0" onChange={e => handleChangeCouponArr(index, e)}  className="form-control" required />
+                            <input
+                              name="count"
+                              type="number"
+                              value={element.count}
+                              min="0"
+                              onChange={(e) => handleChangeCouponArr(index, e)}
+                              className="form-control"
+                              required
+                            />
                           </div>
-                          
-                          {
-                        index ? 
-                          <div className="col-md-2">
-                                   <button className="btn btn-danger btn-sm mt-4" onClick={() => removeCouponFields(index)}><i className="fa-solid fa-trash"> </i> </button>
-                          </div>
-                          :
-                          null}
-                      </div>
+
+                          {index ? (
+                            <div className="col-md-2">
+                              <button
+                                className="btn btn-danger btn-sm mt-4"
+                                onClick={() => removeCouponFields(index)}
+                              >
+                                <i className="fa-solid fa-trash"> </i>{" "}
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
                       ))}
                     </div>
                     <div className="col-md-4">
-                          <button type="button"  className="btn btn-secondary btn-sm"  onClick={handleCouponArrayAdd}><i className="fa-solid fa-plus"> </i> Add</button>
-                          </div>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={handleCouponArrayAdd}
+                      >
+                        <i className="fa-solid fa-plus"> </i> Add
+                      </button>
+                    </div>
                     <div className="col-12 mt-2">
-                      <CustomButton btntype="button" ClickEvent={handleMultipleSubmit} isBtn iconName="fa-solid fa-check" btnName="Save" />
+                      <CustomButton
+                        btntype="button"
+                        ClickEvent={handleMultipleSubmit}
+                        isBtn
+                        iconName="fa-solid fa-check"
+                        btnName="Save"
+                      />
                     </div>
                   </div>
                 </DashboardBox>
               </div>
-            </div> 
-
+            </div>
 
             {/* Single Add Coupon  */}
-
 
             {/* <div className="row">
               <div className="col-12 col-md-8 mb-0">
