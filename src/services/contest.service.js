@@ -18,3 +18,6 @@ export const deleteContest = (id) => {
 export const updateContest = (formData, id) => {
   return axios.patch(`${serverUrl}/updateById/${id}`, formData);
 };
+export const getAllJoinedUserContest = (query) => {
+  return axios.get(`${serverUrl}/getAllContest`);
+};

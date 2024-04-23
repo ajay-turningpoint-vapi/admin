@@ -1,4 +1,4 @@
-import { Switch } from "@mui/material";
+import { Button, Menu, Switch } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { images } from "../Images/Images";
@@ -35,7 +35,9 @@ function Customer() {
   const userArr = useSelector((state) => state.users.users);
   const [selectedData, setSelectedData] = useState(null);
   const [search, setSearch] = useState("");
-
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [userKycStatus, setUserKycStatus] = useState(null);
+  const open = Boolean(anchorEl);
   const handleChangeActiveStatus = async (id, value) => {
     try {
       let { data: res } = await updateUserStatus(id, { status: value });
@@ -54,26 +56,6 @@ function Customer() {
     }
   };
 
-  const handleChangeKycStatus = async (id, value) => {
-    try {
-      let { data: res } = await updateUserKycStatus(id, { value: value });
-      if (res.message) {
-        alert(res.message);
-        handleGetAllUsers();
-      }
-    } catch (err) {
-      if (err.response.data.message) {
-        console.error(err.response.data.message);
-        alert(err.response.data.message);
-      } else {
-        console.error(err.message);
-        alert(err.message);
-      }
-    }
-
-    console.log(id, value);
-  };
-
   const handleModalSet = (e, row) => {
     e.preventDefault();
     setModalBox(true);
@@ -81,47 +63,50 @@ function Customer() {
     setModalName("Customer Information");
     setSelectedData(row);
   };
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const conditionalRowStyles = [
+    {
+      when: (row) => row.isOnline === true,
+      style: {
+        backgroundColor: "#c6efce", // Light green background for online rows
+      },
+    },
+  ];
 
   const users_columns = [
     {
       name: "ID",
       cell: (row, index) => <p>{index + 1}</p>,
       sortable: true,
-      width: "15%",
-    },
-    {
-      name: "AVATAR",
-      cell: (row) =>
-        row.image && row.image != "" ? (
-          <img
-            src={generateFilePath(row.image) || row.image}
-            alt={row.firstname}
-          />
-        ) : (
-          <img src={images.customer} alt={row.firstname} />
-        ),
-      width: "10%",
+      width: "5%",
     },
     {
       name: "NAME",
       cell: (row) => <p>{row.name}</p>,
-      width: "10%",
+      width: "15%",
     },
     {
       name: "EMAIL",
       cell: (row) => <p>{row.email}</p>,
-      width: "15%",
+      width: "20%",
     },
     {
       name: "PHONE",
       cell: (row) => <p>{row.phone}</p>,
-      width: "10%",
+      width: "9%",
     },
     {
       name: "ROLE",
       selector: (row) => row.role,
-      width: "10%",
+      width: "9%",
     },
+
     {
       name: "IS ACTIVE",
       button: true,
@@ -131,9 +116,31 @@ function Customer() {
           checked={row.isActive}
         />
       ),
-      width: "10%",
+      width: "6%",
     },
-
+    {
+      name: "KYC Status",
+      selector: (row) => {
+        let color;
+        switch (row.kycStatus) {
+          case "pending":
+            color = "#FFBF00";
+            break;
+          case "submitted":
+          case "rejected":
+            color = "red";
+            break;
+          case "approved":
+            color = "#097969";
+            break;
+          default:
+            color = "black"; // or any other default color
+            break;
+        }
+        return <p style={{ color }}>{row.kycStatus}</p>;
+      },
+      width: "8%",
+    },
     {
       name: "Action",
       cell: (row) => (
@@ -149,7 +156,13 @@ function Customer() {
             to={`/user-point-history/${row?._id}`}
             className="btn btn-secondary ms-2 text-white"
           >
-            Point History
+            Points
+          </Link>
+          <Link
+            to={`/user-activity-log/${row?._id}`}
+            className="btn btn-secondary ms-2 text-white"
+          >
+            Logs
           </Link>
           {selectedData && (
             <EditModal
@@ -183,17 +196,19 @@ function Customer() {
   ]);
 
   const handleGetAllUsers = () => {
-    dispatch(usersGet());
+    let query = "";
+    query += "?role=CARPENTER";
+    if (userKycStatus !== null) {
+      query += `&kycStatus=${userKycStatus}`;
+    }
+
+    dispatch(usersGet(query));
   };
   useEffect(() => {
     if (userArr && userArr.length) {
       setUsersArr(userArr);
       setDisplayUsersArr(userArr);
       console.log(userArr, "userArr");
-      console.log(
-        usersArr.filter((el) => !el.isActive),
-        "usersArr.filter((el) => el.isActive)"
-      );
       setActiveUsersArr(usersArr.filter((el) => el.isActive));
       setInActiveUsersArr(usersArr.filter((el) => !el.isActive));
     }
@@ -201,7 +216,9 @@ function Customer() {
 
   useEffect(() => {
     handleGetAllUsers();
-  }, []);
+  }, [userKycStatus]);
+   
+console.log(userArr);
 
   const handleSearch = (q) => {
     console.log(search, "search", q);
@@ -218,14 +235,18 @@ function Customer() {
       setUsersArr(searchArr);
     }
   };
+
+
+  
   const handleGetTselectedTable = () => {
     if (tabList.filter((el) => el.active)[0].tabName == "All Customer") {
       return (
         <DataTable
-          paginationPerPage={20}
+          paginationPerPage={10}
           columns={users_columns}
           data={usersArr}
           pagination
+          conditionalRowStyles={conditionalRowStyles}
         />
       );
     } else if (
@@ -233,19 +254,21 @@ function Customer() {
     ) {
       return (
         <DataTable
-          paginationPerPage={100}
+          paginationPerPage={10}
           columns={users_columns}
           data={activeUsersArr}
           pagination
+          conditionalRowStyles={conditionalRowStyles}
         />
       );
     } else {
       return (
         <DataTable
-          paginationPerPage={100}
+          paginationPerPage={10}
           columns={users_columns}
           data={inActiveUsersArr}
           pagination
+          conditionalRowStyles={conditionalRowStyles}
         />
       );
     }
@@ -284,6 +307,40 @@ function Customer() {
             <div className="d-flex align-items-center justify-content-between mb-5">
               <h5 className="blue-1 m-0">Active Customer</h5>
               <div className="d-flex align-items-center gap-3">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  Online-Users
+                  <div
+                    style={{
+                      backgroundColor: "#c6efce",
+                      width: "50px",
+                      height: "20px",
+                      marginLeft: "10px",
+                    }}
+                  ></div>
+                </div>
+
+                <label>KYC</label>
+                <select
+                  className="form-control"
+                  style={{ width: "auto" }}
+                  value={userKycStatus}
+                  onChange={(e) => {
+                    setUserKycStatus(e.target.value);
+                  }}
+                >
+                  <option value="">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="submitted">Submitted</option>
+                </select>
+
                 <div className="search-field">
                   <form action="#" className="form">
                     <div className="input-group">
@@ -302,6 +359,7 @@ function Customer() {
                     </div>
                   </form>
                 </div>
+
                 {/* <CustomButton isLink iconName="fa-solid fa-download" btnName="Customer CSV" path="/" small roundedPill downloadAble ClickEvent={() => downloadCSV(usersArr)} /> */}
               </div>
             </div>

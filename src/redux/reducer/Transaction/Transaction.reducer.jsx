@@ -1,4 +1,7 @@
-import { toastError, toastSuccess } from "../../../components/Utility/ToastUtils";
+import {
+  toastError,
+  toastSuccess,
+} from "../../../components/Utility/ToastUtils";
 import * as TRANSACTION from "../../actions/Transcaction/Transaction.actions";
 
 const initialState = {
@@ -6,6 +9,8 @@ const initialState = {
   transactionObj: null,
   loading: false,
   error: null,
+  transactionCount: 0,
+  totalPages: 0,
 };
 
 export const TransactionReducer = (state = initialState, action) => {
@@ -21,6 +26,8 @@ export const TransactionReducer = (state = initialState, action) => {
         loading: false,
         error: null,
         transaction: action.payload.data,
+        transactionCount: action.payload.count,
+        totalPages: action.payload.totalPages,
       };
     case TRANSACTION.GET_ALL_TRANSACTIONS_FAIL:
       toastError(action.payload);
@@ -43,7 +50,6 @@ export const TransactionReducer = (state = initialState, action) => {
         loading: false,
         error: null,
       };
-
 
     case TRANSACTION.UPDATE_TRANSACTION_BY_ID:
       return {

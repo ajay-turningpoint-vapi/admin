@@ -7,7 +7,7 @@ import {
   TransactionUpdateStatus,
 } from "../../redux/actions/Transcaction/Transaction.actions";
 import { getById } from "../../services/users.service";
-import { Modal, Box } from "@mui/material";
+import { Modal, Box, Pagination } from "@mui/material";
 import SearchBox from "../Utility/SearchBox";
 import { DashboardBox, DashboardTable } from "../Utility/DashboardBox";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
@@ -15,14 +15,18 @@ import moment from "moment";
 
 export const Transactions = () => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
   const [ModalBox, setModalBox] = useState(false);
   const [modalData, setModalData] = useState(null);
   const transactionArr = useSelector((state) => state.transaction.transaction);
+  const transactionArrTotalPages = useSelector(
+    (state) => state.transaction.totalPages
+  );
   const [transactionAllArr, setTransactionAllArr] = useState([]);
   const [successTransactionArr, setSuccessUsersArr] = useState([]);
   const [pendingTransactionArr, setPendingTransactionArr] = useState([]);
   const [rejectTransactionArr, setRejectTransactionArr] = useState("");
-  const [pageLimit, setPageLimit] = useState(1000);
+  const [pageLimit, setPageLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("");
   const [reason, setReason] = useState("");
@@ -54,7 +58,7 @@ export const Transactions = () => {
     query += `&order=desc`;
     // }
     console.log("GET CALLED", query);
-    dispatch(TRANSACTIONGet(query));
+    dispatch(TRANSACTIONGet(query)).then(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -64,10 +68,6 @@ export const Transactions = () => {
     e.preventDefault();
     setModalBox(true);
     try {
-      console.log(row, "row");
-      // let data = await getById(row.userId);
-      // let userData = data?.data?.data;
-      // row.user = userData;
       setModalData(row);
       setStatus(row?.status);
       setReason(row?.reason ? row?.reason : "");
@@ -124,30 +124,17 @@ export const Transactions = () => {
     {
       name: "Transfer",
       selector: (row) => row?.additionalInfo?.transferType,
-      width: "10%",
+      width: "7%",
     },
     {
       name: "Amount",
       selector: (row) => row.amount,
-      width: "10%",
+      width: "7%",
     },
-    {
-      name: "Coupon Code",
-      selector: (row) =>
-        row?.additionalInfo?.transferDetails?.couponCode
-          ? row?.additionalInfo?.transferDetails?.couponCode
-          : "NA",
-      width: "10%",
-    },
-    //   {
-    //     name: "Amount",
-    //     selector: (row) => row.type == 'CREDIT' ?  <span className="text-success"><i className="fa fa-arrow-up "> </i>  {row.amount} </span> : <span className="text-danger"><i className="fa fa-arrow-down "> </i> {row.amount}</span>  ,
-    //     width: "10%",
-    //   },
     {
       name: "Description",
       cell: (row) => <p>{row.description}</p>,
-      width: "30%",
+      width: "25%",
     },
     {
       name: "Status",
@@ -219,7 +206,7 @@ export const Transactions = () => {
       setPendingTransactionArr(tempArr.filter((el) => el.status == "pending"));
       setRejectTransactionArr(tempArr.filter((el) => el.status == "reject"));
     }
-  }, [transactionArr]);
+  }, [transactionArr, page, pageLimit]);
 
   const tabClick = (i, tabList, settabList) => {
     let temp = tabList.map((item, index) => {
@@ -237,7 +224,9 @@ export const Transactions = () => {
 
     settabList([...temp]);
   };
-
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
   const handleGetTselectedTable = () => {
     let arr = [];
     if (tabList.filter((el) => el.active)[0].tabName == "All Transactions") {
@@ -305,37 +294,25 @@ export const Transactions = () => {
                   </div>
                 </div>
               </div>
-              <DashboardTable>
-                <DataTable
-                  pagination
-                  paginationPerPage={100}
-                  columns={transaction_columns}
-                  data={transactionArr?.length ? transactionArr : []}
-                />
-              </DashboardTable>
-              <div className="d-flex align-items-center justify-content-between mt-4">
-                <h5 className="blue-1 m-0"></h5>
-
-                <div className="d-flex gap-3">
-                  {page > 1 ? (
-                    <button
-                      className="btn  btn-1 bg-black text-white"
-                      onClick={() => setPage(parseInt(page - 1))}
-                    >
-                      Previous
-                    </button>
-                  ) : null}
-                  {transactionAllArr &&
-                    transactionAllArr?.length > pageLimit && (
-                      <button
-                        className="btn  btn-1 bg-black text-white"
-                        onClick={() => setPage(parseInt(page + 1))}
-                      >
-                        Next
-                      </button>
-                    )}
-                </div>
-              </div>
+              {loading ? (
+                "Loading..."
+              ) : (
+                <DashboardTable>
+                  <DataTable
+                    columns={transaction_columns}
+                    data={transactionArr?.length ? transactionArr : []}
+                  />
+                  <div className="d-flex align-items-center justify-content-between mt-4">
+                    <h5 className="blue-1 m-0"></h5>
+                    <Pagination
+                      count={transactionArrTotalPages}
+                      onChange={handlePageChange}
+                      showFirstButton
+                      showLastButton
+                    />
+                  </div>
+                </DashboardTable>
+              )}
             </div>
           </div>
         </div>

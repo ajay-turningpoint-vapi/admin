@@ -2,7 +2,7 @@ import React from "react";
 
 export function DashboardBox({ children, className }) {
   return (
-    <div className={className ? `dashboard-box ${className}` : "dashboard-box"}>
+    <div className={className ? `dashboard-box ${className}` : "dashboard-box"} >
       {children}
     </div>
   );

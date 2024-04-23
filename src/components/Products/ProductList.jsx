@@ -7,7 +7,11 @@ import CustomButton from "../Utility/Button";
 import { DashboardTable } from "../Utility/DashboardBox";
 import { AddModal } from "../Utility/Modal";
 import { useSelector, useDispatch } from "react-redux";
-import { PRODUCTDelete, PRODUCTGet, SetPRODUCTObj } from "../../redux/actions/Product/Product.actions";
+import {
+  PRODUCTDelete,
+  PRODUCTGet,
+  SetPRODUCTObj,
+} from "../../redux/actions/Product/Product.actions";
 import { generateFilePath } from "../Utility/utils";
 function ProductList() {
   const dispatch = useDispatch();
@@ -35,22 +39,32 @@ function ProductList() {
       name: "SL",
       selector: (row, index) => index + 1,
       sortable: true,
-      width: "15%",
+      width: "5%",
     },
     {
       name: "Name",
       cell: (row) => <p>{row.name}</p>,
-      width: "20%",
+      width: "15%",
     },
     {
       name: "Brand",
       selector: (row) => row.brand,
-      width: "25%",
+      width: "15%",
     },
     {
       name: "Company",
       selector: (row) => row.company,
-      width: "25%",
+      width: "15%",
+    },
+    {
+      name: "Sale Price",
+      selector: (row) => row.salePrice,
+      width: "15%",
+    },
+    {
+      name: "Commision Allowed(%)",
+      selector: (row) => row.commisionAllowed,
+      width: "15%",
     },
     // {
     //   name: "Image",
@@ -84,16 +98,21 @@ function ProductList() {
             isRedirected={true}
             onEditClick={() => handleEdit(row)}
             editPath="/Product/AddProduct"
-          // detail
-          // detailClick={(e) => {
-          //   e.preventDefault();
-          //   setModalBox(true);
-          //   setModalType("show-product");
-          //   setModalName(row.Name);
-          // }}
+            // detail
+            // detailClick={(e) => {
+            //   e.preventDefault();
+            //   setModalBox(true);
+            //   setModalType("show-product");
+            //   setModalName(row.Name);
+            // }}
           />
 
-          <AddModal ModalBox={ModalBox} setModalBox={setModalBox} name={ModalName} ModalType={ModalType} />
+          <AddModal
+            ModalBox={ModalBox}
+            setModalBox={setModalBox}
+            name={ModalName}
+            ModalType={ModalType}
+          />
         </>
       ),
     },
@@ -107,10 +126,19 @@ function ProductList() {
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">
                 <h5 className="blue-1">Product List</h5>
-                <CustomButton isLink iconName="fa-solid fa-plus" btnName="ADD NEW PRODUCT" path="/Product/AddProduct" />
+                <CustomButton
+                  isLink
+                  iconName="fa-solid fa-plus"
+                  btnName="ADD NEW PRODUCT"
+                  path="/Product/AddProduct"
+                />
               </div>
               <DashboardTable>
-                <DataTable columns={product_sale_columns} data={productArr && productArr.length > 0 ? productArr : []} pagination />
+                <DataTable
+                  columns={product_sale_columns}
+                  data={productArr && productArr.length > 0 ? productArr : []}
+                  pagination
+                />
               </DashboardTable>
             </div>
           </div>

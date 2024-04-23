@@ -1,75 +1,88 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
-import CustomButton from "./Button";
-
+import React, { useState, useEffect } from "react";
+import { url } from "../../services/url.service";
+import toast from "react-hot-toast";
+import Lottie from "react-lottie";
+import animationData from "../Utility/loader1.json";
 function MultiFileUpload({
   onFileChange,
+  getVideoDuration,
   acceptImage,
-  returnOriginal,
   multiple = false,
 }) {
   const [filesArr, setFilesArr] = useState([]);
-  const [value, setValue] = useState([]);
-  const [filesConversionToJSONCompleted, setFilesConversionToJSONCompleted] =
-    useState(false);
-  const getBase64 = (file, cb) => {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        resolve(null);
-      }
+  const [uploading, setUploading] = useState(false);
 
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function () {
-        resolve(reader.result);
-      };
-      reader.onerror = function (error) {
-        reject(error);
-        // console.log('Error: ', error)
-      };
-    });
-  };
   const handleFileSelection = async (event) => {
     try {
       event.preventDefault();
+      setUploading(true); // Set uploading to true when starting file upload
       let tempArr = [];
+
       if (event.target.files && event.target.files.length > 0) {
-        for (let i = 0; i <= event.target.files.length - 1; i++) {
-          const result = await getBase64(event.target.files[i]);
-          if (result)
-            tempArr.push({ link: event.target.files[i], base64: result });
-          if (i == event.target.files.length - 1) {
-            setFilesConversionToJSONCompleted(true);
-            setFilesArr([...tempArr]);
-            setValue("");
-          } else {
-            setFilesConversionToJSONCompleted(false);
-            setValue(event.target.files[i]);
-          }
+        const formData = new FormData();
+
+        for (let i = 0; i < event.target.files.length; i++) {
+          formData.append("images", event.target.files[i]);
+        }
+
+        const response = await fetch(`${url}/upload`, {
+          method: "POST",
+          body: formData,
+        });
+
+        if (response.ok) {
+          const fileUrls = await response.json();
+          tempArr = fileUrls.map((url) => ({
+            fileUrl: url,
+            isVideo: url.endsWith(".mp4"),
+            displayLikeAfter: 0,
+            points: 0,
+          }));
+        } else {
+          const errorMessage = await response.text();
+          throw new Error(errorMessage || "Failed to upload files");
         }
       }
+
+      setFilesArr(tempArr);
+      onFileChange(tempArr);
     } catch (error) {
       console.error(error);
+      toast.error(error.message || "Failed to upload files");
+    } finally {
+      setUploading(false); // Set uploading to false when file upload completes
     }
   };
 
   useEffect(() => {
-    if (filesConversionToJSONCompleted) {
-      onFileChange(filesArr);
+    if (filesArr) {
+      console.log(filesArr, "filesArr");
     }
-  }, [filesConversionToJSONCompleted, filesArr]);
+  }, [filesArr]);
 
   return (
     <div className="position-relative">
       <input
-        multiple
+        multiple={multiple}
         type="file"
         onChange={(event) => handleFileSelection(event)}
         className="form-control"
-        accept="image/png, image/gif, image/jpeg,video/mp4,video/x-m4v,video/*"
+        accept={acceptImage ? "image/*" : "video/*"}
       />
-
-      {/* <CustomButton isLink extraClass="position-absolute start-0 top-0 h-100 text-uppercase rounded-0" noIcon btnName="Browse" /> */}
+      {uploading && (
+        <div className="loader">
+          <Lottie
+            options={{
+              loop: true,
+              autoplay: true,
+              animationData: animationData, // Your animation JSON data
+            }}
+            height={70} // Adjust as needed
+            width={70} // Adjust as needed
+            style={{margin:"15px"}}
+          />
+        </div>
+      )}
     </div>
   );
 }

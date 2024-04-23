@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
-@import 'https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css';
-@import 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css';
-@import '../../../node_modules/react-quill/dist/quill.snow.css';
+@import "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css";
+@import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css";
+@import "../../../node_modules/react-quill/dist/quill.snow.css";
 
 html {
   scroll-behavior: smooth;
@@ -205,7 +205,7 @@ main {
 }
 
 .green {
-  color: #54DA8A;
+  color: #54da8a;
 }
 
 .blue-1 {
@@ -225,7 +225,7 @@ main {
 }
 
 .gray-bg {
-  background-color: #F7F7FF !important;
+  background-color: #f7f7ff !important;
 }
 
 a:hover {
@@ -278,7 +278,7 @@ img.client-img {
   object-fit: contain;
 }
 
-a[data-rel^=lightcase] {
+a[data-rel^="lightcase"] {
   position: absolute;
   height: 100%;
   width: 100%;
@@ -289,7 +289,7 @@ a[data-rel^=lightcase] {
   top: 0;
 }
 
-a[data-rel^=lightcase] i {
+a[data-rel^="lightcase"] i {
   height: 75px;
   width: 75px;
   background-color: #fff;
@@ -304,7 +304,7 @@ a[data-rel^=lightcase] i {
   text-transform: capitalize;
 }
 
-.heading+h5 {
+.heading + h5 {
   margin-top: 2pc;
 }
 
@@ -338,7 +338,7 @@ h6 {
   color: #171717;
 }
 
-[class*=swiper-button] {
+[class*="swiper-button"] {
   background-color: #fff !important;
   color: #d35356 !important;
   height: 50px !important;
@@ -350,7 +350,7 @@ h6 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1882352941) !important;
 }
 
-[class*=swiper-button]:after {
+[class*="swiper-button"]:after {
   font-size: 22px !important;
   font-weight: 900 !important;
 }
@@ -369,7 +369,7 @@ a {
   position: relative;
 }
 
-.password-input>i {
+.password-input > i {
   height: 100%;
   width: auto;
   position: absolute;
@@ -454,14 +454,15 @@ a {
 }
 
 .form .position-relative .form-control {
-  padding-left: 30px;
+  padding-left: 14px;
+  padding-top: 9px;
 }
 
-.form [class*=col-] {
+.form [class*="col-"] {
   margin-bottom: 10px;
 }
 
-.form [class*=col-]:last-child {
+.form [class*="col-"]:last-child {
   margin-bottom: 0;
 }
 
@@ -475,7 +476,7 @@ a {
   margin-right: 10px;
 }
 
-.form .form-check input[type=checkbox] {
+.form .form-check input[type="checkbox"] {
   background-size: 16px auto !important;
   border-radius: 0;
   -webkit-appearance: none;
@@ -483,12 +484,12 @@ a {
   transition: all 0.5s;
 }
 
-.form .form-check input[type=checkbox].form-check-input:focus {
+.form .form-check input[type="checkbox"].form-check-input:focus {
   border-color: rgba(0, 0, 0, 0.2509803922);
   box-shadow: none;
 }
 
-.form .form-check input[type=checkbox]:checked {
+.form .form-check input[type="checkbox"]:checked {
   background-color: #000;
   border-color: #000;
   transition: all 0.5s;
@@ -566,7 +567,7 @@ a {
   text-transform: capitalize;
 }
 
-.form .form-control[type=file]+a {
+.form .form-control[type="file"] + a {
   width: 125px;
   pointer-events: none;
   padding-top: 0;
@@ -620,7 +621,7 @@ th {
 }
 
 ul.reviews-star li {
-  color: #FFCE31;
+  color: #ffce31;
   font-size: 27px;
 }
 
@@ -740,7 +741,7 @@ ul.reviews-star li {
   background: transparent;
 }
 
-.quill>.ql-toolbar:first-child {
+.quill > .ql-toolbar:first-child {
   display: none !important;
 }
 
@@ -750,7 +751,6 @@ ul.reviews-star li {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-y: scroll;
 }
 
 .modal-container {
@@ -758,7 +758,7 @@ ul.reviews-star li {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1254901961);
   border-radius: 15px;
   max-height: 500px;
-  overflow: auto;
+  /* overflow: auto; */
 }
 
 .modal-header {
@@ -776,7 +776,11 @@ ul.reviews-star li {
 .modal-header {
   padding: 20px 30px;
 }
-
+.modal-body {
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  max-height: 400px;
+}
 .modal-close {
   position: absolute;
   top: 0;
@@ -812,7 +816,7 @@ ul.reviews-star li {
   filter: grayscale(1) invert(1);
 }
 
-#sidebar ul.sidebar-menu li [id*=sidebar_item] a {
+#sidebar ul.sidebar-menu li [id*="sidebar_item"] a {
   padding-left: 4pc;
 }
 
@@ -830,8 +834,8 @@ ul.reviews-star li {
   position: relative;
 }
 
-#sidebar ul.sidebar-menu li a+.collapse,
-#sidebar ul.sidebar-menu li a+.collapsing {
+#sidebar ul.sidebar-menu li a + .collapse,
+#sidebar ul.sidebar-menu li a + .collapsing {
   background-color: rgba(255, 255, 255, 0.231372549);
 }
 
@@ -856,7 +860,7 @@ ul.reviews-star li {
   left: 0;
   height: 100%;
   width: 5px;
-  background: #2196F3;
+  background: #2196f3;
   transition: all 0.5s;
 }
 
@@ -876,7 +880,7 @@ ul.reviews-star li {
   font-size: 11px;
 }
 
-#sidebar ul.sidebar-menu li a>i {
+#sidebar ul.sidebar-menu li a > i {
   font-size: 17px;
 }
 
@@ -966,7 +970,7 @@ ul.reviews-star li {
   font-size: 14px;
 }
 
-.header .notification-bell i+span.MuiBadge-badge {
+.header .notification-bell i + span.MuiBadge-badge {
   background: black;
   color: #fff;
   animation: box-shadow 3.5s ease-out infinite;
@@ -1097,7 +1101,7 @@ ul.reviews-star li {
   gap: 18px;
 }
 
-.customer-profile li>span {
+.customer-profile li > span {
   width: 175px;
   display: flex;
   justify-content: space-between;
@@ -1126,7 +1130,7 @@ ul.reviews-star li {
   object-fit: contain;
 }
 
-.modal-body .show-product .product-main-image+h5+ul img {
+.modal-body .show-product .product-main-image + h5 + ul img {
   height: 100px;
   width: auto;
   -o-object-fit: contain;
@@ -1139,6 +1143,14 @@ ul.reviews-star li {
   margin-bottom: 8px;
 }
 
+.usercontestactive {
+  color: rgba(255, 159, 64, 1);
+  cursor: pointer;
+}
+.usercontestactivediv :hover {
+  color: rgba(75, 192, 192);
+  cursor: pointer;
+}
 @media print {
   .no-print {
     display: none !important;
@@ -1160,7 +1172,7 @@ ul.reviews-star li {
 }
 
 .asd {
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   font-family: "trebuchet-ms-bold", sans-serif !important;
 }
 

@@ -138,6 +138,11 @@ function SideBar() {
           path: "/Users-list",
           active: false,
         },
+        {
+          name: "All Users Activity Analysis",
+          path: "/Users-Activity-Analysis",
+          active: false,
+        },
       ],
     },
     {
@@ -181,16 +186,15 @@ function SideBar() {
           active: false,
         },
       ],
-
     },
-    {
-      isrotated: false,
-      active: false,
-      name: "User Contests",
-      path: "/user-contests",
-      icon: "fa-solid fa-list-alt ",
-      children: [],
-    },
+    // {
+    //   isrotated: false,
+    //   active: false,
+    //   name: "User Contests",
+    //   path: "/user-contests/:contestId",
+    //   icon: "fa-solid fa-list-alt ",
+    //   children: [],
+    // },
     {
       isrotated: false,
       active: false,
@@ -205,6 +209,14 @@ function SideBar() {
       name: "Reels",
       path: "/Reels/View",
       icon: "fa-solid fa-video-camera",
+      children: [],
+    },
+    {
+      isrotated: false,
+      active: false,
+      name: "Map",
+      path: "/GeoFencing",
+      icon: "fa-solid fa-map",
       children: [],
     },
 

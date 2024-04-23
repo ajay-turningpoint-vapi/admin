@@ -17,6 +17,8 @@ import moment from "moment";
 import { PRODUCTGet } from "../../redux/actions/Product/Product.actions";
 import { toastError } from "../Utility/ToastUtils";
 import { useNavigate } from "react-router-dom";
+import Lottie from "react-lottie";
+import animationData from "../Utility/loader1.json";
 function AddCoupons() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -45,7 +47,7 @@ function AddCoupons() {
   const [coupons, setCoupons] = useState([{ value: 0, count: 0 }]);
   const [productId, setproductId] = useState("");
   const [productList, setproductList] = useState("");
-
+  const [loading, setLoading] = useState(false);
   const handleFileSet = (value) => {
     // console.log(value);
     setImage(value);
@@ -99,7 +101,7 @@ function AddCoupons() {
     }
   };
 
-  const handleMultipleSubmit = () => {
+  const handleMultipleSubmit = async () => {
     if (`${productId}` == "") {
       toastError("Please Select Product");
       return;
@@ -119,9 +121,15 @@ function AddCoupons() {
     if (isUpdateBanner) {
       dispatch(COUPONUpdate(obj, selectedCouponId));
     } else {
-      dispatch(CouponMultipleAdd(obj));
-
-      navigate("/Coupon/ViewCoupons");
+      try {
+        setLoading(true);
+        await dispatch(CouponMultipleAdd(obj));
+        navigate("/Coupon/ViewCoupons");
+      } catch (error) {
+        console.error("Error adding coupon:", error);
+      } finally {
+        setLoading(false); // Hide loader
+      }
     }
   };
 
@@ -163,130 +171,151 @@ function AddCoupons() {
           <h5 className="blue-1 mb-4">
             {isUpdateBanner ? "Update" : "Add New "} Coupon
           </h5>
-          <form action="#" className="form">
-            {/* Multiple Coupon Create */}
 
-            <div className="row">
-              <div className="col-12 col-md-8 mb-0">
-                <DashboardBox>
-                  <div className="row">
-                    <h5 className="blue-1 mb-4">Coupon Information</h5>
-                    <div className="col-md-12">
-                      <label>
-                        Product List <span className="red">*</span>
-                      </label>
-                      <select
-                        className="form-control"
-                        value={productId}
-                        onChange={(e) => {
-                          setproductId(e.target.value);
-                        }}
-                      >
-                        <option value="">Please Select Product</option>
-                        {productList &&
-                          productList.map((product) => (
-                            <option value={product?._id}>
-                              {product?.name}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                    <div className="col-md-6">
-                      <label>
-                        Total Coupon Value <span className="red">*</span>
-                      </label>
-                      <input
-                        value={couponVal}
-                        onChange={(event) => setCouponVal(event.target.value)}
-                        type="text"
-                        className="form-control"
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label>
-                        No of Coupon <span className="red">*</span>
-                      </label>
-                      <input
-                        value={totalCoupon}
-                        name="count"
-                        onChange={(event) => setTotalCoupon(event.target.value)}
-                        type="text"
-                        className="form-control"
-                      />
-                    </div>
-
-                    <div className="col-md-12">
-                      <h6 className="blue-1 my-2">Coupons</h6>
-                      {coupons.map((element, index) => (
-                        <div className="row" key={index}>
-                          <div className="col-md-4">
-                            <label>
-                              Coupon Value <span className="red">*</span>{" "}
-                            </label>
-                            <input
-                              name="value"
-                              type="text"
-                              value={element.value}
-                              onChange={(e) => handleChangeCouponArr(index, e)}
-                              className="form-control"
-                              required
-                            />
-                          </div>
-                          <div className="col-md-4">
-                            <label>
-                              No of Coupon <span className="red">*</span>{" "}
-                            </label>
-
-                            <input
-                              name="count"
-                              type="number"
-                              value={element.count}
-                              min="0"
-                              onChange={(e) => handleChangeCouponArr(index, e)}
-                              className="form-control"
-                              required
-                            />
-                          </div>
-
-                          {index ? (
-                            <div className="col-md-2">
-                              <button
-                                className="btn btn-danger btn-sm mt-4"
-                                onClick={() => removeCouponFields(index)}
-                              >
-                                <i className="fa-solid fa-trash"> </i>{" "}
-                              </button>
-                            </div>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="col-md-4">
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        onClick={handleCouponArrayAdd}
-                      >
-                        <i className="fa-solid fa-plus"> </i> Add
-                      </button>
-                    </div>
-                    <div className="col-12 mt-2">
-                      <CustomButton
-                        btntype="button"
-                        ClickEvent={handleMultipleSubmit}
-                        isBtn
-                        iconName="fa-solid fa-check"
-                        btnName="Save"
-                      />
-                    </div>
-                  </div>
-                </DashboardBox>
-              </div>
+          {loading ? (
+            <div className="loader">
+              <Lottie
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: animationData, // Your animation JSON data
+                }}
+                height={70} // Adjust as needed
+                width={70} // Adjust as needed
+                style={{ margin: "15px" }}
+              />
             </div>
+          ) : (
+            <form action="#" className="form">
+              {/* Multiple Coupon Create */}
 
-            {/* Single Add Coupon  */}
+              <div className="row">
+                <div className="col-12 col-md-8 mb-0">
+                  <DashboardBox>
+                    <div className="row">
+                      <h5 className="blue-1 mb-4">Coupon Information</h5>
+                      <div className="col-md-12">
+                        <label>
+                          Product List <span className="red">*</span>
+                        </label>
+                        <select
+                          className="form-control"
+                          value={productId}
+                          onChange={(e) => {
+                            setproductId(e.target.value);
+                          }}
+                        >
+                          <option value="">Please Select Product</option>
+                          {productList &&
+                            productList.map((product) => (
+                              <option value={product?._id}>
+                                {product?.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                      <div className="col-md-6">
+                        <label>
+                          Total Coupon Value <span className="red">*</span>
+                        </label>
+                        <input
+                          value={couponVal}
+                          onChange={(event) => setCouponVal(event.target.value)}
+                          type="text"
+                          className="form-control"
+                        />
+                      </div>
+                      <div className="col-md-6">
+                        <label>
+                          No of Coupon <span className="red">*</span>
+                        </label>
+                        <input
+                          value={totalCoupon}
+                          name="count"
+                          onChange={(event) =>
+                            setTotalCoupon(event.target.value)
+                          }
+                          type="text"
+                          className="form-control"
+                        />
+                      </div>
 
-            {/* <div className="row">
+                      <div className="col-md-12">
+                        <h6 className="blue-1 my-2">Coupons</h6>
+                        {coupons.map((element, index) => (
+                          <div className="row" key={index}>
+                            <div className="col-md-4">
+                              <label>
+                                Coupon Value <span className="red">*</span>{" "}
+                              </label>
+                              <input
+                                name="value"
+                                type="text"
+                                value={element.value}
+                                onChange={(e) =>
+                                  handleChangeCouponArr(index, e)
+                                }
+                                className="form-control"
+                                required
+                              />
+                            </div>
+                            <div className="col-md-4">
+                              <label>
+                                No of Coupon <span className="red">*</span>{" "}
+                              </label>
+
+                              <input
+                                name="count"
+                                type="number"
+                                value={element.count}
+                                min="0"
+                                onChange={(e) =>
+                                  handleChangeCouponArr(index, e)
+                                }
+                                className="form-control"
+                                required
+                              />
+                            </div>
+
+                            {index ? (
+                              <div className="col-md-2">
+                                <button
+                                  className="btn btn-danger btn-sm mt-4"
+                                  onClick={() => removeCouponFields(index)}
+                                >
+                                  <i className="fa-solid fa-trash"> </i>{" "}
+                                </button>
+                              </div>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="col-md-4">
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={handleCouponArrayAdd}
+                        >
+                          <i className="fa-solid fa-plus"> </i> Add
+                        </button>
+                      </div>
+                      <div className="col-12 mt-2">
+                        <CustomButton
+                          btntype="button"
+                          ClickEvent={handleMultipleSubmit}
+                          isBtn
+                          iconName="fa-solid fa-check"
+                          btnName="Save"
+                        />
+                      </div>
+                    </div>
+                  </DashboardBox>
+                </div>
+              </div>
+
+              {/* Single Add Coupon  */}
+
+              {/* <div className="row">
               <div className="col-12 col-md-8 mb-0">
                 <DashboardBox>
                   <div className="row">
@@ -363,7 +392,8 @@ function AddCoupons() {
                 </DashboardBox>
               </div>
             </div> */}
-          </form>
+            </form>
+          )}
         </div>
       </section>
     </main>

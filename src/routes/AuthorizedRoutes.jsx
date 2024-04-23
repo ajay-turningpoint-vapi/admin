@@ -60,71 +60,228 @@ import Reels from "../components/Reels/Reels";
 import AddReels from "../components/Reels/AddReels";
 import UserContests from "../components/Customer/UserContests";
 import UpdateReel from "../components/Reels/UpdateReel";
+import GeofenceForm from "../components/Map/GeofenceForm.jsx";
+import ActivityLog from "../components/Customer/ActivityLog.jsx";
+import UserContestDashboard from "../components/Customer/UserContestDashboard.jsx";
+import UserActivityAnalysis from "../components/Customer/UserActivityAnalysis.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
       <div className="row g-0">
-        <div className="col-12 col-md-2 no-print" style={{ contain: "content" }}>
+        <div
+          className="col-12 col-md-2 no-print"
+          style={{ contain: "content" }}
+        >
           <SideBar />
         </div>
-        <div className="col-12 col-md-10" style={{ height: "100vh", overflow: "hidden scroll" }}>
+        <div
+          className="col-12 col-md-10"
+          style={{ height: "100vh", overflow: "hidden scroll" }}
+        >
           <Header />
           <Routes>
             <Route exact path="/" element={<Dashboard />}></Route>
             <Route exact path="/Dashboard" element={<Dashboard />}></Route>
-            <Route exact path="/Product/Category" element={<Category />}></Route>
+            <Route
+              exact
+              path="/Product/Category"
+              element={<Category />}
+            ></Route>
             <Route exact path="/Product/Brand" element={<Brand />}></Route>
-            <Route exact path="/Product/Brand-Create" element={<AddBrand />}></Route>
-            <Route exact path="/Product/Attribute" element={<Attribute />}></Route>
-            <Route exact path="/Product/Attribute-Value" element={<AttributeValue />}></Route>
-            <Route exact path="/Product/AddProduct" element={<AddProduct />}></Route>
-            <Route exact path="/Product/Bulk-Product-Upload" element={<BulkProductUpload />}></Route>
-            <Route exact path="/Product/Bulk-Category-Upload" element={<BulkCategoryUpload />}></Route>
-            <Route exact path="/Product/Bulk-Brand-Upload" element={<BulkBrandUpload />}></Route>
+            <Route
+              exact
+              path="/Product/Brand-Create"
+              element={<AddBrand />}
+            ></Route>
+            <Route
+              exact
+              path="/Product/Attribute"
+              element={<Attribute />}
+            ></Route>
+            <Route
+              exact
+              path="/Product/Attribute-Value"
+              element={<AttributeValue />}
+            ></Route>
+            <Route
+              exact
+              path="/Product/AddProduct"
+              element={<AddProduct />}
+            ></Route>
+            <Route
+              exact
+              path="/Product/Bulk-Product-Upload"
+              element={<BulkProductUpload />}
+            ></Route>
+            <Route
+              exact
+              path="/Product/Bulk-Category-Upload"
+              element={<BulkCategoryUpload />}
+            ></Route>
+            <Route
+              exact
+              path="/Product/Bulk-Brand-Upload"
+              element={<BulkBrandUpload />}
+            ></Route>
             <Route exact path="/Product-List" element={<ProductList />}></Route>
             <Route exact path="/Product/Config" element={<Config />}></Route>
             <Route exact path="/Admin/Profile" element={<Profile />}></Route>
             <Route exact path="/Blog/post" element={<Blog />}></Route>
             <Route exact path="/Reels/View" element={<Reels />}></Route>
             <Route exact path="/Reels/Add" element={<AddReels />}></Route>
-            <Route exact path="/Reels/Edit/:id" element={<UpdateReel />}></Route>
+            <Route
+              exact
+              path="/Reels/Edit/:id"
+              element={<UpdateReel />}
+            ></Route>
             <Route exact path="/Blog/post/create" element={<AddBlog />}></Route>
-            <Route exact path="/Blog/Category" element={<BlogCategory />}></Route>
+            <Route
+              exact
+              path="/Blog/Category"
+              element={<BlogCategory />}
+            ></Route>
             <Route exact path="/Blog/View-Post" element={<ShowBlog />}></Route>
-            <Route exact path="/Order/Total-Order" element={<TotalOrder />}></Route>
-            <Route exact path="/Order/Inhouse-Order" element={<InHouse />}></Route>
-            <Route exact path="/Order/Delivery-Process" element={<DeliveryProcess />}></Route>
-            <Route exact path="/Order/Cancle-Reason" element={<CancleReason />}></Route>
-            <Route exact path="/Order/Track-Order" element={<TrackOrder />}></Route>
-            <Route exact path="/Order/Sale-Detail" element={<SaleDetail />}></Route>
+            <Route
+              exact
+              path="/Order/Total-Order"
+              element={<TotalOrder />}
+            ></Route>
+            <Route
+              exact
+              path="/Order/Inhouse-Order"
+              element={<InHouse />}
+            ></Route>
+            <Route
+              exact
+              path="/Order/Delivery-Process"
+              element={<DeliveryProcess />}
+            ></Route>
+            <Route
+              exact
+              path="/Order/Cancle-Reason"
+              element={<CancleReason />}
+            ></Route>
+            <Route
+              exact
+              path="/Order/Track-Order"
+              element={<TrackOrder />}
+            ></Route>
+            <Route
+              exact
+              path="/Order/Sale-Detail"
+              element={<SaleDetail />}
+            ></Route>
             <Route exact path="/Contact-Mail" element={<ContactMail />}></Route>
             <Route exact path="/Contact-Info" element={<ShowContact />}></Route>
-            <Route exact path="/Review/Product-Review" element={<ProductReview />}></Route>
-            <Route exact path="/Review/Review-Configuration" element={<ReviewConfig />}></Route>
-            <Route exact path="/Company-Information" element={<CompanyInfo />}></Route>
+            <Route
+              exact
+              path="/Review/Product-Review"
+              element={<ProductReview />}
+            ></Route>
+            <Route
+              exact
+              path="/Review/Review-Configuration"
+              element={<ReviewConfig />}
+            ></Route>
+            <Route
+              exact
+              path="/Company-Information"
+              element={<CompanyInfo />}
+            ></Route>
             <Route exact path="/Menus" element={<Menus />}></Route>
-            <Route exact path="/Menus/Menus-Create" element={<AddMenu />}></Route>
-            <Route exact path="/Menus/Menus-Edit" element={<EditMenu />}></Route>
-            <Route exact path="/Menus/Menus-Item" element={<MenuItem />}></Route>
-            <Route exact path="/Payment-Gateway" element={<PaymentGateway />}></Route>
+            <Route
+              exact
+              path="/Menus/Menus-Create"
+              element={<AddMenu />}
+            ></Route>
+            <Route
+              exact
+              path="/Menus/Menus-Edit"
+              element={<EditMenu />}
+            ></Route>
+            <Route
+              exact
+              path="/Menus/Menus-Item"
+              element={<MenuItem />}
+            ></Route>
+            <Route
+              exact
+              path="/Payment-Gateway"
+              element={<PaymentGateway />}
+            ></Route>
             <Route exact path="/GST-SETUP" element={<GstSetup />}></Route>
-            <Route exact path="/GST-Configuation" element={<GstConfig />}></Route>
-            <Route exact path="/Users-list" element={<Customer />}></Route>
-            <Route exact path="/user-point-history/:userId" element={<PointHistory />}></Route>
-            <Route exact path="/Customer-Create" element={<AddCustomer />}></Route>
-            <Route exact path="/Customer-Detail" element={<CustomerDetail />}></Route>
-            <Route exact path="/Coupon/Coupon-Create" element={<AddCoupons />}></Route>
+            <Route
+              exact
+              path="/GST-Configuation"
+              element={<GstConfig />}
+            ></Route>
+            <Route exact path="/Users-list" element={<Customer />}></Route>\
+            <Route
+              exact
+              path="/Users-Activity-Analysis"
+              element={<UserActivityAnalysis />}
+            ></Route>
+            <Route
+              exact
+              path="/user-point-history/:userId"
+              element={<PointHistory />}
+            ></Route>{" "}
+            <Route
+              exact
+              path="/user-activity-log/:userId"
+              element={<ActivityLog />}
+            ></Route>
+            <Route
+              exact
+              path="/Customer-Create"
+              element={<AddCustomer />}
+            ></Route>
+            <Route
+              exact
+              path="/Customer-Detail"
+              element={<CustomerDetail />}
+            ></Route>
+            <Route
+              exact
+              path="/Coupon/Coupon-Create"
+              element={<AddCoupons />}
+            ></Route>
             <Route exact path="/Coupons" element={<Coupons />}></Route>
             <Route exact path="/Contests" element={<Contest />}></Route>
-            <Route exact path="/user-contests" element={<UserContests />}></Route>
-            <Route exact path="/contest/contest-create" element={<AddContest />}></Route>
-            <Route exact path="/transactions" element={<Transactions />}></Route>
+            <Route
+              exact
+              path="/user-contests/:contestId"
+              element={<UserContestDashboard />}
+            ></Route>
+            <Route
+              exact
+              path="/contest/contest-create"
+              element={<AddContest />}
+            ></Route>
+            <Route
+              exact
+              path="/transactions"
+              element={<Transactions />}
+            ></Route>
             <Route exact path="/Banners" element={<Banners />}></Route>
-            <Route exact path="/Banners/Banner-Create" element={<AddBanner />}></Route>
-            <Route exact path="/SetUp/Currency-List" element={<CurrencyList />}></Route>
-            <Route exact path="/SetUp/Currency-Create" element={<AddCurrency />}></Route>
+            <Route
+              exact
+              path="/Banners/Banner-Create"
+              element={<AddBanner />}
+            ></Route>
+            <Route
+              exact
+              path="/SetUp/Currency-List"
+              element={<CurrencyList />}
+            ></Route>
+            <Route
+              exact
+              path="/SetUp/Currency-Create"
+              element={<AddCurrency />}
+            ></Route>
             <Route exact path="/SetUp/Location" element={<Location />}></Route>
             <Route exact path="/SetUp/Tags" element={<Tags />}></Route>
+            <Route exact path="/GeoFencing" element={<GeofenceForm />}></Route>
           </Routes>
           <Footer />
         </div>

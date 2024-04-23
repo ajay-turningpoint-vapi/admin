@@ -1,4 +1,9 @@
-import { addReels, deleteReelsById, getReels, updateReelsById } from "../../../services/reels.service";
+import {
+  addReels,
+  deleteReelsById,
+  getReels,
+  updateReelsById,
+} from "../../../services/reels.service";
 
 export const REELS_ADD = "REELS_ADD";
 export const REELS_ADD_SUCCESS = "REELS_ADD_SUCCESS";
@@ -25,11 +30,13 @@ export const DELETE_REELS_BY_ID_SUCCESS = "DELETE_REELS_BY_ID_SUCCESS";
 export const DELETE_REELS_BY_ID_FAIL = "DELETE_REELS_BY_ID_FAIL";
 
 export const ReelsAdd = (formData) => async (dispatch) => {
+
   try {
+
     dispatch({ type: REELS_ADD });
     let { data: response } = await addReels(formData);
     if (response) {
-      console.log(response);
+      console.log("response action",response);
       dispatch({
         type: REELS_ADD_SUCCESS,
         payload: response.message,
@@ -86,7 +93,7 @@ export const ReelsUpdate = (formData, id) => async (dispatch) => {
       console.log(response);
       dispatch({
         type: UPDATE_REELS_BY_ID_SUCCESS,
-        payload: response
+        payload: response,
       });
     }
   } catch (err) {

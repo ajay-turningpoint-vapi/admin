@@ -10,3 +10,7 @@ export const getTransaction = (query) => {
 export const updateTransactionStatus = (formData, id) => {
   return axios.patch(`${serverUrl}/update-pointstatus/${id}`, formData);
 };
+
+export const getTransactionCount = (query) => {
+  return axios.get(`${serverUrl}/points-history-count`);
+};

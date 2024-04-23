@@ -1,11 +1,15 @@
-import { getTransaction, updateTransactionStatus } from "../../../services/transaction.service";
+import {
+  getTransaction,
+  updateTransactionStatus,
+} from "../../../services/transaction.service";
 
 export const GET_ALL_TRANSACTIONS = "GET_ALL_TRANSACTIONS";
 export const GET_ALL_TRANSACTIONS_SUCCESS = "GET_ALL_TRANSACTIONS_SUCCESS";
 export const GET_ALL_TRANSACTIONS_FAIL = "GET_ALL_TRANSACTIONS_FAIL";
 
 export const UPDATE_TRANSACTION_BY_ID = "UPDATE_TRANSACTION_BY_ID";
-export const UPDATE_TRANSACTION_BY_ID_SUCCESS = "UPDATE_TRANSACTION_BY_ID_SUCCESS";
+export const UPDATE_TRANSACTION_BY_ID_SUCCESS =
+  "UPDATE_TRANSACTION_BY_ID_SUCCESS";
 export const UPDATE_TRANSACTION_BY_ID_FAIL = "UPDATE_TRANSACTION_BY_ID_FAIL";
 
 export const SET_TRANSACTION_OBJ = "SET_TRANSACTION_OBJ";
@@ -17,9 +21,6 @@ export const GET_TRANSACTION_BY_ID_SUCCESS = "GET_TRANSACTION_BY_ID_SUCCESS";
 export const GET_TRANSACTION_BY_ID_FAIL = "GET_TRANSACTION_BY_ID_FAIL";
 export const TRANSACTION_ADD_FAIL = "TRANSACTION_ADD_FAIL";
 
-
-
-
 export const TRANSACTIONGet = (formData) => async (dispatch) => {
   try {
     dispatch({ type: GET_ALL_TRANSACTIONS });
@@ -28,7 +29,12 @@ export const TRANSACTIONGet = (formData) => async (dispatch) => {
       console.log(response);
       dispatch({
         type: GET_ALL_TRANSACTIONS_SUCCESS,
-        payload: { data: response.data, message: response.message },
+        payload: {
+          data: response.data,
+          count: response.count,
+          totalPages: response.totalPages,
+          message: response.message,
+        },
       });
     }
   } catch (err) {
@@ -53,7 +59,10 @@ export const SetTRANSACTIONObj = (formData) => async (dispatch) => {
     }
   } catch (err) {
     console.error(err);
-    dispatch({ type: SET_TRANSACTION_OBJ_FAIL, payload: { message: "NOT FOUND" } });
+    dispatch({
+      type: SET_TRANSACTION_OBJ_FAIL,
+      payload: { message: "NOT FOUND" },
+    });
   }
 };
 
@@ -67,12 +76,10 @@ export const TransactionUpdateStatus = (formData, id) => async (dispatch) => {
         type: UPDATE_TRANSACTION_BY_ID_SUCCESS,
         payload: { data: response.message },
       });
-      dispatch(TRANSACTIONGet())
+      dispatch(TRANSACTIONGet());
     }
   } catch (err) {
     console.error(err);
     dispatch({ type: UPDATE_TRANSACTION_BY_ID_FAIL, payload: err });
   }
 };
-
-

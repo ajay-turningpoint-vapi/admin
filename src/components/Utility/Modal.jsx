@@ -8,12 +8,19 @@ import ShowCategory from "../Products/Category/ShowCategory";
 import ShowAttribute from "../Products/Attribute/ShowAttribute";
 import ShowProduct from "../Products/ShowProduct";
 import CustomerDetail from "../Customer/CustomerDetail";
-
 export const AddModal = ({ ModalBox, setModalBox, name, ModalType, width }) => {
   return (
-    <Modal open={ModalBox} onClose={() => setModalBox(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+    <Modal
+      open={ModalBox}
+      onClose={() => setModalBox(false)}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
       <Box className="modal-box">
-        <div className="modal-container" style={{ maxWidth: width ? width : "1000px" }}>
+        <div
+          className="modal-container"
+          style={{ maxWidth: width ? width : "1000px" }}
+        >
           <div className="modal-header">
             <h5>{name}</h5>
             <CustomButton
@@ -28,8 +35,12 @@ export const AddModal = ({ ModalBox, setModalBox, name, ModalType, width }) => {
             />
           </div>
           <div className="modal-body">
-            {ModalType === "addCategoryModal" && <AddCategory makeChange={true} />}
-            {ModalType === "addBrandModal" && <AddBrandForm makeChange={true} />}
+            {ModalType === "addCategoryModal" && (
+              <AddCategory makeChange={true} />
+            )}
+            {ModalType === "addBrandModal" && (
+              <AddBrandForm makeChange={true} />
+            )}
             {ModalType === "addAttributeModal" && <AddAttribute />}
             {ModalType === "show-category" && <ShowCategory />}
             {ModalType === "show-attribute" && <ShowAttribute />}
@@ -41,11 +52,26 @@ export const AddModal = ({ ModalBox, setModalBox, name, ModalType, width }) => {
   );
 };
 
-export const EditModal = ({ ModalBox, setModalBox, name, ModalType, width, data }) => {
+export const EditModal = ({
+  ModalBox,
+  setModalBox,
+  name,
+  ModalType,
+  width,
+  data,
+}) => {
   return (
-    <Modal open={ModalBox} onClose={() => setModalBox(false)} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+    <Modal
+      open={ModalBox}
+      onClose={() => setModalBox(false)}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
       <Box className="modal-box customer-modal">
-        <div className="modal-container" style={{ maxWidth: width ? width : "1000px" }}>
+        <div
+          className="modal-container"
+          style={{ maxWidth: width ? width : "1000px" }}
+        >
           <div className="modal-header">
             <h5>{name}</h5>
             <CustomButton
@@ -59,7 +85,11 @@ export const EditModal = ({ ModalBox, setModalBox, name, ModalType, width, data 
               }}
             />
           </div>
-          <div className="modal-body">{ModalType === "customer-detail" && <CustomerDetail customerData={data} />}</div>
+          <div className="modal-body">
+            {ModalType === "customer-detail" && (
+              <CustomerDetail customerData={data} />
+            )}
+          </div>
         </div>
       </Box>
     </Modal>

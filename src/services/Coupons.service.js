@@ -4,28 +4,39 @@ import { url } from "./url.service";
 const serverUrl = url + "/coupon";
 
 export const addCoupon = (formData) => {
-    return axios.post(serverUrl + "/addCoupon", formData);
+  return axios.post(serverUrl + "/addCoupon", formData);
 };
 
 export const addMultpleCoupons = (formData) => {
-    console.log(formData)
-    return axios.post(serverUrl + "/addMultipleCoupons", formData);
+  console.log(formData);
+  return axios.post(serverUrl + "/addMultipleCoupons", formData);
 };
 
 export const getCoupons = (query) => {
-    return axios.get(`${serverUrl}/getCoupons?${query}`);
+  return axios.get(`${serverUrl}/getCoupons?${query}`);
 };
 
-
 export const downloadCouponsLink = () => {
-    return axios.get(`${serverUrl}/getActiveCouponsQrZip`);
+  return axios.get(`${serverUrl}/getActiveCouponsQrZip`);
+};
+export const downloadCouponsExcel = () => {
+  return axios.get(`${serverUrl}/getActiveCouponsQrExcel`, {
+    responseType: "blob", 
+  });
 };
 
 export const deleteCouponById = (id) => {
-    alert("asdsa")
-    return axios.delete(`${serverUrl}/deleteById/${id}`);
+  alert("asdsa");
+  return axios.delete(`${serverUrl}/deleteById/${id}`);
 };
 
 export const updateCouponById = (formData, id) => {
-    return axios.patch(`${serverUrl}/updateById/${id}`, formData);
+  return axios.patch(`${serverUrl}/updateById/${id}`, formData);
+};
+
+export const getCouponsCount = (query) => {
+  return axios.get(`${serverUrl}/getCouponsCount`);
+};
+export const getAllCouponsAnalytics = () => {
+  return axios.get(`${serverUrl}/getAllCouponsAnalytics`);
 };

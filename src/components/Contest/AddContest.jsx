@@ -13,6 +13,7 @@ import FileUpload from "../Utility/FileUpload";
 import { generateFilePath } from "../Utility/utils";
 import moment from "moment";
 import { toastError } from "../../utils/toastUtils";
+import SingleFileUpload from "../Utility/SingleFileUpload";
 
 const AddContest = () => {
   const dispatch = useDispatch();
@@ -62,7 +63,7 @@ const AddContest = () => {
   }, [contestObj]);
 
   const handleFileSet = (value) => {
-    setImageStr(value);
+    setImageStr(value.fileUrl);
   };
 
   const handleSubmit = () => {
@@ -191,9 +192,10 @@ const AddContest = () => {
 
   const handlePrizeFileSet = (index, value) => {
     let newprizeArr = [...prizeArr];
-    newprizeArr[index].image = value;
+    console.log("prize value", value);
+    newprizeArr[index].image = value.fileUrl.toString();
+    console.log("test", (newprizeArr[index].image = value.fileUrl.toString()));
     setPrizeArr(newprizeArr);
-    console.log("newprizeArr", newprizeArr);
   };
 
   return (
@@ -237,7 +239,7 @@ const AddContest = () => {
                       <label className="mb-2">
                         Icon <span className="red">*</span>
                       </label>
-                      <FileUpload onFileChange={handleFileSet} />
+                      <SingleFileUpload onFileChange={handleFileSet} />
                     </div>
                     <div className="col-md-6">
                       <label>
@@ -387,7 +389,7 @@ const AddContest = () => {
                             <label>
                               Image<span className="red">*</span>
                             </label>
-                            <FileUpload
+                            <SingleFileUpload
                               onFileChange={(e) => handlePrizeFileSet(index, e)}
                               name="image"
                             />

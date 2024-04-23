@@ -8,7 +8,10 @@ import { AddModal } from "../../Utility/Modal";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllNestedCategories } from "../../../redux/actions/Category/Category.actions";
 import { BrandGet } from "../../../redux/actions/Brand/brand.actions";
-import { PRODUCTAdd ,PRODUCTUpdate} from "../../../redux/actions/Product/Product.actions";
+import {
+  PRODUCTAdd,
+  PRODUCTUpdate,
+} from "../../../redux/actions/Product/Product.actions";
 import { ATTRIBUTEGet } from "../../../redux/actions/Attribute/Attribute.actions";
 import { toastError } from "../../Utility/ToastUtils";
 function GeneralProduct() {
@@ -17,6 +20,8 @@ function GeneralProduct() {
   const [sku, setSku] = useState("");
   const [brand, setBrand] = useState("");
   const [company, setCompany] = useState("");
+  const [salePrice, setSalePrice] = useState("");
+  const [commisionAllowed, setCommisionAllowed] = useState("");
   const [mainCategoryArr, setMainCategoryArr] = useState([]);
   const [subCategoryArr, setSubCategoryArr] = useState([]);
   const [modelNumber, setModelNumber] = useState("");
@@ -99,25 +104,32 @@ function GeneralProduct() {
   };
 
   const handleSubmit = () => {
-
-
     if (name == "") {
-      toastError("Name cannot be empty !")
-        return;
-        
+      toastError("Name cannot be empty !");
+      return;
     }
     if (brand == "") {
-      toastError("brand cannot be empty !")
-        return;
+      toastError("brand cannot be empty !");
+      return;
     }
     if (company == "") {
-      toastError("Company cannot be empty !")
-        return;
+      toastError("Company cannot be empty !");
+      return;
+    }
+    if (salePrice == "") {
+      toastError("SalePrice cannot be empty !");
+      return;
+    }
+    if (commisionAllowed == "") {
+      toastError("CommisionAllowed cannot be empty !");
+      return;
     }
     let obj = {
       name,
       brand,
-     company,
+      company,
+      salePrice,
+      commisionAllowed,
 
       // minimumOrderQuantity,
       // maximumOrderQuantity,
@@ -138,11 +150,10 @@ function GeneralProduct() {
       // brandId: selectedBrandId,
     };
 
-    if(productObj?._id){
-      dispatch(PRODUCTUpdate(obj,productObj._id))
+    if (productObj?._id) {
+      dispatch(PRODUCTUpdate(obj, productObj._id));
     } else {
-    dispatch(PRODUCTAdd(obj));
-
+      dispatch(PRODUCTAdd(obj));
     }
   };
 
@@ -151,6 +162,8 @@ function GeneralProduct() {
       setName(productObj.name);
       setBrand(productObj.brand);
       setCompany(productObj.company);
+      setSalePrice(productObj.salePrice);
+      setCommisionAllowed(productObj.commisionAllowed);
       // setdespcription(productObj.despcription);
       // setSpecifications(productObj.specification);
       // setModelNumber(productObj.modelNumber);
@@ -194,23 +207,66 @@ function GeneralProduct() {
                 <label>
                   Name <span className="red">*</span>
                 </label>
-                <input value={name} onChange={(event) => setName(event.target.value)} type="text" className="form-control" />
+                <input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  type="text"
+                  className="form-control"
+                />
               </div>
               <div className="col-12 col-md-6 mb-3">
                 <label>
                   Brand Name <span className="red">*</span>
                 </label>
-                <input value={brand} onChange={(event) => setBrand(event.target.value)} type="text" className="form-control" />
+                <input
+                  value={brand}
+                  onChange={(event) => setBrand(event.target.value)}
+                  type="text"
+                  className="form-control"
+                />
               </div>
               <div className="col-12 col-md-12 mb-3">
                 <label>Company</label> <span className="red">*</span>
                 {/* <textarea className="form-control" rows="5" vale={despcription} onChange={(event) => setdespcription(event.target.value)}></textarea> */}
-                <input type="text" value={company} onChange={(event) => setCompany(event.target.value)} className="form-control" />
+                <input
+                  type="text"
+                  value={company}
+                  onChange={(event) => setCompany(event.target.value)}
+                  className="form-control"
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3">
+                <label>
+                  Sale Price <span className="red">*</span>
+                </label>
+                <input
+                  value={salePrice}
+                  onChange={(event) => setSalePrice(event.target.value)}
+                  type="number"
+                  className="form-control"
+                />
+              </div>
+              <div className="col-12 col-md-6 mb-3">
+                <label>
+                  Commision Allowed <span className="red">*</span>
+                </label>
+                <input
+                  value={commisionAllowed}
+                  onChange={(event) => setCommisionAllowed(event.target.value)}
+                  type="number"
+                  className="form-control"
+                />
               </div>
               <div className="col-12">
-                <CustomButton btntype="button" ClickEvent={handleSubmit} isBtn iconName="fa-solid fa-check" btnName="Save" />
+                <CustomButton
+                  btntype="button"
+                  ClickEvent={handleSubmit}
+                  isBtn
+                  iconName="fa-solid fa-check"
+                  btnName="Save"
+                />
               </div>
-            
+
               {/* <div className="col-12 col-md-3 mb-3">
                 <div className="d-flex align-items-baseline justify-content-between">
                   <label>

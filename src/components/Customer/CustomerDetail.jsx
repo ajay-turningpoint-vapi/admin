@@ -1,19 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { images } from "../Images/Images";
 import CustomButton from "../Utility/Button";
 import { DashboardBox, DashboardTable } from "../Utility/DashboardBox";
 import SearchBox from "../Utility/SearchBox";
 import tabClick from "../Utility/TabClick";
 import ActionIcon from "../Utility/ActionIcon";
+import { useDispatch, useSelector } from "react-redux";
 import DataTable from "react-data-table-component";
 import { downloadCSV } from "../Utility/CSV";
 import { generateFilePath } from "../Utility/utils";
 import { Switch } from "@mui/material";
 import { updateUserKycStatus } from "../../services/users.service";
-
+import { FormControlLabel, Radio, RadioGroup } from "@material-ui/core";
+import "../../assets/style.css";
+import { usersGet } from "../../redux/actions/Users/users.actions";
 function CustomerDetail({ customerData }) {
   // ==============================================================================================
   console.log(customerData, "CUSTOMER");
+  const [kycStatus, setKycStatus] = useState(customerData.kycStatus);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    setKycStatus(customerData.kycStatus);
+    let query = "";
+    query += "?role=CARPENTER";
+    dispatch(usersGet(query));
+  }, [customerData.kycStatus]);
+
   const [tabList, settabList] = useState([
     {
       tabName: "ORDERS",
@@ -228,6 +240,7 @@ function CustomerDetail({ customerData }) {
   // ==============================================================================================
   const handleChangeKycStatus = async (id, value) => {
     try {
+      setKycStatus(value);
       let { data: res } = await updateUserKycStatus(id, { kycStatus: value });
       if (res.message) {
         alert(res.message);
@@ -247,22 +260,32 @@ function CustomerDetail({ customerData }) {
   return (
     <main>
       <section className="product-category">
-        <div className="container-fluid p-0">
+        <div className="container-fluid p-0  ">
           <DashboardBox className="mb-5">
             <h5 className="blue-1 mb-4">Customer Profile</h5>
             <div className="row">
               <div className="col-12 col-md-12">
                 <div className="customer-profile">
-                  <a href={generateFilePath(customerData.image)}>
+                  <a
+                    href={
+                      typeof customerData.image === "string" &&
+                      customerData.image.startsWith("https://")
+                        ? customerData.image // If customerData.image is a string URL, use it directly
+                        : generateFilePath(customerData.image) || "#"
+                    } // Otherwise, generate the file path
+                  >
                     <img
                       src={
-                        customerData?.image
-                          ? generateFilePath(customerData.image)
-                          : images.customer
+                        typeof customerData.image === "string" &&
+                        customerData.image.startsWith("https://")
+                          ? customerData.image // If customerData.image is a string URL, use it directly
+                          : generateFilePath(customerData.image) ||
+                            images.customer // Otherwise, generate the image path
                       }
                       alt=""
                     />
                   </a>
+
                   <h6 className="blue-1 text-capitalize my-3">
                     {customerData.firstName}
                   </h6>
@@ -347,20 +370,40 @@ function CustomerDetail({ customerData }) {
                       />
                     </a>
                   </li>
-                  <li>
-                    <span className="fw-600">
+                  <li style={{ display: "flex" }}>
+                    <span className="fw-600" style={{ marginRight: "20px" }}>
                       KYC status <span>: </span>
                     </span>
 
-                    <Switch
+                    <RadioGroup
+                      aria-label="kycStatus"
+                      name="kycStatus"
+                      value={kycStatus}
                       onChange={(e) =>
-                        handleChangeKycStatus(
-                          customerData._id,
-                          e.target.checked
-                        )
+                        handleChangeKycStatus(customerData._id, e.target.value)
                       }
-                      checked={customerData.kycStatus}
-                    />
+                    >
+                      <FormControlLabel
+                        value="pending"
+                        control={<Radio />}
+                        label="Pending"
+                      />
+                      <FormControlLabel
+                        value="submitted"
+                        control={<Radio />}
+                        label="Submitted"
+                      />
+                      <FormControlLabel
+                        value="approved"
+                        control={<Radio />}
+                        label="Approved"
+                      />
+                      <FormControlLabel
+                        value="rejected"
+                        control={<Radio />}
+                        label="Rejected"
+                      />
+                    </RadioGroup>
                   </li>
                   {customerData?.bankDetails?.length > 0 &&
                     customerData?.bankDetails?.map((bank, i) => (
@@ -377,8 +420,8 @@ function CustomerDetail({ customerData }) {
                           <span className="fw-600">
                             Bank Type <span>: </span>
                           </span>
-                          {bank?.banktype.charAt(0).toUpperCase() +
-                            bank?.banktype.slice(1)}
+                          {bank?.banktype?.charAt(0).toUpperCase() +
+                            bank?.banktype?.slice(1)}
                         </li>
 
                         <li>
