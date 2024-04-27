@@ -153,7 +153,7 @@ const MapPicker = ({ onLocationChange }) => {
     <div>
       <input
         ref={autocompleteRef}
-        placeholder="Enter a location"
+        placeholder="Enter a location you want to add zone..."
         style={{
           marginTop: "10px",
           width: "30%",

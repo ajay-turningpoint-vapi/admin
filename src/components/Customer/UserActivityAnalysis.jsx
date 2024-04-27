@@ -9,12 +9,15 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import NotificationAddIcon from "@mui/icons-material/NotificationAdd";
 import {
   Button,
+  Card,
+  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   TextField,
+  Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
 function UserActivityAnalysis() {
@@ -22,7 +25,7 @@ function UserActivityAnalysis() {
   const [search, setSearch] = useState("");
   const [dateRange, setDateRange] = useState([null, null]);
   const [originalUsersArr, setOriginalUsersArr] = useState([]);
- 
+  const [usersArrTotal, setUsersArrTotal] = useState(0);
   const conditionalRowStyles = [
     {
       when: (row) =>
@@ -63,12 +66,20 @@ function UserActivityAnalysis() {
     },
     {
       name: "Reel View Qty",
-      selector: (row) => row.reelsLikeCount,
+      selector: (row) => (
+        <span>
+          {row.reelsLikeCount} <i className="fa-solid fa-plus text-success"></i>
+        </span>
+      ),
       width: "10%",
     },
     {
       name: "Contest Join Qty",
-      selector: (row) => row.contestJoinCount,
+      selector: (row) => (
+        <span>
+          {row.contestJoinCount} <i className="fa-solid fa-minus text-danger"></i>
+        </span>
+      ),
       width: "10%",
     },
     {
@@ -80,6 +91,8 @@ function UserActivityAnalysis() {
 
   const handleGetAllUsers = async (query) => {
     const { data: response } = await getUserActivityAnalysis(query);
+    console.log(response);
+    setUsersArrTotal(response);
     setUsersArr(response.data);
     setOriginalUsersArr(response.data);
   };
@@ -121,9 +134,9 @@ function UserActivityAnalysis() {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
-          <div className="d-flex align-items-center justify-content-between mb-3"></div>
+          <div className="d-flex align-items-center justify-content-between "></div>
           <DashboardTable>
-            <div className="d-flex align-items-center justify-content-between mb-5">
+            <div className="d-flex align-items-center justify-content-between mb-3">
               <h5 className="blue-1 m-0">Active Customer Analysis</h5>{" "}
               <div
                 style={{
@@ -180,7 +193,31 @@ function UserActivityAnalysis() {
                 </div>
               </div>
             </div>
-          
+            <div
+              style={{
+                display: "flex",
+                marginBottom: "10px",
+                alignContent: "center",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Card style={{ marginRight: "20px" }}>
+                <CardContent>
+                  <Typography variant="body2" color="#415094" component="h1">
+                    Total Reel View Qty ( <b>{usersArrTotal.totalReelsLikeCount}</b>{" "}
+                    )
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent>
+                  <Typography variant="body2" color="#415094" component="h1">
+                    Total Contest Join Qty ({" "}
+                    <b>{usersArrTotal.totalContestJoinCount}</b> )
+                  </Typography>
+                </CardContent>
+              </Card>
+            </div>
             <DataTable
               paginationPerPage={10}
               columns={users_columns}

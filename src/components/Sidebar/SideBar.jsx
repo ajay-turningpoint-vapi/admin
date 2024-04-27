@@ -430,6 +430,8 @@ function SideBar() {
     <div id="sidebar" className="no-print">
       <div className="main-logo">
         <img src={images.logo} alt="" />
+        <br/>
+        <span>Beta v1.0.0</span>
       </div>
       <ul className="sidebar-menu" id="sidebarMenu">
         {sidebar_item.map((item, i) => {

@@ -53,7 +53,7 @@ const GeofenceForm = () => {
 
   return (
     <div className="geofence-form">
-      <h4 style={{ marginLeft: "10px" }}>Create Geofence</h4>
+      <h5 style={{ marginLeft: "10px", color: "#415094 " }}>Create Geofence</h5>
       <form onSubmit={handleSubmit} style={{ marginLeft: "10px" }}>
         <div className="form-group">
           <input
@@ -112,7 +112,7 @@ const GeofenceForm = () => {
         <button
           type="submit"
           className="btn btn-primary"
-          style={{ marginRight: "10px" }}
+          style={{ marginRight: "10px", marginBottom: "30px" }}
         >
           Create Geofence
         </button>

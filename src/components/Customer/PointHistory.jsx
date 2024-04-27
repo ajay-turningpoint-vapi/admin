@@ -95,11 +95,11 @@ function PointHistory() {
       selector: (row) =>
         row.type == "CREDIT" ? (
           <span className="text-success">
-            <i className="fa fa-arrow-up "> </i> {row.amount}{" "}
+            <i className="fa fa-arrow-down"> </i> {row.amount}{" "}
           </span>
         ) : (
           <span className="text-danger">
-            <i className="fa fa-arrow-down "> </i> {row.amount}
+            <i className="fa fa-arrow-up"> </i> {row.amount}
           </span>
         ),
       width: "10%",
@@ -154,6 +154,14 @@ function PointHistory() {
                 <div className="col-12 py-4 border rounded bg-white ">
                   <h6 className="blue-1 mb-4">User Name</h6>
                   <div>{userPointsReportsData.userName}</div>
+                </div>
+              </div>
+            </div>
+            <div className="col-3 gap-2 mb-3">
+              <div className="row mx-1 ">
+                <div className="col-12 py-4 border rounded bg-white ">
+                  <h6 className="blue-1 mb-4">User Joining Point</h6>
+                  <div>100</div>
                 </div>
               </div>
             </div>

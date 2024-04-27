@@ -217,8 +217,8 @@ function Customer() {
   useEffect(() => {
     handleGetAllUsers();
   }, [userKycStatus]);
-   
-console.log(userArr);
+
+  console.log(userArr);
 
   const handleSearch = (q) => {
     console.log(search, "search", q);
@@ -236,8 +236,6 @@ console.log(userArr);
     }
   };
 
-
-  
   const handleGetTselectedTable = () => {
     if (tabList.filter((el) => el.active)[0].tabName == "All Customer") {
       return (
