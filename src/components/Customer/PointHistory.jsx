@@ -157,43 +157,24 @@ function PointHistory() {
                 </div>
               </div>
             </div>
-            <div className="col-3 gap-2 mb-3">
-              <div className="row mx-1 ">
-                <div className="col-12 py-4 border rounded bg-white ">
-                  <h6 className="blue-1 mb-4">User Joining Point</h6>
-                  <div>100</div>
-                </div>
-              </div>
-            </div>
-            <div className="col-3 gap-2 mb-3">
-              <div className="row mx-1 ">
-                <div className="col-12 py-4 border rounded bg-white ">
-                  <h6 className="blue-1 mb-4">User Balance</h6>
-                  <div>
-                    {userPointsReportsData.points
-                      ? userPointsReportsData.points
-                      : 0}
-                  </div>
-                </div>
-              </div>
-            </div>
+
             <div className="col-3 gap-2 mb-3">
               <div
                 className="row mx-1 "
                 onClick={() => {
-                  setSearch("Redeem");
-                  handleDivClick("div1");
+                  setSearch("ReelsLike");
+                  handleDivClick("div3");
                 }}
               >
-                <div className="col-12 py-4 border rounded bg-white usercontestactivediv ">
-                  <h6 className="blue-1 mb-4">Total points redeemed</h6>
+                <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
+                  <h6 className="blue-1 mb-4">Points From Reels</h6>
                   <div
                     className={`div ${
-                      activeDiv === "div1" ? "usercontestactive" : ""
+                      activeDiv === "div3" ? "usercontestactive" : ""
                     }`}
                   >
-                    {userPointsReportsData.totalPointsRedeemed
-                      ? userPointsReportsData.totalPointsRedeemed
+                    {userPointsReportsData.totalPointsRedeemedForLiking
+                      ? userPointsReportsData.totalPointsRedeemedForLiking
                       : 0}
                   </div>
                 </div>
@@ -221,28 +202,7 @@ function PointHistory() {
                 </div>
               </div>
             </div>
-            <div className="col-3 gap-2 mb-3">
-              <div
-                className="row mx-1 "
-                onClick={() => {
-                  setSearch("ReelsLike");
-                  handleDivClick("div3");
-                }}
-              >
-                <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
-                  <h6 className="blue-1 mb-4">Points From Reels</h6>
-                  <div
-                    className={`div ${
-                      activeDiv === "div3" ? "usercontestactive" : ""
-                    }`}
-                  >
-                    {userPointsReportsData.totalPointsRedeemedForLiking
-                      ? userPointsReportsData.totalPointsRedeemedForLiking
-                      : 0}
-                  </div>
-                </div>
-              </div>
-            </div>
+
             <div className="col-3 gap-2 mb-3">
               <div className="row mx-1 ">
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv ">
@@ -255,6 +215,30 @@ function PointHistory() {
                 </div>
               </div>
             </div>
+
+            <div className="col-3 gap-2 mb-3">
+              <div
+                className="row mx-1 "
+                onClick={() => {
+                  setSearch("Redeem");
+                  handleDivClick("div1");
+                }}
+              >
+                <div className="col-12 py-4 border rounded bg-white usercontestactivediv ">
+                  <h6 className="blue-1 mb-4">Total points redeemed</h6>
+                  <div
+                    className={`div ${
+                      activeDiv === "div1" ? "usercontestactive" : ""
+                    }`}
+                  >
+                    {userPointsReportsData.totalPointsRedeemed
+                      ? userPointsReportsData.totalPointsRedeemed
+                      : 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="col-3 gap-2 mb-3">
               <div
                 className="row mx-1 "
@@ -272,6 +256,26 @@ function PointHistory() {
                   >
                     {userPointsReportsData.totalPointsRedeemedInContest
                       ? userPointsReportsData.totalPointsRedeemedInContest
+                      : 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-3 gap-2 mb-3">
+              <div className="row mx-1 ">
+                <div className="col-12 py-4 border rounded bg-white ">
+                  <h6 className="blue-1 mb-4">User Joining Point</h6>
+                  <div>100</div>
+                </div>
+              </div>
+            </div>
+            <div className="col-3 gap-2 mb-3">
+              <div className="row mx-1 ">
+                <div className="col-12 py-4 border rounded bg-white ">
+                  <h6 className="blue-1 mb-4">User Balance</h6>
+                  <div>
+                    {userPointsReportsData.points
+                      ? userPointsReportsData.points
                       : 0}
                   </div>
                 </div>

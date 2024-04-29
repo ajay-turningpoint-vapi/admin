@@ -68,7 +68,7 @@ function UserActivityAnalysis() {
       name: "Reel View Qty",
       selector: (row) => (
         <span>
-          {row.reelsLikeCount} <i className="fa-solid fa-plus text-success"></i>
+          {row.reelsLikeCount} 
         </span>
       ),
       width: "10%",
@@ -77,7 +77,7 @@ function UserActivityAnalysis() {
       name: "Contest Join Qty",
       selector: (row) => (
         <span>
-          {row.contestJoinCount} <i className="fa-solid fa-minus text-danger"></i>
+          {row.contestJoinCount} 
         </span>
       ),
       width: "10%",
