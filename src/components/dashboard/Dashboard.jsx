@@ -729,7 +729,7 @@ function Dashboard() {
                 <Bar options={options} data={data2} />
               </DashboardChart>
             </div>
-            <div className="col-12 col-md-4 mb-5">
+            <div className="col-12 col-md-4 mb-5" style={{ width: "auto" }}>
               <DashboardChart>
                 <h5 className="blue-1 mb-4">Coupons</h5>
                 <Doughnut data={couponChartData} />
