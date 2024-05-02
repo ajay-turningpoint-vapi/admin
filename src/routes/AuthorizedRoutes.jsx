@@ -64,6 +64,7 @@ import GeofenceForm from "../components/Map/GeofenceForm.jsx";
 import ActivityLog from "../components/Customer/ActivityLog.jsx";
 import UserContestDashboard from "../components/Customer/UserContestDashboard.jsx";
 import UserActivityAnalysis from "../components/Customer/UserActivityAnalysis.jsx";
+import Contractors from "../components/Contractors/Contractors.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -215,12 +216,18 @@ export default function AuthorizedRoutes() {
               path="/GST-Configuation"
               element={<GstConfig />}
             ></Route>
-            <Route exact path="/Users-list" element={<Customer />}></Route>\
+            <Route exact path="/Users-list" element={<Customer />}></Route>
             <Route
               exact
               path="/Users-Activity-Analysis"
               element={<UserActivityAnalysis />}
             ></Route>
+
+            <Route
+            exact
+            path="/No-Listed-Contractor"
+            element={<Contractors />}
+          ></Route>
             <Route
               exact
               path="/user-point-history/:userId"

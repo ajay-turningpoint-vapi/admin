@@ -148,6 +148,14 @@ function SideBar() {
     {
       isrotated: false,
       active: false,
+      name: "Not Listed Contractors",
+      path: "/No-Listed-Contractor",
+      icon: "fa-solid fa-user-circle",
+      children: [],
+    },
+    {
+      isrotated: false,
+      active: false,
       name: "Product",
       path: "/Dashboard",
       icon: "fa-solid fa-shopping-cart",
@@ -430,7 +438,7 @@ function SideBar() {
     <div id="sidebar" className="no-print">
       <div className="main-logo">
         <img src={images.logo} alt="" />
-        <br/>
+        <br />
         <span>Beta v1.0.0</span>
       </div>
       <ul className="sidebar-menu" id="sidebarMenu">
