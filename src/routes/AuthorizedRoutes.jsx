@@ -65,6 +65,7 @@ import ActivityLog from "../components/Customer/ActivityLog.jsx";
 import UserContestDashboard from "../components/Customer/UserContestDashboard.jsx";
 import UserActivityAnalysis from "../components/Customer/UserActivityAnalysis.jsx";
 import Contractors from "../components/Contractors/Contractors.jsx";
+import Referrals from "../components/Customer/Referrals.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -228,6 +229,12 @@ export default function AuthorizedRoutes() {
             path="/No-Listed-Contractor"
             element={<Contractors />}
           ></Route>
+
+          <Route
+          exact
+          path="/referrals"
+          element={<Referrals />}
+        ></Route>
             <Route
               exact
               path="/user-point-history/:userId"

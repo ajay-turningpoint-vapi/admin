@@ -47,7 +47,7 @@ export default function Contractors() {
         className="nav nav-pills dashboard-pills justify-content-start"
         id="pills-tab"
         role="tablist"
-        style={{marginBottom:"20px"}}
+        style={{ marginBottom: "20px" }}
       >
         <li>
           <CustomButton

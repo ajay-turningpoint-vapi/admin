@@ -142,6 +142,10 @@ function SideBar() {
           name: "All Users Activity Analysis",
           path: "/Users-Activity-Analysis",
           active: false,
+        },{
+          name: "Referrals",
+          path: "/referrals",
+          active: false,
         },
       ],
     },

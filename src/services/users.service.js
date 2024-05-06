@@ -85,3 +85,7 @@ export const getUserContestsCount = () => {
 export const notListedContractors = () => {
   return axios.get(`${serverUrl}/not-listed-contractors`);
 };
+
+export const userReferrals = () => {
+  return axios.get(`${serverUrl}/getUserReferralsReports`);
+};

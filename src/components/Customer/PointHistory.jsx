@@ -204,12 +204,22 @@ function PointHistory() {
             </div>
 
             <div className="col-3 gap-2 mb-3">
-              <div className="row mx-1 ">
+              <div
+                className="row mx-1 "
+                onClick={() => {
+                  setSearch("Referral");
+                  handleDivClick("div5");
+                }}
+              >
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv ">
-                  <h6 className="blue-1 mb-4">Points redeemed in cash</h6>
-                  <div>
-                    {userPointsReportsData.totalPointsRedeemedInCash
-                      ? userPointsReportsData.totalPointsRedeemedInCash
+                  <h6 className="blue-1 mb-4">Points from Referrals</h6>
+                  <div
+                    className={`div ${
+                      activeDiv === "div5" ? "usercontestactive" : ""
+                    }`}
+                  >
+                    {userPointsReportsData.totalPointsEarnedFormReferrals
+                      ? userPointsReportsData.totalPointsEarnedFormReferrals
                       : 0}
                   </div>
                 </div>
