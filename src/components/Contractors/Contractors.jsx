@@ -36,6 +36,11 @@ export default function Contractors() {
       cell: (row) => <p>{row.phone}</p>,
       width: "30%",
     },
+    {
+      name: "Carpenter Name",
+      cell: (row) => <p>{row.givenName}</p>,
+      width: "30%",
+    },
   ];
 
   return (

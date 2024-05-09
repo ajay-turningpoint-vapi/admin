@@ -52,11 +52,28 @@ function Header() {
             </div>
           </div> */}
           <div className="user-profile position-relative">
-            <CustomButton isLink isLinkImg ImgSrc={images.avatar} path="/" noIcon noClass imgClass="rounded-circle" />
+            <CustomButton
+              isLink
+              isLinkImg
+              ImgSrc={images.avatar}
+              path="/"
+              noIcon
+              noClass
+              imgClass="rounded-circle"
+            />
             <div className="user-profile-box mt-3 end-0 py-4 px-3 bg-dark">
-              <p className="fw-light mb-0">Welcome {user?.name ? user?.name : "SuperAdmin"} !</p>
+              <p className="fw-light mb-0">
+                Welcome {user?.name ? user?.name : "SuperAdmin"} !
+              </p>
               <p className="fw-600 mb-0">
-                <CustomButton btntype="button" isLink btnName={user?.name ? user?.name : "SuperAdmin"} path="/" noIcon noClass />
+                <CustomButton
+                  btntype="button"
+                  isLink
+                  btnName={user?.name ? user?.name : "SuperAdmin"}
+                  path="/"
+                  noIcon
+                  noClass
+                />
               </p>
               <ul className="mt-4 pt-4">
                 {/* <li>
@@ -69,7 +86,14 @@ function Header() {
                   <CustomButton isLink btnName="Settings" path="/" iconName="ion-ios-gear" noClass />
                 </li> */}
                 <li>
-                  <CustomButton ClickEvent={handleLogout} isLink btnName="Log out" path="/" iconName="ion-share" noClass />
+                  <CustomButton
+                    ClickEvent={handleLogout}
+                    isLink
+                    btnName="Log out"
+                    path="/"
+                    iconName="ion-share"
+                    noClass
+                  />
                 </li>
               </ul>
             </div>

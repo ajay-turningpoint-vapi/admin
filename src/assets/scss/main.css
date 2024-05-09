@@ -1187,3 +1187,9 @@ ul.reviews-star li {
 }
 
 /*# sourceMappingURL=main.css.map */
+
+@media only screen and (min-width: 768px) {
+  .toggle-sidebar{
+    display: none;
+  }
+}
