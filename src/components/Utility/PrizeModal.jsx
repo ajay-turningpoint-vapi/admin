@@ -51,7 +51,7 @@ console.log(data);
         onClick={handleClickOpen}
         style={{ marginRight: "15px" }}
       >
-        View Prizes
+        Prizes
       </Button>
       <Dialog
         fullWidth={true}

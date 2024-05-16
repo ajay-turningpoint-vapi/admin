@@ -46,7 +46,7 @@ export default function Contractors() {
   return (
     <div
       className="dashboard-table dashboard-box"
-      style={{ maxWidth: "700px", marginLeft: "20px" }}
+      style={{ maxWidth: "800px", marginLeft: "20px" }}
     >
       <ul
         className="nav nav-pills dashboard-pills justify-content-start"

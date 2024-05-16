@@ -294,9 +294,7 @@ export const Transactions = () => {
                   </div>
                 </div>
               </div>
-              {loading ? (
-                "Loading..."
-              ) : (
+              {transactionArr ? (
                 <DashboardTable>
                   <DataTable
                     columns={transaction_columns}
@@ -312,6 +310,8 @@ export const Transactions = () => {
                     />
                   </div>
                 </DashboardTable>
+              ) : (
+                "Loading..."
               )}
             </div>
           </div>

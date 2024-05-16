@@ -14,6 +14,7 @@ import { generateFilePath } from "../Utility/utils";
 import moment from "moment";
 import { toastError } from "../../utils/toastUtils";
 import SingleFileUpload from "../Utility/SingleFileUpload";
+import { useNavigate } from "react-router-dom";
 
 const AddContest = () => {
   const dispatch = useDispatch();
@@ -36,7 +37,7 @@ const AddContest = () => {
 
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (contestObj) {
       setselectedContestId(contestObj._id);
@@ -151,6 +152,7 @@ const AddContest = () => {
       setRulesArr([]);
       setImageStr("");
       setPrizeArr([]);
+      navigate("/Contests");
     }
   };
 

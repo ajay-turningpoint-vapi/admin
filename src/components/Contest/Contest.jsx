@@ -44,7 +44,7 @@ const Contest = () => {
     {
       name: "Image",
       grow: 0,
-      width: "10%",
+      width: "6%",
       cell: (row) => (
         <img height="84px" width="56px" alt={row.name} src={row.image} />
       ),
@@ -52,7 +52,7 @@ const Contest = () => {
     {
       name: "Name",
       selector: (row) => row.name,
-      width: "12%",
+      width: "15%",
     },
     {
       name: "Joining Points",
@@ -62,7 +62,7 @@ const Contest = () => {
     {
       name: "Start Date",
       selector: (row) => new Date(row?.startDate).toDateString(),
-      width: "8%",
+      width: "10%",
     },
     {
       name: "End Date",
@@ -82,13 +82,13 @@ const Contest = () => {
     {
       name: "Status",
       button: true,
-      width: "8%",
+      width: "7%",
       cell: (row) => <CustomButton greenBtn btnName={row.status} />,
     },
 
     {
       name: "Action",
-      width: "20%",
+      width: "24%",
       cell: (row) => {
         if (row.status === "INACTIVE") {
           return (
@@ -118,7 +118,8 @@ const Contest = () => {
               )}
               <Link
                 to={`/user-contests/${row?._id}`}
-                className="btn btn-secondary ms-2 text-white" style={{marginRight:"10px"}}
+                className="btn btn-secondary ms-2 text-white"
+                style={{ marginRight: "10px" }}
               >
                 Report
               </Link>

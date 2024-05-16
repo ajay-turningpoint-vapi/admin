@@ -238,9 +238,7 @@ function Coupons() {
                   {/* <SearchBox extraClass="bg-white" /> */}
                 </div>
               </div>
-              {loading ? (
-                "Loading..."
-              ) : (
+              {couponArr ? (
                 <DashboardTable>
                   <DataTable
                     columns={brand_columns}
@@ -256,6 +254,8 @@ function Coupons() {
                     />
                   </div>
                 </DashboardTable>
+              ) : (
+                "Loading"
               )}
             </div>
           </div>

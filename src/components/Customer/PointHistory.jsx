@@ -107,7 +107,7 @@ function PointHistory() {
     {
       name: "Description",
       selector: (row) => row.description,
-      width: "20%",
+      width: "25%",
     },
     {
       name: "Status",
