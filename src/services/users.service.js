@@ -78,8 +78,8 @@ export const getUserContestsReportLose = (query) => {
   return axios.get(`${serverUrl}/getUserContestsReportLose?${query}`);
 };
 
-export const getUserContestsCount = () => {
-  return axios.get(`${serverUrl}/getUserContestsCount`);
+export const getUserContestsCount = (id) => {
+  return axios.get(`${serverUrl}/getUserContestsCount/${id}`);
 };
 
 export const notListedContractors = () => {

@@ -47,13 +47,14 @@ function UserContestDashboard() {
       query += `&q=${search}`;
     }
     const response = await getUserContestsReport(query);
+    console.log("res", response);
     setUserContArrLose("");
     setUserContArrTotalPageLose("");
     setLoading(false);
     setUserContArr(response.data);
     setUserContArrTotalPage(response.data.totalPage);
 
-    const response1 = await getUserContestsCount();
+    const response1 = await getUserContestsCount(contestId);
     setCount(response1.data.totalJoinCount);
   };
   const handleUserConestLose = async (contestId) => {
