@@ -4,9 +4,11 @@ import Button from "@material-ui/core/Button";
 
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import { Dialog, DialogActions } from "@mui/material";
+import { Dialog, DialogActions, Slide } from "@mui/material";
 import DataTable from "react-data-table-component";
-
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="left" ref={ref} {...props} />;
+});
 export default function PrizeModal({ data }) {
   const [open, setOpen] = React.useState(false);
   const handleClickOpen = () => {
@@ -56,11 +58,12 @@ console.log(data);
       <Dialog
         fullWidth={true}
         maxWidth={"md"}
+        TransitionComponent={Transition}
         open={open}
         onClose={handleClose}
-        aria-labelledby="max-width-dialog-title"
+        aria-labelledby="alert-dialog-slide-description"
       >
-        <DialogTitle id="max-width-dialog-title">Prizes List</DialogTitle>
+        <DialogTitle id="alert-dialog-slide-description">Prizes List</DialogTitle>
         <DialogContent>
           <DataTable
             paginationPerPage={10}

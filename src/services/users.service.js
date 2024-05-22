@@ -82,6 +82,13 @@ export const getUserContestsCount = (id) => {
   return axios.get(`${serverUrl}/getUserContestsCount/${id}`);
 };
 
+export const getAllContractors = () => {
+  return axios.get(`${serverUrl}/getAllContractors`);
+};
+
+export const getAllContractorsByNameAdmin = (name) => {
+  return axios.get(`${serverUrl}/getCaprentersByContractorNameAdmin/${name}`);
+};
 export const notListedContractors = () => {
   return axios.get(`${serverUrl}/not-listed-contractors`);
 };

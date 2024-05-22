@@ -1,18 +1,18 @@
 {
   "files": {
     "main.css": "/static/css/main.5fa97d7e.css",
-    "main.js": "/static/js/main.e0efc8ee.js",
+    "main.js": "/static/js/main.d1ded22e.js",
     "static/js/787.b5629dd8.chunk.js": "/static/js/787.b5629dd8.chunk.js",
     "static/media/TREBUCBD.ttf": "/static/media/TREBUCBD.12d7273690f87dcb79c1.ttf",
     "static/media/brand.jpg": "/static/media/brand.2488be220bfdf4f67cb5.jpg",
     "static/media/product.jpeg": "/static/media/product.9fd3126746c28839d67d.jpeg",
     "index.html": "/index.html",
     "main.5fa97d7e.css.map": "/static/css/main.5fa97d7e.css.map",
-    "main.e0efc8ee.js.map": "/static/js/main.e0efc8ee.js.map",
+    "main.d1ded22e.js.map": "/static/js/main.d1ded22e.js.map",
     "787.b5629dd8.chunk.js.map": "/static/js/787.b5629dd8.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5fa97d7e.css",
-    "static/js/main.e0efc8ee.js"
+    "static/js/main.d1ded22e.js"
   ]
 }

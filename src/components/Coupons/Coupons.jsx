@@ -118,7 +118,7 @@ function Coupons() {
       name: "Name",
       cell: (row) => <p>{row.name}</p>,
 
-      width: "25%",
+      width: "17%",
     },
     {
       name: "Coupon Value",
@@ -159,7 +159,7 @@ function Coupons() {
     {
       name: "Maximum No Of Users Allowed",
       // grow: 0,
-      width: "15%",
+      width: "20%",
       selector: (row) =>
         row.maximumNoOfUsersAllowed == 0 ? (
           <span className="badge bg-danger p-2">

@@ -142,12 +142,21 @@ function SideBar() {
           name: "All Users Activity Analysis",
           path: "/Users-Activity-Analysis",
           active: false,
-        },{
+        },
+        {
           name: "Referrals",
           path: "/referrals",
           active: false,
         },
       ],
+    },
+    {
+      isrotated: false,
+      active: false,
+      name: "Contractors",
+      path: "/All-Contractors",
+      icon: "fa-solid fa-user",
+      children: [],
     },
     {
       isrotated: false,

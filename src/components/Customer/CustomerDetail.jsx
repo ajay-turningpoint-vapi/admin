@@ -14,6 +14,7 @@ import { updateUserKycStatus } from "../../services/users.service";
 import { FormControlLabel, Radio, RadioGroup } from "@material-ui/core";
 import "../../assets/style.css";
 import { usersGet } from "../../redux/actions/Users/users.actions";
+import Swal from "sweetalert2";
 function CustomerDetail({ customerData }) {
   // ==============================================================================================
   console.log(customerData, "CUSTOMER");
@@ -239,24 +240,29 @@ function CustomerDetail({ customerData }) {
 
   // ==============================================================================================
   const handleChangeKycStatus = async (id, value) => {
+    // Prompt the user for confirmation
+    const userConfirmed = window.confirm(
+      "Are you sure you want to change the KYC status?"
+    );
+
+    if (!userConfirmed) {
+      // If the user cancels, exit the function
+      return;
+    }
+
     try {
       setKycStatus(value);
       let { data: res } = await updateUserKycStatus(id, { kycStatus: value });
-      if (res.message) {
-        alert(res.message);
-      }
     } catch (err) {
-      if (err.response.data.message) {
+      if (err.response && err.response.data && err.response.data.message) {
         console.error(err.response.data.message);
-        alert(err.response.data.message);
       } else {
         console.error(err.message);
         alert(err.message);
       }
     }
-
-    console.log(id, value);
   };
+
   return (
     <main>
       <section className="product-category">

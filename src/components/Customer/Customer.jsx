@@ -1,12 +1,10 @@
 import { Button, Menu, Switch } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { images } from "../Images/Images";
-import ActionIcon from "../Utility/ActionIcon";
 import CustomButton from "../Utility/Button";
 import { downloadCSV } from "../Utility/CSV";
 import { DashboardTable } from "../Utility/DashboardBox";
-import SearchBox from "../Utility/SearchBox";
+
 import tabClick from "../Utility/TabClick";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
@@ -14,46 +12,49 @@ import {
   updateUserKycStatus,
   updateUserStatus,
 } from "../../services/users.service";
-import Box from "@mui/material/Box";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import CustomerDetail from "./CustomerDetail";
+
 import { EditModal } from "../Utility/Modal";
 import { Link } from "react-router-dom";
 import { generateFilePath } from "../Utility/utils";
+import Swal from "sweetalert2";
+
 function Customer() {
   const dispatch = useDispatch();
   const [ModalType, setModalType] = useState("");
   const [ModalName, setModalName] = useState("");
   const [ModalBox, setModalBox] = useState(false);
-  const [displayUsersArr, setDisplayUsersArr] = useState([]);
   const [usersArr, setUsersArr] = useState([]);
-  const [activeUsersArr, setActiveUsersArr] = useState([]);
-  const [inActiveUsersArr, setInActiveUsersArr] = useState([]);
   const userArr = useSelector((state) => state.users.users);
   const [selectedData, setSelectedData] = useState(null);
   const [search, setSearch] = useState("");
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const [userKycStatus, setUserKycStatus] = useState(null);
-  const open = Boolean(anchorEl);
+
   const handleChangeActiveStatus = async (id, value) => {
-    try {
-      let { data: res } = await updateUserStatus(id, { status: value });
-      if (res.message) {
-        alert(res.message);
-        handleGetAllUsers();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to change isActive status!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, change it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          let { data: res } = await updateUserStatus(id, { status: value });
+          if (res.message) {
+            handleGetAllUsers();
+          }
+        } catch (err) {
+          if (err.response && err.response.data && err.response.data.message) {
+            console.error(err.response.data.message);
+          } else {
+            console.error(err.message);
+            alert(err.message);
+          }
+        }
       }
-    } catch (err) {
-      if (err.response.data.message) {
-        console.error(err.response.data.message);
-        alert(err.response.data.message);
-      } else {
-        console.error(err.message);
-        alert(err.message);
-      }
-    }
+    });
   };
 
   const handleModalSet = (e, row) => {
@@ -63,18 +64,12 @@ function Customer() {
     setModalName("Customer Information");
     setSelectedData(row);
   };
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const conditionalRowStyles = [
     {
       when: (row) => row.isOnline === true,
       style: {
-        backgroundColor: "#c6efce", // Light green background for online rows
+        backgroundColor: "#c6efce", 
       },
     },
   ];
@@ -106,7 +101,6 @@ function Customer() {
       selector: (row) => row.role,
       width: "9%",
     },
-
     {
       name: "IS ACTIVE",
       button: true,
@@ -134,7 +128,7 @@ function Customer() {
             color = "#097969";
             break;
           default:
-            color = "black"; // or any other default color
+            color = "black";
             break;
         }
         return <p style={{ color }}>{row.kycStatus}</p>;
@@ -180,21 +174,6 @@ function Customer() {
     },
   ];
 
-  const [tabList, settabList] = useState([
-    {
-      tabName: "All Customer",
-      active: true,
-    },
-    // {
-    //   tabName: "Active Customer",
-    //   active: false,
-    // },
-    // {
-    //   tabName: "Inactive customer",
-    //   active: false,
-    // },
-  ]);
-
   const handleGetAllUsers = () => {
     let query = "";
     query += "?role=CARPENTER";
@@ -204,25 +183,20 @@ function Customer() {
 
     dispatch(usersGet(query));
   };
-  useEffect(() => {
-    if (userArr && userArr.length) {
-      setUsersArr(userArr);
-      setDisplayUsersArr(userArr);
-      console.log(userArr, "userArr");
-      setActiveUsersArr(usersArr.filter((el) => el.isActive));
-      setInActiveUsersArr(usersArr.filter((el) => !el.isActive));
-    }
-  }, [userArr]);
 
   useEffect(() => {
     handleGetAllUsers();
   }, [userKycStatus]);
 
-  console.log(userArr);
+  useEffect(() => {
+    if (userArr && userArr.length) {
+      setUsersArr(userArr);
+    } else {
+      setUsersArr([]); // Ensure the component handles an empty array
+    }
+  }, [userArr]);
 
   const handleSearch = (q) => {
-    console.log(search, "search", q);
-    console.log(activeUsersArr, "activeUsersArr");
     setSearch(q);
     if (q) {
       let searchArr = userArr.filter(
@@ -231,44 +205,9 @@ function Customer() {
           `${el.phone}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
           `${el.email}`.toLowerCase().includes(`${q}`.toLowerCase())
       );
-      console.log(searchArr, "searchArr");
       setUsersArr(searchArr);
-    }
-  };
-
-  const handleGetTselectedTable = () => {
-    if (tabList.filter((el) => el.active)[0].tabName == "All Customer") {
-      return (
-        <DataTable
-          paginationPerPage={10}
-          columns={users_columns}
-          data={usersArr}
-          pagination
-          conditionalRowStyles={conditionalRowStyles}
-        />
-      );
-    } else if (
-      tabList.filter((el) => el.active)[0].tabName == "Active Customer"
-    ) {
-      return (
-        <DataTable
-          paginationPerPage={10}
-          columns={users_columns}
-          data={activeUsersArr}
-          pagination
-          conditionalRowStyles={conditionalRowStyles}
-        />
-      );
     } else {
-      return (
-        <DataTable
-          paginationPerPage={10}
-          columns={users_columns}
-          data={inActiveUsersArr}
-          pagination
-          conditionalRowStyles={conditionalRowStyles}
-        />
-      );
+      setUsersArr(userArr);
     }
   };
 
@@ -282,45 +221,24 @@ function Customer() {
               id="pills-tab"
               role="tablist"
             >
-              {tabList.map((item, i) => {
-                return (
-                  <li key={i}>
-                    <CustomButton
-                      navPills
-                      btnName={item.tabName}
-                      pillActive={item.active ? true : false}
-                      path={item.path}
-                      extraClass={item.extraClass}
-                      ClickEvent={() => {
-                        tabClick(i, tabList, settabList);
-                      }}
-                    />
-                  </li>
-                );
-              })}
+              <li>
+                <CustomButton
+                  navPills
+                  btnName={"All Users"}
+                  pillActive={true}
+                  path={"Users"}
+                  extraClass={"test"}
+                />
+              </li>
             </ul>
-            {/* <CustomButton isLink iconName="fa-solid fa-plus" btnName="Create Customer" path="/Customer-Create" /> */}
           </div>
           <DashboardTable>
             <div className="d-flex align-items-center justify-content-between mb-5">
-              <h5 className="blue-1 m-0">Active Customer</h5>
+              <h5 className="blue-1 m-0">Active Users</h5>
               <div className="d-flex align-items-center gap-3">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                   Online-Users
-                  <div
-                    style={{
-                      backgroundColor: "#c6efce",
-                      width: "50px",
-                      height: "20px",
-                      marginLeft: "10px",
-                    }}
-                  ></div>
+                  <div style={{ backgroundColor: "#c6efce", width: "50px", height: "20px", marginLeft: "10px" }}></div>
                 </div>
 
                 <label>KYC</label>
@@ -328,9 +246,7 @@ function Customer() {
                   className="form-control"
                   style={{ width: "auto" }}
                   value={userKycStatus}
-                  onChange={(e) => {
-                    setUserKycStatus(e.target.value);
-                  }}
+                  onChange={(e) => setUserKycStatus(e.target.value)}
                 >
                   <option value="">All</option>
                   <option value="pending">Pending</option>
@@ -350,19 +266,21 @@ function Customer() {
                         className="form-control"
                         placeholder="Search"
                         value={search}
-                        onChange={(e) => {
-                          handleSearch(e.target.value);
-                        }}
+                        onChange={(e) => handleSearch(e.target.value)}
                       />
                     </div>
                   </form>
                 </div>
-
-                {/* <CustomButton isLink iconName="fa-solid fa-download" btnName="Customer CSV" path="/" small roundedPill downloadAble ClickEvent={() => downloadCSV(usersArr)} /> */}
               </div>
             </div>
 
-            {handleGetTselectedTable()}
+            <DataTable
+              paginationPerPage={10}
+              columns={users_columns}
+              data={usersArr}
+              pagination
+              conditionalRowStyles={conditionalRowStyles}
+            />
           </DashboardTable>
         </div>
       </section>

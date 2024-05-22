@@ -1,14 +1,15 @@
-import * as React from "react";
-import Card from "@mui/material/Card";
-import { notListedContractors } from "../../services/users.service";
+import React, { useState } from "react";
+import { getAllContractors } from "../../services/users.service";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
+import CarpenterModal from "../Utility/CarpenterModal";
 
 export default function Contractors() {
   const [state, setState] = React.useState();
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const fetchData = async () => {
     try {
-      const response = await notListedContractors();
+      const response = await getAllContractors();
 
       setState(response.data);
     } catch (error) {
@@ -19,34 +20,54 @@ export default function Contractors() {
     fetchData();
   }, []);
 
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
   const columns = [
     {
       name: "ID",
       cell: (row, index) => <p>{index + 1}</p>,
       sortable: true,
-      width: "15%",
+      width: "10%",
     },
     {
       name: "NAME",
       cell: (row) => <p>{row.name}</p>,
-      width: "30%",
+      width: "22%",
+    },
+
+    {
+      name: "Business Name",
+      cell: (row) => <p>{row.businessName}</p>,
+      width: "22%",
     },
     {
       name: "Phone",
       cell: (row) => <p>{row.phone}</p>,
-      width: "30%",
+      width: "18%",
     },
     {
-      name: "Carpenter Name",
-      cell: (row) => <p>{row.givenName}</p>,
-      width: "30%",
+      name: "Action",
+      width: "28%",
+      cell: (row) => {
+        return (
+          <>
+            {isModalOpen && (
+              <CarpenterModal
+                handleClose={toggleModal}
+                data={row.businessName}
+              />
+            )}
+          </>
+        );
+      },
     },
   ];
 
   return (
     <div
       className="dashboard-table dashboard-box"
-      style={{ maxWidth: "800px", marginLeft: "20px" }}
+      style={{ maxWidth: "900px", marginLeft: "20px" }}
     >
       <ul
         className="nav nav-pills dashboard-pills justify-content-start"
@@ -57,7 +78,7 @@ export default function Contractors() {
         <li>
           <CustomButton
             navPills
-            btnName={"Not Listed Contractors"}
+            btnName={"All Contractors"}
             pillActive={true}
           />
         </li>

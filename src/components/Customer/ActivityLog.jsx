@@ -15,8 +15,9 @@ function ActivityLog() {
   const dispatch = useDispatch();
   const [usersArr, setUsersArr] = useState([]);
   const userArr = useSelector((state) => state.users.users);
-  const [search, setSearch] = useState("");
   const useractivityArr = useSelector((state) => state.users.userActivtyLog);
+
+  console.log("data", useractivityArr);
   useEffect(() => {
     dispatch(userActivityLog(userId));
   }, [userId]);
@@ -24,15 +25,15 @@ function ActivityLog() {
   const users_columns = [
     {
       name: "ID",
-      cell: (row, index) => <p>{row.logId}</p>,
+      cell: (row, index) => <p>{index + 1}</p>,
       sortable: true,
-      width: "20%",
+      width: "15%",
     },
 
     {
       name: "ACITIVTY NAME",
       cell: (row) => <p>{row.type}</p>,
-      width: "20%",
+      width: "25%",
     },
 
     {
@@ -40,14 +41,14 @@ function ActivityLog() {
       cell: (row) => (
         <CustomButton greenBtn btnName={row.timestamp.slice(0, 9)} />
       ),
-      width: "20%",
+      width: "22%",
     },
     {
       name: "TIME",
       cell: (row) => (
         <CustomButton redBtn btnName={row.timestamp.slice(10, 22)} />
       ),
-      width: "20%",
+      width: "15%",
     },
   ];
 
@@ -73,41 +74,12 @@ function ActivityLog() {
     handleGetAllUsers();
   }, []);
 
-  const handleSearch = (q) => {
-    console.log(search, "search", q);
-    console.log(useractivityArr, "activeUsersArr");
-    setSearch(q);
-    if (q) {
-      let searchArr = useractivityArr.filter(
-        (el) =>
-          `${el.type}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
-          `${el.timestamp.slice(0, 9)}`
-            .toLowerCase()
-            .includes(`${q}`.toLowerCase()) ||
-          `${el.timestamp.slice(10, 22)}`
-            .toLowerCase()
-            .includes(`${q}`.toLowerCase())
-      );
-      console.log(searchArr, "searchArr");
-      setUsersArr(searchArr);
-    }
-  };
-  const handleGetTselectedTable = () => {
-    if (tabList.filter((el) => el.active)[0].tabName == "All Logs") {
-      return (
-        <DataTable
-          paginationPerPage={10}
-          columns={users_columns}
-          data={usersArr}
-          pagination
-        />
-      );
-    }
-  };
-
   return (
     <main>
-      <section className="product-category">
+      <section
+        className="product-category"
+        style={{ maxWidth: "700px", marginLeft: "20px" }}
+      >
         <div className="container-fluid p-0">
           <div className="d-flex align-items-center justify-content-between mb-3">
             <ul
@@ -141,7 +113,12 @@ function ActivityLog() {
               </h5>
             </div>
 
-            {handleGetTselectedTable()}
+            <DataTable
+              paginationPerPage={10}
+              columns={users_columns}
+              data={useractivityArr}
+              pagination
+            />
           </DashboardTable>
         </div>
       </section>
