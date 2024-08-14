@@ -34,7 +34,7 @@ export const CONTESTAdd = (formData) => async (dispatch) => {
     dispatch({ type: CONTEST_ADD });
     let { data: response } = await addContest(formData);
     if (response) {
-      console.log(response);
+      
       dispatch({
         type: CONTEST_ADD_SUCCESS,
         payload: response.message,
@@ -51,7 +51,7 @@ export const CONTESTGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_CONTESTS });
     let { data: response } = await getContest(formData);
     if (response) {
-      console.log(response);
+      
       dispatch({
         type: GET_ALL_CONTESTS_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -88,7 +88,7 @@ export const CONTESTUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_CONTEST_BY_ID });
     let { data: response } = await updateContest(formData, id);
     if (response) {
-      console.log(response);
+  
       dispatch({
         type: UPDATE_CONTEST_BY_ID_SUCCESS,
         payload: { data: null, message: response.message },
@@ -105,7 +105,7 @@ export const CONTESTDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_CONTEST_BY_ID });
     let { data: response } = await deleteContest(id);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: DELETE_CONTEST_BY_ID_SUCCESS,
         payload: { data: null, message: response.message },

@@ -95,7 +95,7 @@ function GstConfig() {
     const type = state[0];
     const rate = state[1];
     const index = gstStateRate.findIndex((item) => item.type === type);
-    console.log(type, index);
+ 
     if (index === -1) {
       temp = [...gstStateRate, { type, rate }];
     } else {

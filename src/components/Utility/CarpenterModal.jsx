@@ -17,7 +17,7 @@ export default function CarpenterModal({ data }) {
   const handleClickOpen = () => {
     setOpen(true);
   };
-  console.log(data);
+
   const handleClose = () => {
     setOpen(false);
   };

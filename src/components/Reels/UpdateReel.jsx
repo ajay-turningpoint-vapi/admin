@@ -25,7 +25,7 @@ const UpdateReel = () => {
   const [result, setResult] = useState("");
 
   const handleFileChange = (value) => {
-    console.log(value);
+
     if (`${value.result}`.includes("video")) {
       setIsVideo(true);
       setFileUrl(value.file);
@@ -45,7 +45,7 @@ const UpdateReel = () => {
       setFileUrl(reelsObj?.fileUrl);
       setDescription(reelsObj?.description);
       setType(reelsObj?.type);
-      console.log(reelsObj, "reelsObj");
+      
     }
     return () => {
       dispatch(SetCONTESTObj(null));

@@ -26,6 +26,8 @@ function UserActivityAnalysis() {
   const [dateRange, setDateRange] = useState([null, null]);
   const [originalUsersArr, setOriginalUsersArr] = useState([]);
   const [usersArrTotal, setUsersArrTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const conditionalRowStyles = [
     {
       when: (row) =>
@@ -33,10 +35,11 @@ function UserActivityAnalysis() {
         row.contestJoinCount === 0 &&
         row.contestWinCount === 0,
       style: {
-        backgroundColor: "#f0c6c6", // Light green background for online rows
+        backgroundColor: "#f0c6c6",
       },
     },
   ];
+
   const users_columns = [
     {
       name: "ID",
@@ -68,7 +71,7 @@ function UserActivityAnalysis() {
       name: "Reel View Qty",
       selector: (row) => (
         <span>
-          {row.reelsLikeCount} 
+          {row.reelsLikeCount}
         </span>
       ),
       width: "10%",
@@ -77,7 +80,7 @@ function UserActivityAnalysis() {
       name: "Contest Join Qty",
       selector: (row) => (
         <span>
-          {row.contestJoinCount} 
+          {row.contestJoinCount}
         </span>
       ),
       width: "10%",
@@ -90,25 +93,19 @@ function UserActivityAnalysis() {
   ];
 
   const handleGetAllUsers = async (query) => {
+    setLoading(true);
     const { data: response } = await getUserActivityAnalysis(query);
-    console.log(response);
     setUsersArrTotal(response);
     setUsersArr(response.data);
     setOriginalUsersArr(response.data);
+    setLoading(false);
   };
 
   useEffect(() => {
     if (dateRange !== null) {
-      const startDate = dateRange[0]
-        ? dayjs(dateRange[0]).format("YYYY-MM-DD")
-        : null;
-      const endDate = dateRange[1]
-        ? dayjs(dateRange[1]).format("YYYY-MM-DD")
-        : null;
-      const query =
-        startDate && endDate
-          ? `?startDate=${startDate}&endDate=${endDate}`
-          : "";
+      const startDate = dateRange[0] ? dayjs(dateRange[0]).format("YYYY-MM-DD") : null;
+      const endDate = dateRange[1] ? dayjs(dateRange[1]).format("YYYY-MM-DD") : null;
+      const query = startDate && endDate ? `?startDate=${startDate}&endDate=${endDate}` : "";
       handleGetAllUsers(query);
     }
   }, [dateRange]);
@@ -116,16 +113,13 @@ function UserActivityAnalysis() {
   const handleSearch = (q) => {
     setSearch(q);
     if (q) {
-      // If search query is not empty, filter the users
-      let searchArr = usersArr.filter(
+      const searchArr = usersArr.filter(
         (el) =>
           `${el.name}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
           `${el.phone}`.toLowerCase().includes(`${q}`.toLowerCase())
       );
-      console.log(searchArr, "searchArr");
       setUsersArr(searchArr);
     } else {
-      // If search query is empty, show all users
       setUsersArr(originalUsersArr);
     }
   };
@@ -134,26 +128,13 @@ function UserActivityAnalysis() {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
-          <div className="d-flex align-items-center justify-content-between "></div>
+          <div className="d-flex align-items-center justify-content-between"></div>
           <DashboardTable>
             <div className="d-flex align-items-center justify-content-between mb-3">
-              <h5 className="blue-1 m-0">Active Customer Analysis</h5>{" "}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
+              <h5 className="blue-1 m-0">Active Customer Analysis</h5>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                 In-Active-Users
-                <div
-                  style={{
-                    backgroundColor: "#f0c6c6",
-                    width: "50px",
-                    height: "20px",
-                    marginLeft: "10px",
-                  }}
-                ></div>
+                <div style={{ backgroundColor: "#f0c6c6", width: "50px", height: "20px", marginLeft: "10px" }}></div>
               </div>
               <div className="d-flex align-items-center gap-3">
                 <label>Select Date</label>
@@ -193,38 +174,33 @@ function UserActivityAnalysis() {
                 </div>
               </div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                marginBottom: "10px",
-                alignContent: "center",
-                justifyContent: "flex-end",
-              }}
-            >
+            <div style={{ display: "flex", marginBottom: "10px", alignContent: "center", justifyContent: "flex-end" }}>
               <Card style={{ marginRight: "20px" }}>
                 <CardContent>
                   <Typography variant="body2" color="#415094" component="h1">
-                    Total Reel View Qty ( <b>{usersArrTotal.totalReelsLikeCount}</b>{" "}
-                    )
+                    Total Reel View Qty (<b>{usersArrTotal.totalReelsLikeCount}</b>)
                   </Typography>
                 </CardContent>
               </Card>
               <Card>
                 <CardContent>
                   <Typography variant="body2" color="#415094" component="h1">
-                    Total Contest Join Qty ({" "}
-                    <b>{usersArrTotal.totalContestJoinCount}</b> )
+                    Total Contest Join Qty (<b>{usersArrTotal.totalContestJoinCount}</b>)
                   </Typography>
                 </CardContent>
               </Card>
             </div>
-            <DataTable
-              paginationPerPage={10}
-              columns={users_columns}
-              data={usersArr}
-              pagination
-              conditionalRowStyles={conditionalRowStyles}
-            />
+            {loading ? (
+              <div className="text-center">Loading...</div>
+            ) : (
+              <DataTable
+                paginationPerPage={10}
+                columns={users_columns}
+                data={usersArr}
+                pagination
+                conditionalRowStyles={conditionalRowStyles}
+              />
+            )}
           </DashboardTable>
         </div>
       </section>

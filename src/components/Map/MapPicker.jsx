@@ -142,7 +142,7 @@ const MapPicker = ({ onLocationChange }) => {
         `${url}/users/deletedGeofence/${geofenceId}`
       );
       const { data } = response;
-      console.log(response);
+   
       toast.success(data.message);
     } catch (error) {
       console.error("Error deleting geofence:", error);

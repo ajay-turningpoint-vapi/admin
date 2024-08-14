@@ -13,7 +13,7 @@ const AddReels = () => {
   const dispatch = useDispatch();
   const [isUpdateContest, setIsUpdateContest] = useState(false);
   const reelsObj = useSelector((state) => state.reels.reelsObj);
-  console.log("reelsObject", reelsObj);
+ 
   const [filesArr, setFilesArr] = useState([]);
 
   const handleAddTimeOut = (value, index) => {
@@ -98,7 +98,7 @@ const AddReels = () => {
     if (allFieldsFilled) {
       // Dispatch action only if all fields are filled for each file
       dispatch(ReelsAdd(filesArr));
-      console.log("test");
+    
       navigate(-1);
     }
   };

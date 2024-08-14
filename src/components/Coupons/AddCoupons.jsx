@@ -49,13 +49,13 @@ function AddCoupons() {
   const [productList, setproductList] = useState("");
   const [loading, setLoading] = useState(false);
   const handleFileSet = (value) => {
-    // console.log(value);
+
     setImage(value);
   };
 
   useEffect(() => {
     if (bannerObj) {
-      console.log(bannerObj, "bannerObj");
+     
       // setselectedCouponId(bannerObj._id);
       // setName(bannerObj.name);
       // setDescription(bannerObj.description);
@@ -64,7 +64,7 @@ function AddCoupons() {
       // setValidTill(bannerObj.validTill);
       // setMaximumNoOfUsersAllowed(bannerObj.maximumNoOfUsersAllowed);
       // let tempVal = discountTypeArr.find(el => el.value == bannerObj.discountType)
-      // console.log(tempVal, "tempVal")
+     
       // setDiscountType(tempVal);
       // setSelectedStatus({ value: brandObj.statusInfo, label: brandObj.statusInfo });
       setIsUpdateBanner(true);
@@ -116,7 +116,7 @@ function AddCoupons() {
       coupons,
       productId,
     };
-    console.log(obj);
+   
 
     if (isUpdateBanner) {
       dispatch(COUPONUpdate(obj, selectedCouponId));
@@ -150,10 +150,10 @@ function AddCoupons() {
   };
 
   const handleCoupnValueAdd = (event) => {
-    console.log(event.target.value, discountType);
+
     if (discountType != "" && discountType.value == "PERCENTAGEOFF") {
       if (!(event.target.value > 100)) {
-        console.log("Asdas");
+   
         setValue(event.target.value);
       } else {
         alert("cannot be more than 100");
@@ -358,7 +358,7 @@ function AddCoupons() {
                         defaultInputValue={discountType}
                         value={discountType}
                         onChange={(e) => {
-                          console.log(e)
+                    
                           if (e.value == "PERCENTAGEOFF") {
                             if (value != 0 && value > 100) {
                               setValue(100)

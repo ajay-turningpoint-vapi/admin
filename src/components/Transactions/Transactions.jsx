@@ -12,6 +12,7 @@ import SearchBox from "../Utility/SearchBox";
 import { DashboardBox, DashboardTable } from "../Utility/DashboardBox";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 import moment from "moment";
+import Loader from "../Utility/Loader.jsx";
 
 export const Transactions = () => {
   const dispatch = useDispatch();
@@ -32,18 +33,18 @@ export const Transactions = () => {
   const [reason, setReason] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-
   const [transactionId, setTransactionId] = useState("");
+
   useEffect(() => {
     handleGet();
   }, []);
 
   const handleGet = () => {
+    setLoading(true);
     let query = "transactions=true";
     if (page) {
       query += `&page=${page}`;
     }
-
     if (pageLimit) {
       query += `&limit=${pageLimit}`;
     }
@@ -53,17 +54,15 @@ export const Transactions = () => {
     if (statusFilter) {
       query += `&status=${statusFilter}`;
     }
-    // if (statusFilter) {
-    query += `&sort=createdAt`;
-    query += `&order=desc`;
-    // }
-    console.log("GET CALLED", query);
+    query += `&sort=createdAt&order=desc`;
+  
     dispatch(TRANSACTIONGet(query)).then(() => setLoading(false));
   };
 
   useEffect(() => {
     handleGet();
   }, [page, search, statusFilter]);
+
   const handleModalSet = async (e, row) => {
     e.preventDefault();
     setModalBox(true);
@@ -73,37 +72,23 @@ export const Transactions = () => {
       setReason(row?.reason ? row?.reason : "");
       setTransactionId(row?._id);
     } catch (err) {
-      if (err.response.data.message) {
-        console.error(err.response.data.message);
-        alert(err.response.data.message);
-      } else {
-        console.error(err.message);
-        alert(err.message);
-      }
-
+      console.error(err.message);
+      alert(err.message);
       setModalBox(false);
     }
   };
 
   const handleStatusUpdate = () => {
     try {
-      let obj = {
-        status: status,
-        reason,
-      };
-      console.log(transactionId, "transactionId");
-      dispatch(TransactionUpdateStatus(obj, transactionId));
-      setModalBox(false);
-      handleGet();
-    } catch (err) {
-      if (err.response.data.message) {
-        console.error(err.response.data.message);
-        alert(err.response.data.message);
-      } else {
-        console.error(err.message);
-        alert(err.message);
-      }
+      let obj = { status, reason };
 
+      dispatch(TransactionUpdateStatus(obj, transactionId)).then(() => {
+        setModalBox(false);
+        handleGet();
+      });
+    } catch (err) {
+      console.error(err.message);
+      alert(err.message);
       setModalBox(false);
     }
   };
@@ -112,25 +97,16 @@ export const Transactions = () => {
     {
       name: "Transaction Id",
       cell: (row) => <p>{row.transactionId}</p>,
-
       sortable: true,
       width: "12%",
     },
-    {
-      name: "Mobile",
-      cell: (row) => <p>{row?.user?.phone} </p>,
-      width: "10%",
-    },
+    { name: "Mobile", cell: (row) => <p>{row?.user?.phone} </p>, width: "10%" },
     {
       name: "Transfer",
       selector: (row) => row?.additionalInfo?.transferType,
       width: "7%",
     },
-    {
-      name: "Amount",
-      selector: (row) => row.amount,
-      width: "7%",
-    },
+    { name: "Points", selector: (row) => row.amount, width: "7%" },
     {
       name: "Description",
       cell: (row) => <p>{row.description}</p>,
@@ -139,72 +115,51 @@ export const Transactions = () => {
     {
       name: "Status",
       selector: (row) =>
-        row.status == "success" ? (
+        row.status === "success" ? (
           <CustomButton greenBtn btnName="Success" />
         ) : (
           <CustomButton redBtn btnName={row.status} />
         ),
       width: "10%",
     },
-
     {
       name: "Date Time",
       selector: (row) => `${moment(row.createdAt).format("YYYY-MM-DD, HH:mm")}`,
       width: "15%",
     },
-
     {
       name: "Action",
       cell: (row) => (
-        <>
-          <CustomButton
-            btntype="button"
-            ClickEvent={(e) => handleModalSet(e, row)}
-            isBtn
-            iconName="fa-solid fa-check"
-            btnName="View"
-          />
-        </>
+        <CustomButton
+          btntype="button"
+          ClickEvent={(e) => handleModalSet(e, row)}
+          isBtn
+          iconName="fa-solid fa-check"
+          btnName="View"
+        />
       ),
       width: "10%",
     },
   ];
 
   const [tabList, setTabList] = useState([
-    {
-      tabName: "All Transactions",
-      status: "",
-      active: true,
-    },
-    {
-      tabName: "Pending Transactions",
-      status: "pending",
-      active: false,
-    },
-    {
-      tabName: "Success Transactions",
-      status: "success",
-      active: false,
-    },
-    {
-      tabName: "Reject Transactions",
-      status: "reject",
-      active: false,
-    },
+    { tabName: "All Transactions", status: "", active: true },
+    { tabName: "Pending Transactions", status: "pending", active: false },
+    { tabName: "Success Transactions", status: "success", active: false },
+    { tabName: "Reject Transactions", status: "reject", active: false },
   ]);
 
   useEffect(() => {
-    console.log(transactionAllArr, "transactionAllArr");
+
   }, [transactionAllArr]);
 
   useEffect(() => {
     if (transactionArr) {
       let tempArr = transactionArr;
       setTransactionAllArr([...tempArr]);
-      // console.log(tempArr, "transactionArr")
-      setSuccessUsersArr(tempArr.filter((el) => el.status == "success"));
-      setPendingTransactionArr(tempArr.filter((el) => el.status == "pending"));
-      setRejectTransactionArr(tempArr.filter((el) => el.status == "reject"));
+      setSuccessUsersArr(tempArr.filter((el) => el.status === "success"));
+      setPendingTransactionArr(tempArr.filter((el) => el.status === "pending"));
+      setRejectTransactionArr(tempArr.filter((el) => el.status === "reject"));
     }
   }, [transactionArr, page, pageLimit]);
 
@@ -212,41 +167,35 @@ export const Transactions = () => {
     let temp = tabList.map((item, index) => {
       if (i === index) {
         item.active = true;
-        // if (item.status) {
         setStatusFilter(item.status);
-        // }
       } else {
         item.active = false;
       }
-
       return item;
     });
-
     settabList([...temp]);
   };
+
   const handlePageChange = (event, value) => {
+    setLoading(true);
     setPage(value);
   };
+
   const handleGetTselectedTable = () => {
     let arr = [];
-    if (tabList.filter((el) => el.active)[0].tabName == "All Transactions") {
+    if (tabList.find((el) => el.active).tabName === "All Transactions") {
       arr = transactionAllArr;
     } else if (
-      tabList.filter((el) => el.active)[0].tabName == "Success Transactions"
+      tabList.find((el) => el.active).tabName === "Success Transactions"
     ) {
       arr = successTransactionArr;
     } else if (
-      tabList.filter((el) => el.active)[0].tabName == "Reject Transactions"
+      tabList.find((el) => el.active).tabName === "Reject Transactions"
     ) {
       arr = rejectTransactionArr;
     } else {
       arr = pendingTransactionArr;
     }
-    console.log(
-      transactionAllArr.map((el) => el.status),
-      arr.map((el) => el.status),
-      tabList.filter((el) => el.active)[0].tabName == "All Transactions"
-    );
     return arr;
   };
 
@@ -260,21 +209,18 @@ export const Transactions = () => {
                 <h5 className="blue-1 m-0">Transactions</h5>
                 <div className="d-flex gap-3">
                   <ul className="dashboard-filter filters">
-                    {tabList.map((item, i) => {
-                      return (
-                        <li key={`${item.type}_${i}`}>
-                          <CustomButton
-                            navPills
-                            btnName={item.tabName}
-                            changeClass="filtering"
-                            pillActive={item.active ? true : false}
-                            ClickEvent={() => tabClick(i, tabList, setTabList)}
-                          />
-                        </li>
-                      );
-                    })}
+                    {tabList.map((item, i) => (
+                      <li key={`${item.type}_${i}`}>
+                        <CustomButton
+                          navPills
+                          btnName={item.tabName}
+                          changeClass="filtering"
+                          pillActive={item.active}
+                          ClickEvent={() => tabClick(i, tabList, setTabList)}
+                        />
+                      </li>
+                    ))}
                   </ul>
-
                   <div className="search-field">
                     <form action="#" className="form">
                       <div className="input-group bg-white">
@@ -285,33 +231,32 @@ export const Transactions = () => {
                           type="text"
                           className="form-control"
                           placeholder="Search"
-                          onChange={(e) => {
-                            setSearch(e.target.value);
-                          }}
+                          onChange={(e) => setSearch(e.target.value)}
                         />
                       </div>
                     </form>
                   </div>
                 </div>
               </div>
-              {transactionArr ? (
+              {loading ? (
+                <Loader/>
+              ) : (
                 <DashboardTable>
                   <DataTable
                     columns={transaction_columns}
-                    data={transactionArr?.length ? transactionArr : []}
+                    data={handleGetTselectedTable()}
                   />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <h5 className="blue-1 m-0"></h5>
                     <Pagination
                       count={transactionArrTotalPages}
                       onChange={handlePageChange}
+                      page={page}
                       showFirstButton
                       showLastButton
                     />
                   </div>
                 </DashboardTable>
-              ) : (
-                "Loading..."
               )}
             </div>
           </div>
@@ -394,24 +339,22 @@ export const Transactions = () => {
                               {modalData.additionalInfo && (
                                 <>
                                   <li>
-                                    <li>
-                                      <span className="fw-600">
-                                        TransferType <span>:</span>
-                                      </span>
-                                      {modalData.additionalInfo?.transferType}
-                                    </li>
+                                    <span className="fw-600">
+                                      TransferType <span>:</span>
+                                    </span>
+                                    {modalData.additionalInfo?.transferType}
                                   </li>
                                   {(() => {
                                     switch (
                                       modalData.additionalInfo?.transferType
                                     ) {
                                       case "CASH":
-                                        return;
+                                        return null;
                                       case "BANK":
                                         return (
                                           <>
                                             <span className="fw-600">
-                                              Bank :
+                                              Bank :{" "}
                                               {
                                                 modalData.additionalInfo
                                                   ?.transferDetails?.bank
@@ -419,7 +362,7 @@ export const Transactions = () => {
                                             </span>
                                             <br />
                                             <span className="fw-600">
-                                              Account No :
+                                              Account No :{" "}
                                               {
                                                 modalData.additionalInfo
                                                   ?.transferDetails?.accountNo
@@ -427,7 +370,7 @@ export const Transactions = () => {
                                             </span>
                                             <br />
                                             <span className="fw-600">
-                                              Account Name :
+                                              Account Name :{" "}
                                               {
                                                 modalData.additionalInfo
                                                   ?.transferDetails?.accountName
@@ -435,7 +378,7 @@ export const Transactions = () => {
                                             </span>
                                             <br />
                                             <span className="fw-600">
-                                              IFSC Code :
+                                              IFSC Code :{" "}
                                               {
                                                 modalData.additionalInfo
                                                   ?.transferDetails?.ifsc
@@ -444,11 +387,10 @@ export const Transactions = () => {
                                             <br />
                                           </>
                                         );
-
                                       case "UPI":
                                         return (
                                           <span className="fw-600">
-                                            UPI Id :
+                                            UPI Id :{" "}
                                             {
                                               modalData.additionalInfo
                                                 ?.transferDetails?.upiId
@@ -465,48 +407,42 @@ export const Transactions = () => {
                                     </span>
                                     {modalData?.user?.email}
                                   </li>
-                                  {/* {
-                                    modalData?.status != 'success' && ( */}
-                                  <>
-                                    <li>
-                                      <span className="fw-600">
-                                        Update Status <span>:</span>
-                                      </span>
-                                      {modalData?.status}
-                                      <select
-                                        className="form-control my-2"
-                                        value={status}
-                                        onChange={(e) =>
-                                          setStatus(e.target.value)
-                                        }
-                                      >
-                                        <option>Select Status</option>
-                                        <option value="success">Success</option>
-                                        <option value="reject">Reject</option>
-                                      </select>
-                                    </li>
-                                    <li>
-                                      <span className="fw-600">
-                                        Reason <span>:</span>
-                                      </span>
-                                      {modalData?.reason}
-                                      <input
-                                        value={reason}
-                                        className="form-control mb-3"
-                                        onChange={(e) =>
-                                          setReason(e.target.value)
-                                        }
-                                      />
-                                    </li>
-                                    <button
-                                      className="btn btn-success"
-                                      onClick={handleStatusUpdate}
+                                  <li>
+                                    <span className="fw-600">
+                                      Update Status <span>:</span>
+                                    </span>
+                                    {modalData?.status}
+                                    <select
+                                      className="form-control my-2"
+                                      value={status}
+                                      onChange={(e) =>
+                                        setStatus(e.target.value)
+                                      }
                                     >
-                                      Update
-                                    </button>
-                                  </>
-                                  {/* )
-                                  } */}
+                                      <option>Select Status</option>
+                                      <option value="success">Success</option>
+                                      <option value="reject">Reject</option>
+                                    </select>
+                                  </li>
+                                  <li>
+                                    <span className="fw-600">
+                                      Reason <span>:</span>
+                                    </span>
+                                    {modalData?.reason}
+                                    <input
+                                      value={reason}
+                                      className="form-control mb-3"
+                                      onChange={(e) =>
+                                        setReason(e.target.value)
+                                      }
+                                    />
+                                  </li>
+                                  <button
+                                    className="btn btn-success"
+                                    onClick={handleStatusUpdate}
+                                  >
+                                    Update
+                                  </button>
                                 </>
                               )}
                             </ul>

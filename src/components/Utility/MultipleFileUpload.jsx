@@ -56,7 +56,7 @@ function MultiFileUpload({
 
   useEffect(() => {
     if (filesArr) {
-      console.log(filesArr, "filesArr");
+   
     }
   }, [filesArr]);
 

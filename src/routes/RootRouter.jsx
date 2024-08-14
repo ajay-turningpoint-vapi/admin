@@ -5,36 +5,33 @@ import AuthorizedRoutes from "./AuthorizedRoutes";
 import { useSelector } from "react-redux";
 import UnauthorizedRoutes from "./UnauthorizedRoutes";
 import ViewCoupons from "../components/Coupons/ViewCoupons";
+import { useAuthCheck } from "../utils/useAuthCheck";
 export default function RootRouter() {
   const authObj = useSelector((state) => state.auth);
   const [hideAllOtherRoutes, setHideAllOtherRoutes] = useState(false);
   useEffect(() => {
-    console.log(window.location.href, "window.location.href", window.location.href.includes("/Coupon/ViewCoupons"))
     if (window.location.href.includes("/Coupon/ViewCoupons")) {
-      setHideAllOtherRoutes(true)
+      setHideAllOtherRoutes(true);
+    } else {
+      setHideAllOtherRoutes(false);
     }
-    else {
-      setHideAllOtherRoutes(false)
-    }
-  }, [window.location.href])
+  }, [window.location.href]);
 
-  useEffect(() => {
+  useEffect(() => {}, [hideAllOtherRoutes]);
 
-  }, [hideAllOtherRoutes])
-  return <Router>
-    <Routes>
-      <Route exact path="/Coupon/ViewCoupons" element={<ViewCoupons />}>
-      </Route>
-      {/* <Route path="/*">
-        
-      </Route> */}
-    </Routes>
-    {/* {
-      hideAllOtherRoutes === false && */}
-    <div className="no-print">
-      {authObj?.isAuthorized ? <AuthorizedRoutes /> : <UnauthorizedRoutes />}
-    </div>
-    {/* } */}
-
-  </Router>;
+  useAuthCheck();
+  return (
+    <Router>
+      <Routes>
+        <Route
+          exact
+          path="/Coupon/ViewCoupons"
+          element={<ViewCoupons />}
+        ></Route>
+      </Routes>
+      <div className="no-print">
+        {authObj?.isAuthorized ? <AuthorizedRoutes /> : <UnauthorizedRoutes />}
+      </div>
+    </Router>
+  );
 }

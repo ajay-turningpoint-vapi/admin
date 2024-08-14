@@ -17,7 +17,7 @@ function ActivityLog() {
   const userArr = useSelector((state) => state.users.users);
   const useractivityArr = useSelector((state) => state.users.userActivtyLog);
 
-  console.log("data", useractivityArr);
+  
   useEffect(() => {
     dispatch(userActivityLog(userId));
   }, [userId]);

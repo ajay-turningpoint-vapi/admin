@@ -37,7 +37,7 @@ export const COUPONAdd = (formData) => async (dispatch) => {
     dispatch({ type: COUPON_ADD });
     let { data: response } = await addCoupon(formData);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: COUPON_ADD_SUCCESS,
         payload: response.message,
@@ -51,11 +51,11 @@ export const COUPONAdd = (formData) => async (dispatch) => {
 
 export const CouponMultipleAdd = (formData) => async (dispatch) => {
   try {
-    console.log(formData, "respose");
+  
     dispatch({ type: COUPON_MULTIPLE_ADD });
     let { data: response } = await addMultpleCoupons(formData);
     if (response) {
-      console.log(response, "respose");
+    
       dispatch({
         type: COUPON_MULTIPLE_ADD_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -72,7 +72,7 @@ export const COUPONGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_COUPONS });
     let { data: response } = await getCoupons(formData);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: GET_ALL_COUPONS_SUCCESS,
         payload: {
@@ -114,7 +114,7 @@ export const COUPONUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_COUPON_BY_ID });
     let { data: response } = await updateCouponById(formData, id);
     if (response) {
-      console.log(response);
+
       dispatch({
         type: UPDATE_COUPON_BY_ID_SUCCESS,
       });
@@ -130,7 +130,7 @@ export const COUPONDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_COUPON_BY_ID });
     let { data: response } = await deleteCouponById(id);
     if (response) {
-      console.log(response);
+    
       dispatch({
         type: DELETE_COUPON_BY_ID_SUCCESS,
       });

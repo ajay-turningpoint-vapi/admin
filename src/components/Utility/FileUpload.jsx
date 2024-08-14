@@ -9,7 +9,7 @@ function FileUpload({ getVideoDuration, onFileChange, currentImage }) {
     var duration = 0;
     reader.readAsDataURL(file);
     reader.onload = function () {
-      console.log(reader);
+
       var media = new Audio(reader.result);
       media.onloadedmetadata = function () {
         duration = media.duration;

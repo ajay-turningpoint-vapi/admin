@@ -18,7 +18,7 @@ export default function PrizeModal({ data }) {
   const handleClose = () => {
     setOpen(false);
   };
-console.log(data);
+
   const contest_columns = [
     {
       name: "Rank",

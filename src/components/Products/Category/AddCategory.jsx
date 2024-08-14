@@ -67,7 +67,7 @@ function AddCategory({ makeChange }) {
   }, []);
 
   const handleChange = (value) => {
-    console.log(value);
+
     setSelectedParentCategoryId(value._id);
   };
   const handleFileSet = (value) => {

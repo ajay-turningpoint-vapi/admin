@@ -12,8 +12,8 @@ import {
 } from "../../services/users.service";
 import { Pagination } from "@mui/material";
 import "../../assets/scss/main.css";
+import Loader from "../Utility/Loader.jsx";
 function PointHistory() {
-  // ======================================================================================
   const dispatch = useDispatch();
   let { userId } = useParams();
   const [pointHistoriesArr, setPointHistoriesArr] = useState([]);
@@ -23,21 +23,20 @@ function PointHistory() {
   const [search, setSearch] = useState("");
   const [activeDiv, setActiveDiv] = useState(null);
   const [totalPagesCount, settTotalPagesCount] = useState("");
-  const pointHistoryArr = useSelector(
-    (state) => state.users.pointHistoryByUserObj
-  );
+  const pointHistoryArr = useSelector((state) => state.users.pointHistoryByUserObj);
 
   const [userPointsReportsData, setUserPointsReportsData] = useState({});
+
   const handleGetAllUserPointHistoryByUserId = (userId) => {
     dispatch(userPointHistory(userId));
   };
 
   const handlePointHistory = async () => {
+    setLoading(true);
     let query = `userId=${userId}`;
     if (page) {
       query += `&page=${page}`;
     }
-
     if (pageLimit) {
       query += `&limit=${pageLimit}`;
     }
@@ -47,6 +46,7 @@ function PointHistory() {
     const response = await getUserPointHistoryById(query);
     setPointHistoriesArr(response.data.data);
     settTotalPagesCount(response.data.totalPages);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -60,24 +60,29 @@ function PointHistory() {
     HandleGetUserStatsReport(userId);
     handleGetAllUserPointHistoryByUserId(userId);
   }, [userId]);
+
   useEffect(() => {
     handlePointHistory();
   }, [search, page]);
+
   const HandleGetUserStatsReport = async (userIdValue) => {
     try {
-      console.log(userIdValue);
+  
       let { data: res } = await getUserStatsReport(userIdValue);
       if (res.data) {
-        console.log(res.data, "stats");
+    
         setUserPointsReportsData(res.data);
       }
     } catch (err) {
       console.error(err);
     }
   };
+
   const handlePageChange = (event, value) => {
+    setLoading(true)
     setPage(value);
   };
+
   const points_columns = [
     {
       name: "TransactionId",
@@ -93,7 +98,7 @@ function PointHistory() {
     {
       name: "Amount",
       selector: (row) =>
-        row.type == "CREDIT" ? (
+        row.type === "CREDIT" ? (
           <span className="text-success">
             <i className="fa fa-arrow-down"> </i> {row.amount}{" "}
           </span>
@@ -119,29 +124,11 @@ function PointHistory() {
       selector: (row) => `${moment(row.createdAt).format("YYYY-MM-DD, HH:mm")}`,
       width: "15%",
     },
-    // {
-    //   name: "IS ACTIVE",
-    //   button: true,
-    //   cell: (row) => <Switch onChange={(e) => handleChangeActiveStatus(row._id, e.target.checked)} checked={row.isActive} />,
-    //   width: "10%",
-    // },
-
-    // {
-    //   name: "Action",
-    //   cell: (row) => (
-    //     <>
-    //       <CustomButton btntype="button" ClickEvent={(e) => handleModalSet(e, row)} isBtn iconName="fa-solid fa-check" btnName="View" />
-    //       <Link to={`/user-point-history/${row?._id}`} className="btn btn-secondary ms-2 text-white">Point History</Link>
-    //       {selectedData && <EditModal ModalBox={ModalBox} data={selectedData} setModalBox={setModalBox} name={ModalName} ModalType={ModalType} width="max-content" />}
-    //     </>
-    //   ),
-    //   width: "20%",
-    // },
   ];
+
   const handleDivClick = (divId) => {
     setActiveDiv(divId);
   };
-  // ======================================================================================
 
   return (
     <main>
@@ -292,18 +279,23 @@ function PointHistory() {
               </div>
             </div>
           </div>
-          <DashboardTable>
-            <DataTable columns={points_columns} data={pointHistoriesArr} />{" "}
-            <div className="d-flex align-items-center justify-content-between mt-4">
-              <h5 className="blue-1 m-0"></h5>
-              <Pagination
-                count={totalPagesCount}
-                onChange={handlePageChange}
-                showFirstButton
-                showLastButton
-              />
-            </div>
-          </DashboardTable>
+          {loading ? (
+            <Loader />
+          ) : (
+            <DashboardTable>
+              <DataTable columns={points_columns} data={pointHistoriesArr} />
+              <div className="d-flex align-items-center justify-content-between mt-4">
+                <h5 className="blue-1 m-0"></h5>
+                <Pagination
+                  count={totalPagesCount}
+                  onChange={handlePageChange}
+                  page={page}
+                  showFirstButton
+                  showLastButton
+                />
+              </div>
+            </DashboardTable>
+          )}
         </div>
       </section>
     </main>

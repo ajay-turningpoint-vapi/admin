@@ -1,11 +1,23 @@
-import { toastError, toastSuccess } from "../../../components/Utility/ToastUtils";
-import { AUTH, AUTH_FAIL, AUTH_SUCCESS, LOGOUT } from "../../actions/auth/auth.actions";
+import {
+  toastError,
+  toastSuccess,
+} from "../../../components/Utility/ToastUtils";
+import {
+  AUTH,
+  AUTH_FAIL,
+  AUTH_SUCCESS,
+  LOGOUT,
+  REFRESH_TOKEN_FAIL,
+  REFRESH_TOKEN_REQUEST,
+  REFRESH_TOKEN_SUCCESS,
+} from "../../actions/auth/auth.actions";
 
 const initialState = {
   isAuthorized: false,
   user: null,
   role: null,
   token: null,
+  refreshToken: null,
   loading: false,
   error: null,
 };
@@ -43,6 +55,26 @@ export const authReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       };
+      case REFRESH_TOKEN_REQUEST:
+        return {
+          ...state,
+          loading: true,
+          error: null,
+        };
+      case REFRESH_TOKEN_SUCCESS:
+        return {
+          ...state,
+          token: action.payload,
+          loading: false,
+          error: null,
+        };
+      case REFRESH_TOKEN_FAIL:
+        return {
+          ...state,
+          loading: false,
+          error: action.payload,
+        };
+
     case LOGOUT:
       toastSuccess("Logged Out");
       return { ...initialState };

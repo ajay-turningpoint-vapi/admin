@@ -7,7 +7,7 @@ export function convertArrayOfObjectsToCSV(array) {
 
   const keys = Object.keys(array[0]);
 
-  console.log(keys);
+  
 
   result = "";
 

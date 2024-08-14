@@ -23,7 +23,7 @@ function AttributeValue() {
       status,
     };
     if (isUpdate) {
-      console.log(selectedAttributeId);
+  
       dispatch(ATTRIBUTE_VALUEUpdate(obj, selectedAttributeId));
     } else {
       dispatch(ATTRIBUTE_VALUE_Add(obj));

@@ -32,7 +32,7 @@ function Attribute({
   const onAttributeSelected = (e) => {
     addAttributeField(e.value);
     setAttributeSelected(e.value);
-    console.log(AttributeSelected, e.value);
+;
   };
 
   const deleteAttributeField = (index) => {

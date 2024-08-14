@@ -29,7 +29,7 @@ export const BANNERAdd = (formData) => async (dispatch) => {
     dispatch({ type: BANNER_ADD });
     let { data: response } = await addBanner(formData);
     if (response) {
-      console.log(response);
+
       dispatch({
         type: BANNER_ADD_SUCCESS,
         payload: response.message,
@@ -46,7 +46,7 @@ export const BANNERGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_BANNERS });
     let { data: response } = await getBanner(formData);
     if (response) {
-      console.log(response);
+
       dispatch({
         type: GET_ALL_BANNERS_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -83,7 +83,7 @@ export const BANNERUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_BANNER_BY_ID });
     let { data: response } = await updateBanner(formData, id);
     if (response) {
-      console.log(response);
+      
       dispatch({
         type: UPDATE_BANNER_BY_ID_SUCCESS,
       });
@@ -99,7 +99,7 @@ export const BANNERDelete = (formData, id) => async (dispatch) => {
     dispatch({ type: DELETE_BANNER_BY_ID });
     let { data: response } = await deleteBanner(formData, id);
     if (response) {
-      console.log(response);
+      
       dispatch({
         type: DELETE_BANNER_BY_ID_SUCCESS,
       });

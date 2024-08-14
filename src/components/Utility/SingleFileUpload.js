@@ -9,7 +9,7 @@ function SingleFileUpload({ getVideoDuration, onFileChange, currentImage }) {
     if (newFilesArr.length > 0) {
       const result = newFilesArr[0];
       // Handle the result, you can use it as needed
-      console.log(result);
+     
       setFilesArr(newFilesArr);
       onFileChange(result);
     }

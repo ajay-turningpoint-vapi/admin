@@ -33,7 +33,7 @@ export const PRODUCTAdd = (formData) => async (dispatch) => {
     dispatch({ type: PRODUCT_ADD });
     let { data: response } = await addProduct(formData);
     if (response) {
-      console.log(response);
+     
       dispatch({
         type: PRODUCT_ADD_SUCCESS,
         payload: response.message,
@@ -50,7 +50,7 @@ export const PRODUCTGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_PRODUCTS });
     let { data: response } = await getProducts(formData);
     if (response) {
-      console.log(response);
+      
       dispatch({
         type: GET_ALL_PRODUCTS_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -87,7 +87,7 @@ export const PRODUCTUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_PRODUCT_BY_ID });
     let { data: response } = await updateProductById(formData, id);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: UPDATE_PRODUCT_BY_ID_SUCCESS,
         payload: response.message,
@@ -104,7 +104,7 @@ export const PRODUCTDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_PRODUCT_BY_ID });
     let { data: response } = await deleteProductById(id);
     if (response) {
-      console.log(response);
+ 
       dispatch({
         type: DELETE_PRODUCT_BY_ID_SUCCESS,
         payload: { message: response.message },

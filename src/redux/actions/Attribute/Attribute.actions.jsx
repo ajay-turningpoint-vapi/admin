@@ -53,7 +53,7 @@ export const ATTRIBUTE_VALUE_Add = (formData) => async (dispatch) => {
     dispatch({ type: ATTRIBUTE_VALUE_ADD });
     let { data: response } = await addAttributValue(formData);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: ATTRIBUTE_VALUE_ADD_SUCCESS,
         payload: response.message,
@@ -71,7 +71,7 @@ export const ATTRIBUTE_VALUE_Get = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_ATTRIBUTE_VALUES });
     let { data: response } = await getAttributeValue(formData);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: GET_ALL_ATTRIBUTE_VALUES_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -108,7 +108,7 @@ export const ATTRIBUTE_VALUEUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_ATTRIBUTE_VALUE_BY_ID });
     let { data: response } = await updateAttributeValue(formData, id);
     if (response) {
-      console.log(response);
+  
       dispatch({
         type: UPDATE_ATTRIBUTE_VALUE_BY_ID_SUCCESS,
       });
@@ -124,7 +124,7 @@ export const ATTRIBUTE_VALUEDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_ATTRIBUTE_VALUE_BY_ID });
     let { data: response } = await deleteAttributeValue(id);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: DELETE_ATTRIBUTE_VALUE_BY_ID_SUCCESS,
         payload: response.message,
@@ -142,7 +142,7 @@ export const ATTRIBUTEAdd = (formData) => async (dispatch) => {
     dispatch({ type: ATTRIBUTE_ADD });
     let { data: response } = await addAttribute(formData);
     if (response) {
-      console.log(response);
+     
       dispatch({
         type: ATTRIBUTE_ADD_SUCCESS,
         payload: response.message,
@@ -160,7 +160,7 @@ export const ATTRIBUTEGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_ATTRIBUTE });
     let { data: response } = await getAttribute(formData);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: GET_ALL_ATTRIBUTE_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -177,7 +177,7 @@ export const ATTRIBUTEDelete = (formData) => async (dispatch) => {
     dispatch({ type: DELETE_ATTRIBUTE_BY_ID });
     let { data: response } = await deleteAttribute(formData);
     if (response) {
-      console.log(response);
+    
       dispatch({
         type: DELETE_ATTRIBUTE_BY_ID_SUCCESS,
         payload: response.message,

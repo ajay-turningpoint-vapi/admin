@@ -33,7 +33,7 @@ export const CATEGORYAdd = (formData) => async (dispatch) => {
     dispatch({ type: CATEGORY_ADD });
     let { data: response } = await addCategory(formData);
     if (response) {
-      console.log(response);
+     
       dispatch({
         type: CATEGORY_ADD_SUCCESS,
         payload: response.message,
@@ -50,7 +50,7 @@ export const CATEGORYGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_CATEGORYS });
     let { data: response } = await getCategory(formData);
     if (response) {
-      console.log(response);
+  
       dispatch({
         type: GET_ALL_CATEGORYS_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -87,7 +87,7 @@ export const CATEGORYUpdate = (id, formData) => async (dispatch) => {
     dispatch({ type: UPDATE_CATEGORY_BY_ID });
     let { data: response } = await updateCategory(formData, id);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: UPDATE_CATEGORY_BY_ID_SUCCESS,
         payload: response.message,
@@ -105,7 +105,7 @@ export const CATEGORYDelete = (formData, id) => async (dispatch) => {
     dispatch({ type: DELETE_CATEGORY_BY_ID });
     let { data: response } = await deleteCategory(formData, id);
     if (response) {
-      console.log(response);
+  
       dispatch({
         type: DELETE_CATEGORY_BY_ID_SUCCESS,
       });

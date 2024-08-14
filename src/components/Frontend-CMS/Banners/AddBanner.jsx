@@ -49,7 +49,7 @@ function AddBanner() {
       url,
       image: imageStr ? imageStr : prevImage,
     };
-    console.log(selectedBannerId);
+  
     if (isUpdateBanner) {
       dispatch(BANNERUpdate(obj, selectedBannerId));
     } else {

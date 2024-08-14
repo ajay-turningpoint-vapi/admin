@@ -29,7 +29,7 @@ function GstSetup() {
   };
 
   const taxes = useSelector((state) => state.taxes.taxes);
-  console.log(taxes);
+
   useEffect(() => {
     dispatch(TAXGet());
   }, []);

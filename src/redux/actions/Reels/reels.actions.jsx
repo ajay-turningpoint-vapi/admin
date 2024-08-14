@@ -36,7 +36,7 @@ export const ReelsAdd = (formData) => async (dispatch) => {
     dispatch({ type: REELS_ADD });
     let { data: response } = await addReels(formData);
     if (response) {
-      console.log("response action",response);
+   
       dispatch({
         type: REELS_ADD_SUCCESS,
         payload: response.message,
@@ -53,7 +53,7 @@ export const ReelsGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_REELS });
     let { data: response } = await getReels(formData);
     if (response) {
-      console.log(response);
+  
       dispatch({
         type: GET_ALL_REELS_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -90,7 +90,7 @@ export const ReelsUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_REELS_BY_ID });
     let { data: response } = await updateReelsById(formData, id);
     if (response) {
-      console.log(response);
+
       dispatch({
         type: UPDATE_REELS_BY_ID_SUCCESS,
         payload: response,
@@ -107,7 +107,7 @@ export const ReelsDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_REELS_BY_ID });
     let { data: response } = await deleteReelsById(id);
     if (response) {
-      console.log(response);
+    
       dispatch({
         type: DELETE_REELS_BY_ID_SUCCESS,
       });

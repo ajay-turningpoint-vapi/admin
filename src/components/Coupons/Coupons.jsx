@@ -21,6 +21,7 @@ import { generateFilePath, generateQrFilePath } from "../Utility/utils";
 import { Pagination } from "@mui/material";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
+import Loader from "../Utility/Loader.jsx";
 function Coupons() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,79 +35,81 @@ function Coupons() {
   const [productId, setproductId] = useState("");
 
   const handleGetAllCoupons = () => {
+    setLoading(true);
     let query = "";
-    if (page) {
-      query += `&page=${page}`;
-    }
-
-    if (pageLimit) {
-      query += `&limit=${pageLimit}`;
-    }
-    if (usedCoupon) {
-      query += `&couponUsed=${usedCoupon}`;
-    }
-    if (productId) {
-      query += `&productId=${productId}`;
-    }
+    if (page) query += `&page=${page}`;
+    if (pageLimit) query += `&limit=${pageLimit}`;
+    if (usedCoupon) query += `&couponUsed=${usedCoupon}`;
+    if (productId) query += `&productId=${productId}`;
     dispatch(COUPONGet(query)).then(() => setLoading(false));
   };
+
   const handleExportExcel = async () => {
     try {
+      setLoading(true);
       const res = await downloadCouponsExcel();
       const blobUrl = window.URL.createObjectURL(new Blob([res.data]));
-      // Create a link element to trigger the download
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.setAttribute("download", "coupons.xlsx"); // Set the filename
-
-      // Append the link to the document body and trigger the download
+      link.setAttribute("download", "coupons.xlsx");
       document.body.appendChild(link);
       link.click();
-
-      // Clean up resources after download
       window.URL.revokeObjectURL(blobUrl);
       document.body.removeChild(link);
+      setLoading(false);
     } catch (error) {
       console.error("Error downloading file:", error);
+      setLoading(false);
     }
   };
 
   const handleDownloadAllCouponsZip = async (e) => {
     try {
       e.preventDefault();
+      setLoading(true);
       let { data: res } = await downloadCouponsLink();
-      console.log(res, "ads");
       const link = document.createElement("a");
-      console.log(generateQrFilePath(res.data.zipFileName), "link");
       window.open(`${generateQrFilePath(res.data.zipFileName)}`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setLoading(false);
     } catch (err) {
       toastError(err);
+      setLoading(false);
     }
   };
 
   const handleDelete = (row) => {
-    COUPONDelete(row._id);
-    handleGetAllCoupons();
+    setLoading(true);
+    dispatch(COUPONDelete(row._id)).then(() => {
+      handleGetAllCoupons();
+      setLoading(false);
+    });
   };
+
   const handlePageChange = (event, value) => {
+    setLoading(true);
     setPage(value);
   };
+
   useEffect(() => {
     handleGetAllCoupons();
     dispatch(PRODUCTGet());
   }, []);
+
   useEffect(() => {
     handleGetAllCoupons();
   }, [page]);
+
   useEffect(() => {
     handleGetAllCoupons();
   }, [usedCoupon, productId]);
+
   const handleEdit = (row) => {
     dispatch(SetCOUPONObj(row));
   };
+
   const brand_columns = [
     {
       name: "ID",
@@ -117,7 +120,6 @@ function Coupons() {
     {
       name: "Name",
       cell: (row) => <p>{row.name}</p>,
-
       width: "17%",
     },
     {
@@ -132,36 +134,11 @@ function Coupons() {
         row?.productObj ? <p>{row.productObj?.name}</p> : <p>No Product</p>,
       width: "15%",
     },
-
-    // {
-    //   name: "Image",
-    //   grow: 0,
-    //   cell: (row) => <img height="84px" width="56px" alt={row.name} src={generateFilePath(row.image)} />,
-    // },
-    // {
-    //   name: "Discount Type",
-    //   grow: 0,
-    //   selector: (row) => row.discountType,
-    //   width: "16%",
-    // },
-    // {
-    //   name: "Discount Value",
-    //   grow: 0,
-    //   selector: (row) => row.value,
-    // },
-    // {
-    //   name: "Valid Till",
-    //   grow: 0,
-    //   selector: (row) => `${new Date(row.validTill).toDateString()}`,
-    //   width: "17%",
-
-    // },
     {
       name: "Maximum No Of Users Allowed",
-      // grow: 0,
       width: "20%",
       selector: (row) =>
-        row.maximumNoOfUsersAllowed == 0 ? (
+        row.maximumNoOfUsersAllowed === 0 ? (
           <span className="badge bg-danger p-2">
             {row.maximumNoOfUsersAllowed} (Used)
           </span>
@@ -169,18 +146,11 @@ function Coupons() {
           row.maximumNoOfUsersAllowed
         ),
     },
-
     {
       name: "Created At",
       cell: (row) => <p>{new Date(row.createdAt).toDateString()}</p>,
       width: "15%",
     },
-
-    // {
-    //   name: "Action",
-    //   width: "20%",
-    //   cell: (row) => <ActionIcon isRedirected={true} onEditClick={() => handleEdit(row)} editPath="/Coupon/Coupon-Create" onDeleteClick={() => handleDelete(row._id)} deletePath="/Coupons" remove edit Uniquekey={row.id} />,
-    // },
   ];
 
   return (
@@ -192,13 +162,11 @@ function Coupons() {
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <h5 className="blue-1 m-0">Coupon List</h5>
                 <div className="d-flex align-items-center gap-3">
-                  <label>Copouns</label>
+                  <label>Coupons</label>
                   <select
                     className="form-control"
                     value={usedCoupon}
-                    onChange={(e) => {
-                      setUsedCoupon(e.target.value);
-                    }}
+                    onChange={(e) => setUsedCoupon(e.target.value)}
                   >
                     <option value="All">All</option>
                     <option value="0">Used</option>
@@ -208,14 +176,14 @@ function Coupons() {
                   <select
                     className="form-control"
                     value={productId}
-                    onChange={(e) => {
-                      setproductId(e.target.value);
-                    }}
+                    onChange={(e) => setproductId(e.target.value)}
                   >
                     <option>Please Select </option>
                     {productArr &&
                       productArr.map((product) => (
-                        <option value={product?._id}>{product.name}</option>
+                        <option key={product._id} value={product._id}>
+                          {product.name}
+                        </option>
                       ))}
                   </select>
                   <CustomButton
@@ -223,7 +191,7 @@ function Coupons() {
                     iconName="fa-solid fa-download"
                     btnName="Download Active Coupons Excel"
                     path="/Coupon/Coupon-Create"
-                    ClickEvent={(e) => handleExportExcel(e)}
+                    ClickEvent={handleExportExcel}
                     small
                     roundedPill
                   />
@@ -235,10 +203,11 @@ function Coupons() {
                     small
                     roundedPill
                   />
-                  {/* <SearchBox extraClass="bg-white" /> */}
                 </div>
               </div>
-              {couponArr ? (
+              {loading ? (
+              <Loader />
+              ) : (
                 <DashboardTable>
                   <DataTable
                     columns={brand_columns}
@@ -249,13 +218,12 @@ function Coupons() {
                     <Pagination
                       count={couponArrTotalPages}
                       onChange={handlePageChange}
+                      page={page}
                       showFirstButton
                       showLastButton
                     />
                   </div>
                 </DashboardTable>
-              ) : (
-                "Loading"
               )}
             </div>
           </div>

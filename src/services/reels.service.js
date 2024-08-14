@@ -4,7 +4,7 @@ import { url } from "./url.service";
 const serverUrl = url + "/reels";
 const serverReelLikeUrl = url + "/reelLike";
 export const addReels = (formData) => {
-  console.log("call", formData);
+ 
   return axios.post(serverUrl + "/", formData);
 };
 

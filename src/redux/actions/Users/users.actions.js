@@ -67,7 +67,7 @@ export const usersGet = (formData) => async (dispatch) => {
   try {
     dispatch({ type: USER_GET });
     let { data: response } = await getUser(formData);
-    console.log(response);
+   
     if (response) {
       dispatch({
         type: USER_GET_SUCCESS,
@@ -83,7 +83,7 @@ export const userActivityLog = (userId) => async (dispatch) => {
   try {
     dispatch({ type: GET_USER_ACTIVITY_LOG_BY_ID });
     let response = await getUserActivityLog(`?userId=${userId}&limit=10`);
-    console.log(response);
+  
     if (response) {
       dispatch({
         type: USER_ACTIVITY_LOG_GET_SUCCESS,
@@ -105,7 +105,7 @@ export const userPointHistory = (userId) => async (dispatch) => {
     let { data: response } = await getUserPointHistory(
       `?userId=${userId}&limit=10`
     );
-    console.log(response);
+
     if (response) {
       dispatch({
         type: USER_POINT_HISTORY_GET_SUCCESS,
@@ -187,7 +187,7 @@ export const getUserContests = (formData) => async (dispatch) => {
   try {
     dispatch({ type: USER_CONTEST_GET });
     let { data: response } = await getUserContestsApi(formData);
-    console.log("res", response);
+  
     if (response) {
       dispatch({
         type: USER_CONTEST_GET_SUCCESS,

@@ -74,7 +74,7 @@ function GeneralProduct() {
   }, [attributes]);
 
   const handleMainCategorySelection = (obj) => {
-    console.log(obj);
+  
     if (obj?.subCategoryArr && obj?.subCategoryArr.length > 0) {
       setSubCategoryArr(obj.subCategoryArr);
     }
@@ -83,14 +83,14 @@ function GeneralProduct() {
   };
 
   const handleMainAttributeSelection = (obj) => {
-    console.log(obj);
+   
     if (obj?.attributeValueArr && obj?.attributeValueArr.length > 0) {
       setSubAttributesArr(obj.attributeValueArr);
     }
   };
 
   const handleBrandSelection = (obj) => {
-    console.log(obj);
+
     setSelectedBrandId(obj?._id);
   };
 
@@ -99,7 +99,7 @@ function GeneralProduct() {
   };
 
   const handlePdfFileSet = (value) => {
-    // console.log(value);
+   
     setSpecificationFile(value);
   };
 

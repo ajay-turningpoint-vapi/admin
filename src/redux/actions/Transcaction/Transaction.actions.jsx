@@ -26,7 +26,7 @@ export const TRANSACTIONGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_TRANSACTIONS });
     let { data: response } = await getTransaction(formData);
     if (response) {
-      console.log(response);
+     
       dispatch({
         type: GET_ALL_TRANSACTIONS_SUCCESS,
         payload: {
@@ -71,7 +71,7 @@ export const TransactionUpdateStatus = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_TRANSACTION_BY_ID });
     let { data: response } = await updateTransactionStatus(formData, id);
     if (response) {
-      console.log(response);
+      
       dispatch({
         type: UPDATE_TRANSACTION_BY_ID_SUCCESS,
         payload: { data: response.message },

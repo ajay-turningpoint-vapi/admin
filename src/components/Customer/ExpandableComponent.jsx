@@ -1,7 +1,7 @@
 import React from "react";
 
 const ExpandableComponent = ({ data }) => {
-  console.log("Expanded Rows Data:", data); // Log the data prop
+ 
   return (
     <div>
       {/* Access props.data here */}

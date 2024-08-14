@@ -49,7 +49,7 @@ const Reels = () => {
 
   useEffect(() => {
     if (reelsArr) {
-      console.log(reelsArr);
+    
       setDisplayReelArr([...reelsArr]);
     }
   }, [reelsArr]);
@@ -63,7 +63,7 @@ const Reels = () => {
   };
 
   useEffect(() => {
-    console.log(reelsArr, "reelsArr");
+
   }, [reelsArr]);
 
   const handleCheckReels = (row, index, e) => {

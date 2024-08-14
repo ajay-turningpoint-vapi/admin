@@ -1,36 +1,57 @@
-import { Button, Menu, Switch } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControlLabel,
+  Menu,
+  Radio,
+  RadioGroup,
+  Switch,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
-import { downloadCSV } from "../Utility/CSV";
 import { DashboardTable } from "../Utility/DashboardBox";
-
-import tabClick from "../Utility/TabClick";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
 import {
   updateUserKycStatus,
   updateUserStatus,
 } from "../../services/users.service";
+import "../../assets/style.css";
 
-import { EditModal } from "../Utility/Modal";
 import { Link } from "react-router-dom";
 import { generateFilePath } from "../Utility/utils";
 import Swal from "sweetalert2";
-
+import Slide from "@mui/material/Slide";
+import noImg from "../../assets/images/noImg.png";
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="left" ref={ref} {...props} />;
+});
 function Customer() {
   const dispatch = useDispatch();
-  const [ModalType, setModalType] = useState("");
-  const [ModalName, setModalName] = useState("");
-  const [ModalBox, setModalBox] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [usersArr, setUsersArr] = useState([]);
   const userArr = useSelector((state) => state.users.users);
   const [selectedData, setSelectedData] = useState(null);
   const [search, setSearch] = useState("");
   const [userKycStatus, setUserKycStatus] = useState(null);
+  const [kycStatus, setKycStatus] = useState("");
+
+  useEffect(() => {
+    handleGetAllUsers();
+  }, [userKycStatus]);
+
+  useEffect(() => {
+
+    setUsersArr(userArr?.length ? userArr : []);
+  }, [userArr]);
 
   const handleChangeActiveStatus = async (id, value) => {
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "You want to change isActive status!",
       icon: "warning",
@@ -38,41 +59,66 @@ function Customer() {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, change it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          let { data: res } = await updateUserStatus(id, { status: value });
-          if (res.message) {
-            handleGetAllUsers();
-          }
-        } catch (err) {
-          if (err.response && err.response.data && err.response.data.message) {
-            console.error(err.response.data.message);
-          } else {
-            console.error(err.message);
-            alert(err.message);
-          }
-        }
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        const { data: res } = await updateUserStatus(id, { status: value });
+        if (res.message) handleGetAllUsers();
+      } catch (err) {
+        console.error(err.response?.data?.message || err.message);
+        alert(err.response?.data?.message || err.message);
+      }
+    }
   };
 
-  const handleModalSet = (e, row) => {
-    e.preventDefault();
-    setModalBox(true);
-    setModalType("customer-detail");
-    setModalName("Customer Information");
+  const handleDialogOpen = (row) => {
+
+    setDialogOpen(true);
     setSelectedData(row);
+    setKycStatus(row.kycStatus);
   };
 
-  const conditionalRowStyles = [
-    {
-      when: (row) => row.isOnline === true,
-      style: {
-        backgroundColor: "#c6efce", 
-      },
-    },
-  ];
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    setSelectedData(null);
+  };
+
+  const handleChangeKycStatus = async (id, value) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to update KYC status?"
+    );
+    if (!confirmed) return;
+
+    try {
+      await updateUserKycStatus(id, { kycStatus: value });
+      setKycStatus(value);
+      handleGetAllUsers();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update KYC status");
+    }
+  };
+
+  const handleSearch = (q) => {
+    setSearch(q);
+    setUsersArr(
+      q
+        ? userArr.filter(
+            (el) =>
+              el.name.toLowerCase().includes(q.toLowerCase()) ||
+              el.phone.toLowerCase().includes(q.toLowerCase()) ||
+              el.email.toLowerCase().includes(q.toLowerCase())
+          )
+        : userArr
+    );
+  };
+
+  const handleGetAllUsers = () => {
+    let query = "?role=CARPENTER";
+    if (userKycStatus) query += `&kycStatus=${userKycStatus}`;
+    dispatch(usersGet(query));
+  };
 
   const users_columns = [
     {
@@ -115,23 +161,17 @@ function Customer() {
     {
       name: "KYC Status",
       selector: (row) => {
-        let color;
-        switch (row.kycStatus) {
-          case "pending":
-            color = "#FFBF00";
-            break;
-          case "submitted":
-          case "rejected":
-            color = "red";
-            break;
-          case "approved":
-            color = "#097969";
-            break;
-          default:
-            color = "black";
-            break;
-        }
-        return <p style={{ color }}>{row.kycStatus}</p>;
+        const kycColors = {
+          pending: "#FFBF00",
+          submitted: "red",
+          rejected: "red",
+          approved: "#097969",
+        };
+        return (
+          <p style={{ color: kycColors[row.kycStatus] || "black" }}>
+            {row.kycStatus}
+          </p>
+        );
       },
       width: "8%",
     },
@@ -141,75 +181,37 @@ function Customer() {
         <>
           <CustomButton
             btntype="button"
-            ClickEvent={(e) => handleModalSet(e, row)}
+            ClickEvent={() => handleDialogOpen(row)}
             isBtn
             iconName="fa-solid fa-check"
             btnName="View"
           />
           <Link
-            to={`/user-point-history/${row?._id}`}
+            to={`/user-point-history/${row._id}`}
             className="btn btn-secondary ms-2 text-white"
           >
             Points
           </Link>
           <Link
-            to={`/user-activity-log/${row?._id}`}
+            to={`/user-activity-log/${row._id}`}
             className="btn btn-secondary ms-2 text-white"
           >
             Logs
           </Link>
-          {selectedData && (
-            <EditModal
-              ModalBox={ModalBox}
-              data={selectedData}
-              setModalBox={setModalBox}
-              name={ModalName}
-              ModalType={ModalType}
-              width="max-content"
-            />
-          )}
         </>
       ),
       width: "20%",
     },
   ];
 
-  const handleGetAllUsers = () => {
-    let query = "";
-    query += "?role=CARPENTER";
-    if (userKycStatus !== null) {
-      query += `&kycStatus=${userKycStatus}`;
-    }
-
-    dispatch(usersGet(query));
-  };
-
-  useEffect(() => {
-    handleGetAllUsers();
-  }, [userKycStatus]);
-
-  useEffect(() => {
-    if (userArr && userArr.length) {
-      setUsersArr(userArr);
-    } else {
-      setUsersArr([]); // Ensure the component handles an empty array
-    }
-  }, [userArr]);
-
-  const handleSearch = (q) => {
-    setSearch(q);
-    if (q) {
-      let searchArr = userArr.filter(
-        (el) =>
-          `${el.name}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
-          `${el.phone}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
-          `${el.email}`.toLowerCase().includes(`${q}`.toLowerCase())
-      );
-      setUsersArr(searchArr);
-    } else {
-      setUsersArr(userArr);
-    }
-  };
+  const conditionalRowStyles = [
+    {
+      when: (row) => row.isOnline,
+      style: {
+        backgroundColor: "#c6efce",
+      },
+    },
+  ];
 
   return (
     <main>
@@ -236,11 +238,23 @@ function Customer() {
             <div className="d-flex align-items-center justify-content-between mb-5">
               <h5 className="blue-1 m-0">Active Users</h5>
               <div className="d-flex align-items-center gap-3">
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
                   Online-Users
-                  <div style={{ backgroundColor: "#c6efce", width: "50px", height: "20px", marginLeft: "10px" }}></div>
+                  <div
+                    style={{
+                      backgroundColor: "#c6efce",
+                      width: "50px",
+                      height: "20px",
+                      marginLeft: "10px",
+                    }}
+                  ></div>
                 </div>
-
                 <label>KYC</label>
                 <select
                   className="form-control"
@@ -254,7 +268,6 @@ function Customer() {
                   <option value="rejected">Rejected</option>
                   <option value="submitted">Submitted</option>
                 </select>
-
                 <div className="search-field">
                   <form action="#" className="form">
                     <div className="input-group">
@@ -273,7 +286,6 @@ function Customer() {
                 </div>
               </div>
             </div>
-
             <DataTable
               paginationPerPage={10}
               columns={users_columns}
@@ -284,6 +296,196 @@ function Customer() {
           </DashboardTable>
         </div>
       </section>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        maxWidth="sm"
+        fullWidth
+        TransitionComponent={Transition}
+        style={{ height: "700px" }}
+      >
+        <DialogTitle style={{ background: "#E5E4E2" }}>
+          Customer Information
+        </DialogTitle>
+        <DialogContent>
+          <div className="dialog-content-flex">
+            <div className="customer-profile text-center">
+              <a
+                href={
+                  typeof selectedData?.image === "string" &&
+                  selectedData?.image.startsWith("https://")
+                    ? selectedData.image
+                    : generateFilePath(selectedData?.image) || "#"
+                }
+                target="_blank"
+              >
+                <img
+                  src={
+                    typeof selectedData?.image === "string" &&
+                    selectedData?.image.startsWith("https://")
+                      ? selectedData.image
+                      : generateFilePath(selectedData?.image)
+                  }
+                  alt=""
+                  className="profile-img"
+                  target="_blank"
+                />
+              </a>
+              <h6 className="blue-1 text-capitalize my-3">
+                {selectedData?.name}
+              </h6>
+            </div>
+            <div className="details-container">
+              <ul className="blue-1 fs-14 details-column">
+                <li>
+                  <span className="fw-600">Email: </span>
+                  <span>{selectedData?.email}</span>
+                </li>
+                <li>
+                  <span className="fw-600">Phone: </span>
+                  <span>{selectedData?.phone}</span>
+                </li>
+                <li>
+                  <span className="fw-600">Business Name: </span>
+                  <span>
+                    {!selectedData?.shopName
+                      ? "No Business"
+                      : selectedData?.shopName}
+                  </span>
+                </li>
+
+                <li>
+                  <span className="fw-600">Points: </span>
+                  <span>{selectedData?.points ?? 0}</span>
+                </li>
+                <li>
+                  <span className="fw-600">Registered Date: </span>
+                  <span>
+                    {new Date(selectedData?.createdAt).toDateString()}
+                  </span>
+                </li>
+                <li>
+                  <span className="fw-600">Active Status: </span>
+                  <span>
+                    <CustomButton greenBtn btnName="Active" />
+                  </span>
+                </li>
+              </ul>
+            </div>
+            <div className="details-container">
+              <ul className="blue-1 fs-14 details-column">
+                {selectedData?.bankDetails?.length > 0 &&
+                  selectedData.bankDetails.map((bank, i) => (
+                    <React.Fragment key={i}>
+                      <li>
+                        <span className="fw-600">Bank Name: </span>
+                        {bank.bank}
+                      </li>
+                      <li>
+                        <span className="fw-600">Bank Type: </span>
+                        {bank.banktype.charAt(0).toUpperCase() +
+                          bank.banktype.slice(1)}
+                      </li>
+                      <li>
+                        <span className="fw-600">Account Number: </span>
+                        {bank.accountNo}
+                      </li>
+                      <li>
+                        <span className="fw-600">Account Name: </span>
+                        {bank.accountName}
+                      </li>
+                      <li>
+                        <span className="fw-600">IFSC Code: </span>
+                        {bank.ifsc}
+                      </li>
+                    </React.Fragment>
+                  ))}
+
+                <li>
+                  <span className="fw-600">Id Front Image: </span>
+                  {selectedData?.idFrontImage ? (
+                    <span>
+                      <a
+                        href={generateFilePath(selectedData?.idFrontImage)}
+                        target="_blank"
+                      >
+                        <img
+                          src={generateFilePath(selectedData?.idFrontImage)}
+                          alt=""
+                          className="kyc-img"
+                        />
+                      </a>
+                    </span>
+                  ) : (
+                    <span>
+                      <img src={noImg} alt="Dummy Image" className="kyc-img" />
+                    </span>
+                  )}
+                </li>
+                <li>
+                  <span className="fw-600">Id Front Image: </span>
+                  {selectedData?.idBackImage ? (
+                    <span>
+                      <a
+                        href={generateFilePath(selectedData?.idBackImage)}
+                        target="_blank"
+                      >
+                        <img
+                          src={generateFilePath(selectedData?.idBackImage)}
+                          alt=""
+                          className="kyc-img"
+                        />
+                      </a>
+                    </span>
+                  ) : (
+                    <span>
+                      <img src={noImg} alt="Dummy Image" className="kyc-img" />
+                    </span>
+                  )}
+                </li>
+                <li className="kyc-status-container">
+                  <span className="fw-600 kyc-status-label">KYC status: </span>
+                  <RadioGroup
+                    aria-label="kycStatus"
+                    name="kycStatus"
+                    value={kycStatus}
+                    onChange={(e) =>
+                      handleChangeKycStatus(selectedData._id, e.target.value)
+                    }
+                    className="kyc-radio-group"
+                  >
+                    <FormControlLabel
+                      value="pending"
+                      control={<Radio />}
+                      label="Pending"
+                    />
+                    <FormControlLabel
+                      value="submitted"
+                      control={<Radio />}
+                      label="Submitted"
+                    />
+                    <FormControlLabel
+                      value="approved"
+                      control={<Radio />}
+                      label="Approved"
+                    />
+                    <FormControlLabel
+                      value="rejected"
+                      control={<Radio />}
+                      label="Rejected"
+                    />
+                  </RadioGroup>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </main>
   );
 }

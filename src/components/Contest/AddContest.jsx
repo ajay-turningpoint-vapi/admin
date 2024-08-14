@@ -54,8 +54,7 @@ const AddContest = () => {
       setRulesArr(contestObj.rulesArr);
       setPrevImage(contestObj.image);
       setPrizeArr(contestObj?.prizeArr);
-      // setSelectedStatus({ value: brandObj.statusInfo, label: brandObj.statusInfo });
-      console.log(prizeArr, "prizearrr");
+    
       setIsUpdateContest(true);
     }
     return () => {
@@ -85,7 +84,7 @@ const AddContest = () => {
       toastError("End Date cannot be empty");
       return;
     }
-    console.log(endTime, "endTime");
+
 
     if (!startTime || startTime == "") {
       toastError("Start Time cannot be empty");
@@ -136,7 +135,7 @@ const AddContest = () => {
     };
 
     if (isUpdateContest) {
-      console.log(selectedContestId);
+   
       dispatch(CONTESTUpdate(obj, selectedContestId));
     } else {
       dispatch(CONTESTAdd(obj));
@@ -194,9 +193,9 @@ const AddContest = () => {
 
   const handlePrizeFileSet = (index, value) => {
     let newprizeArr = [...prizeArr];
-    console.log("prize value", value);
+  
     newprizeArr[index].image = value.fileUrl.toString();
-    console.log("test", (newprizeArr[index].image = value.fileUrl.toString()));
+
     setPrizeArr(newprizeArr);
   };
 

@@ -96,3 +96,17 @@ export const notListedContractors = () => {
 export const userReferrals = () => {
   return axios.get(`${serverUrl}/getUserReferralsReports`);
 };
+
+
+export const userRefreshToken = (refreshToken) => {
+  return axios.post(`${serverUrl}/refresh-token`, { refreshToken });
+};
+
+
+export const userLogout=()=>{
+  return axios.post(`${serverUrl}/logout`, {}, {
+    headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+});
+}

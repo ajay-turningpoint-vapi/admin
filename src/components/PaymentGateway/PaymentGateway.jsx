@@ -75,7 +75,7 @@ function PaymentGateway() {
   const handleChange = (checked, row) => {
     let temp = [];
     let index = tabList.findIndex((item) => item.tabName === row.name);
-    // console.log({ checked, row,index  });
+   
     if (checked && index === -1) {
       temp = [
         ...tabList,

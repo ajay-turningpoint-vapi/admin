@@ -29,7 +29,7 @@ export const BrandAdd = (formData) => async (dispatch) => {
     dispatch({ type: BRAND_ADD });
     let { data: response } = await addBrand(formData);
     if (response) {
-      console.log(response);
+    
       dispatch({
         type: BRAND_ADD_SUCCESS,
         payload: response.message,
@@ -46,7 +46,7 @@ export const BrandGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_BRANDS });
     let { data: response } = await getBrand(formData);
     if (response) {
-      console.log(response);
+
       dispatch({
         type: GET_ALL_BRANDS_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -83,7 +83,7 @@ export const BrandUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_BRAND_BY_ID });
     let { data: response } = await updateBrand(formData, id);
     if (response) {
-      console.log(response);
+  
       dispatch({
         type: UPDATE_BRAND_BY_ID_SUCCESS,
       });
@@ -99,7 +99,7 @@ export const BrandDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_BRAND_BY_ID });
     let { data: response } = await deleteBrand(id);
     if (response) {
-      console.log(response);
+   
       dispatch({
         type: DELETE_BRAND_BY_ID_SUCCESS,
       });

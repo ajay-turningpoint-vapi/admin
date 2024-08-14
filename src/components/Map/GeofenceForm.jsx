@@ -30,12 +30,12 @@ const GeofenceForm = () => {
     try {
       const { name, latitude, longitude, radius } = formData;
 
-      console.log(formData);
+   
       if (latitude === "" || longitude === "") {
         alert("Latitude and longitude cannot be blank.");
         return;
       }
-      console.log("before", formData);
+
       const response = await axios.post(`${url}/users/addGeofence`, formData);
       const { data } = response;
       toast.success(data.message);

@@ -15,9 +15,9 @@ import {
 } from "../../services/users.service";
 import { Pagination } from "@mui/material";
 import "../../assets/scss/main.css";
+import Loader from "../Utility/Loader.jsx";
 
 function UserContestDashboard() {
-  // ======================================================================================
   const dispatch = useDispatch();
   let { contestId } = useParams();
   const [pageLimit, setPageLimit] = useState(10);
@@ -34,46 +34,52 @@ function UserContestDashboard() {
   const [activeDiv, setActiveDiv] = useState(null);
 
   const handleUserContest = async (contestId) => {
+    setLoading(true);
     let query = "";
     query += `contestId=${contestId}`;
-    if (page) {
-      query += `&page=${page}`;
-    }
+    if (page) query += `&page=${page}`;
+    if (pageLimit) query += `&limit=${pageLimit}`;
+    if (search) query += `&q=${search}`;
+    
+    try {
+      const response = await getUserContestsReport(query);
+      setUserContArrLose("");
+      setUserContArrTotalPageLose("");
+      setUserContArr(response.data);
+      setUserContArrTotalPage(response.data.totalPage);
 
-    if (pageLimit) {
-      query += `&limit=${pageLimit}`;
+      const response1 = await getUserContestsCount(contestId);
+      setCount(response1.data.totalJoinCount);
+    } catch (error) {
+      console.error("Error fetching user contests:", error);
+    } finally {
+      setLoading(false);
     }
-    if (search) {
-      query += `&q=${search}`;
-    }
-    const response = await getUserContestsReport(query);
-    console.log("res", response);
-    setUserContArrLose("");
-    setUserContArrTotalPageLose("");
-    setLoading(false);
-    setUserContArr(response.data);
-    setUserContArrTotalPage(response.data.totalPage);
-
-    const response1 = await getUserContestsCount(contestId);
-    setCount(response1.data.totalJoinCount);
   };
+
   const handleUserConestLose = async (contestId) => {
+    setLoading(true);
     let query = "";
     query += `contestId=${contestId}`;
-    if (pageLose) {
-      query += `&page=${pageLose}`;
+    if (pageLose) query += `&page=${pageLose}`;
+    
+    try {
+      const response = await getUserContestsReportLose(query);
+      setUserContArr("");
+      setUserContArrTotalPage("");
+      setUserContArrLose(response.data);
+      setUserContArrTotalPageLose(response.data.totalPage);
+    } catch (error) {
+      console.error("Error fetching user contests (lose):", error);
+    } finally {
+      setLoading(false);
     }
-    const response = await getUserContestsReportLose(query);
-    setUserContArr("");
-    setUserContArrTotalPage("");
-    setLoading(false);
-    setUserContArrLose(response.data);
-    setUserContArrTotalPageLose(response.data.totalPage);
   };
 
   useEffect(() => {
     handleUserContest(contestId);
   }, [search, page]);
+
   useEffect(() => {
     handleUserConestLose(contestId);
   }, [pageLose]);
@@ -81,12 +87,17 @@ function UserContestDashboard() {
   const handleDivClick = (divId) => {
     setActiveDiv(divId);
   };
+
   const handlePageChange = (event, value) => {
+    setLoading(true)
     setPage(value);
   };
+
   const handlePageChangeLose = (event, value) => {
+    setLoading(true)
     setPageLose(value);
   };
+
   const points_columns = [
     {
       name: "Sr No.",
@@ -95,7 +106,7 @@ function UserContestDashboard() {
       width: "7%",
     },
     {
-      name: "Contest ",
+      name: "Contest",
       selector: (row) => row.contestObj?.name,
       sortable: true,
       width: "20%",
@@ -106,14 +117,11 @@ function UserContestDashboard() {
       sortable: true,
       width: "20%",
     },
-
     {
       name: "Join Date",
       width: "15%",
       selector: (row) => (
-        <p>{`${moment.utc(row?.createdAt).format("DD-MM-YYYY")}-${moment
-          .utc(row?.createdAt)
-          .format("HH:mm A")}`}</p>
+        <p>{`${moment.utc(row?.createdAt).format("DD-MM-YYYY")} - ${moment.utc(row?.createdAt).format("HH:mm A")}`}</p>
       ),
     },
     {
@@ -131,24 +139,6 @@ function UserContestDashboard() {
       width: "10%",
       selector: (row) => row?.rank,
     },
-    // {
-    //   name: "IS ACTIVE",
-    //   button: true,
-    //   cell: (row) => <Switch onChange={(e) => handleChangeActiveStatus(row._id, e.target.checked)} checked={row.isActive} />,
-    //   width: "10%",
-    // },
-
-    // {
-    //   name: "Action",
-    //   cell: (row) => (
-    //     <>
-    //       <CustomButton btntype="button" ClickEvent={(e) => handleModalSet(e, row)} isBtn iconName="fa-solid fa-check" btnName="View" />
-    //       <Link to={`/user-point-history/${row?._id}`} className="btn btn-secondary ms-2 text-white">Point History</Link>
-    //       {selectedData && <EditModal ModalBox={ModalBox} data={selectedData} setModalBox={setModalBox} name={ModalName} ModalType={ModalType} width="max-content" />}
-    //     </>
-    //   ),
-    //   width: "20%",
-    // },
   ];
 
   return (
@@ -158,7 +148,7 @@ function UserContestDashboard() {
           <h5 className="blue-1 mb-4">User Contest Dashboard</h5>
           <div className="row mb-3">
             <div className="col-3 gap-2 mb-3">
-              <div className="row mx-1 ">
+              <div className="row mx-1">
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
                   <h6 className="blue-1 mb-4">Users Join Count</h6>
                   <div>{count !== "" ? count : 0}</div>
@@ -167,7 +157,7 @@ function UserContestDashboard() {
             </div>
             <div className="col-3 gap-2 mb-3">
               <div
-                className="row mx-1 "
+                className="row mx-1"
                 onClick={() => {
                   setSearch("winners");
                   handleDivClick("div1");
@@ -176,9 +166,7 @@ function UserContestDashboard() {
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
                   <h6 className="blue-1 mb-4">Winners</h6>
                   <div
-                    className={`div ${
-                      activeDiv === "div1" ? "usercontestactive" : ""
-                    }`}
+                    className={`div ${activeDiv === "div1" ? "usercontestactive" : ""}`}
                   >
                     Click to view
                   </div>
@@ -187,7 +175,7 @@ function UserContestDashboard() {
             </div>
             <div className="col-3 gap-2 mb-3">
               <div
-                className="row mx-1 "
+                className="row mx-1"
                 onClick={() => {
                   handleUserConestLose(contestId);
                   handleDivClick("div2");
@@ -196,9 +184,7 @@ function UserContestDashboard() {
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
                   <h6 className="blue-1 mb-4">Losers</h6>
                   <div
-                    className={`div ${
-                      activeDiv === "div2" ? "usercontestactive" : ""
-                    }`}
+                    className={`div ${activeDiv === "div2" ? "usercontestactive" : ""}`}
                   >
                     Click to view
                   </div>
@@ -207,7 +193,7 @@ function UserContestDashboard() {
             </div>
             <div className="col-3 gap-2 mb-3">
               <div
-                className="row mx-1 "
+                className="row mx-1"
                 onClick={() => {
                   setSearch("");
                   handleDivClick("div3");
@@ -216,9 +202,7 @@ function UserContestDashboard() {
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
                   <h6 className="blue-1 mb-4">Date and Time of Joining</h6>
                   <div
-                    className={`div ${
-                      activeDiv === "div3" ? "usercontestactive" : ""
-                    }`}
+                    className={`div ${activeDiv === "div3" ? "usercontestactive" : ""}`}
                   >
                     Click to View
                   </div>
@@ -226,8 +210,8 @@ function UserContestDashboard() {
               </div>
             </div>
           </div>
-          {loading == true ? (
-            "Loading..."
+          {loading ? (
+           <Loader />
           ) : (
             <DashboardTable>
               {userContArr.data && (
@@ -238,6 +222,7 @@ function UserContestDashboard() {
                     <Pagination
                       count={userContArrTotalPage}
                       onChange={handlePageChange}
+                      page={page}
                       showFirstButton
                       showLastButton
                     />
@@ -246,15 +231,13 @@ function UserContestDashboard() {
               )}
               {userContArrLose.data && (
                 <>
-                  <DataTable
-                    columns={points_columns}
-                    data={userContArrLose.data}
-                  />
+                  <DataTable columns={points_columns} data={userContArrLose.data} />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <h5 className="blue-1 m-0"></h5>
                     <Pagination
                       count={userContArrTotalPageLose}
                       onChange={handlePageChangeLose}
+                      page={pageLose}
                       showFirstButton
                       showLastButton
                     />

@@ -8,7 +8,7 @@ export const addCoupon = (formData) => {
 };
 
 export const addMultpleCoupons = (formData) => {
-  console.log(formData);
+
   return axios.post(serverUrl + "/addMultipleCoupons", formData);
 };
 

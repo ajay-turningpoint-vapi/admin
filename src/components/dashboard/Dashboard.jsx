@@ -60,7 +60,7 @@ function Dashboard() {
   const [reelsAnalytics, setReelsAnalytics] = useState(0);
   const [userContestLabel, setUserContestLabel] = useState(0);
   const [userContestCount, setUserContestCount] = useState(0);
-  console.log("contestArr", contestArr);
+  
 
   const handleTransactionCount = async () => {
     let { data: response } = await getTransactionCount();
@@ -87,22 +87,22 @@ function Dashboard() {
       setReelsAnalytics(response5.data);
     }
     if (response6) {
-      console.log(response6);
+    
       setUserContestLabel(response6.contestNames);
       setUserContestCount(response6.userCounts);
     }
   };
 
   useEffect(() => {
-    console.log(userArr, "userArr");
+   
     if (userArr) {
       setTotalUsers(userArr.length > 0 ? userArr?.length : 0);
     }
-    console.log(couponArr, "couponArr");
+ 
     if (couponArr) {
       setTotalCoupons(couponArr.length > 0 ? couponArr?.length : 0);
     }
-    console.log(contestArr, "contestArr");
+    
     if (contestArr) {
       setTotalContest(contestArr.length > 0 ? contestArr?.length : 0);
     }
@@ -110,7 +110,7 @@ function Dashboard() {
     // if (transactionArr) {
     //   setTotalTransactions(transactionArr || 0);
     // }
-    console.log(reelsArr, "reelsArr");
+  
     if (reelsArr) {
       setTotalReels(reelsArr.length > 0 ? reelsArr?.length : 0);
     }

@@ -71,7 +71,7 @@ function Profile({ addAddress }) {
     const city = nameArr[0];
     const state = nameArr[1];
     const country = nameArr[2];
-    // console.log(row,nameArr);
+   
     setAddressDetail({
       name: row.name,
       address: row.address,
@@ -459,7 +459,7 @@ function Profile({ addAddress }) {
           ClickEvent={(e) => {
             e.preventDefault();
             setCustomAddressSet(true);
-            console.log(addAddress);
+         
           }}
         />
       </div>
