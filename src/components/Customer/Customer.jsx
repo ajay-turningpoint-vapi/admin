@@ -46,7 +46,6 @@ function Customer() {
   }, [userKycStatus]);
 
   useEffect(() => {
-
     setUsersArr(userArr?.length ? userArr : []);
   }, [userArr]);
 
@@ -73,7 +72,6 @@ function Customer() {
   };
 
   const handleDialogOpen = (row) => {
-
     setDialogOpen(true);
     setSelectedData(row);
     setKycStatus(row.kycStatus);
@@ -367,7 +365,11 @@ function Customer() {
                 <li>
                   <span className="fw-600">Active Status: </span>
                   <span>
-                    <CustomButton greenBtn btnName="Active" />
+                    {selectedData?.isActive ? (
+                      <CustomButton greenBtn btnName="Active" />
+                    ) : (
+                      <CustomButton redBtn btnName="InActive" />
+                    )}
                   </span>
                 </li>
               </ul>
@@ -405,12 +407,9 @@ function Customer() {
                   <span className="fw-600">Id Front Image: </span>
                   {selectedData?.idFrontImage ? (
                     <span>
-                      <a
-                        href={generateFilePath(selectedData?.idFrontImage)}
-                        target="_blank"
-                      >
+                      <a href={selectedData?.idFrontImage} target="_blank">
                         <img
-                          src={generateFilePath(selectedData?.idFrontImage)}
+                          src={selectedData?.idFrontImage}
                           alt=""
                           className="kyc-img"
                         />
@@ -418,7 +417,12 @@ function Customer() {
                     </span>
                   ) : (
                     <span>
-                      <img src={noImg} alt="Dummy Image" className="kyc-img" />
+                      <img
+                        src={noImg}
+                        alt="Dummy Image"
+                        className="kyc-img"
+                        style={{ height: "150px", width: "150px" }}
+                      />
                     </span>
                   )}
                 </li>
@@ -426,12 +430,9 @@ function Customer() {
                   <span className="fw-600">Id Front Image: </span>
                   {selectedData?.idBackImage ? (
                     <span>
-                      <a
-                        href={generateFilePath(selectedData?.idBackImage)}
-                        target="_blank"
-                      >
+                      <a href={selectedData?.idBackImage} target="_blank">
                         <img
-                          src={generateFilePath(selectedData?.idBackImage)}
+                          src={selectedData?.idBackImage}
                           alt=""
                           className="kyc-img"
                         />
@@ -439,7 +440,12 @@ function Customer() {
                     </span>
                   ) : (
                     <span>
-                      <img src={noImg} alt="Dummy Image" className="kyc-img" />
+                      <img
+                        src={noImg}
+                        alt="Dummy Image"
+                        className="kyc-img"
+                        style={{ height: "150px", width: "150px" }}
+                      />
                     </span>
                   )}
                 </li>
