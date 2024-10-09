@@ -4,6 +4,7 @@ import {
   getCoupons,
   updateCouponById,
   addMultpleCoupons,
+  getActiveCoupons,
 } from "../../../services/Coupons.service";
 
 export const COUPON_ADD = "COUPON_ADD";
@@ -32,12 +33,38 @@ export const DELETE_COUPON_BY_ID = "DELETE_COUPON_BY_ID";
 export const DELETE_COUPON_BY_ID_SUCCESS = "DELETE_COUPON_BY_ID_SUCCESS";
 export const DELETE_COUPON_BY_ID_FAIL = "DELETE_COUPON_BY_ID_FAIL";
 
+export const GET_ACTIVE_COUPONS = "GET_ACTIVE_COUPONS";
+export const GET_ACTIVE_COUPONS_SUCCESS = "GET_ACTIVE_COUPONS_SUCCESS";
+export const GET_ACTIVE_COUPONS_FAIL = "GET_ACTIVE_COUPONS_FAIL";
+export const COUPONGetActive = (formData, navigate) => async (dispatch) => {
+  try {
+    // Dispatch action to indicate that we're fetching the active coupons
+    dispatch({ type: GET_ACTIVE_COUPONS });
+
+    // Call the API to get active coupons with productName as a query parameter
+    const { data: response } = await getActiveCoupons(formData);
+    if (response) {
+      dispatch({
+        type: GET_ACTIVE_COUPONS_SUCCESS,
+        payload: {
+          data: response.data,
+          message: response.message,
+          totalPages: response.totalPages, // Ensure totalPages is returned from the API
+        },
+      });
+      navigate("/Coupon/ViewCoupons");
+    }
+  } catch (err) {
+    console.error(err);
+    dispatch({ type: GET_ACTIVE_COUPONS_FAIL, payload: err });
+  }
+};
+
 export const COUPONAdd = (formData) => async (dispatch) => {
   try {
     dispatch({ type: COUPON_ADD });
     let { data: response } = await addCoupon(formData);
     if (response) {
-   
       dispatch({
         type: COUPON_ADD_SUCCESS,
         payload: response.message,
@@ -51,11 +78,9 @@ export const COUPONAdd = (formData) => async (dispatch) => {
 
 export const CouponMultipleAdd = (formData) => async (dispatch) => {
   try {
-  
     dispatch({ type: COUPON_MULTIPLE_ADD });
     let { data: response } = await addMultpleCoupons(formData);
     if (response) {
-    
       dispatch({
         type: COUPON_MULTIPLE_ADD_SUCCESS,
         payload: { data: response.data, message: response.message },
@@ -72,7 +97,6 @@ export const COUPONGet = (formData) => async (dispatch) => {
     dispatch({ type: GET_ALL_COUPONS });
     let { data: response } = await getCoupons(formData);
     if (response) {
-   
       dispatch({
         type: GET_ALL_COUPONS_SUCCESS,
         payload: {
@@ -114,7 +138,6 @@ export const COUPONUpdate = (formData, id) => async (dispatch) => {
     dispatch({ type: UPDATE_COUPON_BY_ID });
     let { data: response } = await updateCouponById(formData, id);
     if (response) {
-
       dispatch({
         type: UPDATE_COUPON_BY_ID_SUCCESS,
       });
@@ -130,7 +153,6 @@ export const COUPONDelete = (id) => async (dispatch) => {
     dispatch({ type: DELETE_COUPON_BY_ID });
     let { data: response } = await deleteCouponById(id);
     if (response) {
-    
       dispatch({
         type: DELETE_COUPON_BY_ID_SUCCESS,
       });

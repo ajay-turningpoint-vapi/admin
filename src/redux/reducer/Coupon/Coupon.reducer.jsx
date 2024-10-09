@@ -25,6 +25,19 @@ export const CouponReducer = (state = initialState, action) => {
         ...state,
         loading: true,
       };
+    case COUPON.GET_ACTIVE_COUPONS:
+      return {
+        ...state,
+        loading: true,
+      };
+    case COUPON.GET_ACTIVE_COUPONS_FAIL:
+      toastError(action.payload);
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
     case COUPON.COUPON_ADD_SUCCESS:
       toastSuccess(action.payload);
 
@@ -39,6 +52,7 @@ export const CouponReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload,
       };
+
     case COUPON.COUPON_MULTIPLE_ADD_SUCCESS:
       return {
         ...state,
@@ -46,6 +60,15 @@ export const CouponReducer = (state = initialState, action) => {
         error: null,
         coupons: action.payload.data,
       };
+
+    case COUPON.GET_ACTIVE_COUPONS_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        error: null,
+        coupons: action.payload.data,
+      };
+
     case COUPON.GET_ALL_COUPONS:
       return {
         ...state,

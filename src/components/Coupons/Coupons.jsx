@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import {
   COUPONDelete,
   COUPONGet,
+  COUPONGetActive,
   SetCOUPONObj,
 } from "../../redux/actions/Coupon/Coupon.actions";
 import { PRODUCTGet } from "../../redux/actions/Product/Product.actions";
@@ -33,6 +34,7 @@ function Coupons() {
   const [page, setPage] = useState(1);
   const [usedCoupon, setUsedCoupon] = useState("All");
   const [productId, setproductId] = useState("");
+  const [filterType, setFilterType] = useState("");
 
   const handleGetAllCoupons = () => {
     setLoading(true);
@@ -44,48 +46,30 @@ function Coupons() {
     dispatch(COUPONGet(query)).then(() => setLoading(false));
   };
 
-  const handleExportExcel = async () => {
-    try {
-      setLoading(true);
-      const res = await downloadCouponsExcel();
-      const blobUrl = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.setAttribute("download", "coupons.xlsx");
-      document.body.appendChild(link);
-      link.click();
-      window.URL.revokeObjectURL(blobUrl);
-      document.body.removeChild(link);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error downloading file:", error);
-      setLoading(false);
+  const handleFilterChange = (e) => {
+    const selectedOption = e.target.value;
+    setFilterType(selectedOption);
+    setproductId("");
+
+    if (selectedOption === "activeCoupons") {
+      let query = "";
+      dispatch(COUPONGetActive(query, navigate));
     }
   };
 
-  const handleDownloadAllCouponsZip = async (e) => {
-    try {
-      e.preventDefault();
-      setLoading(true);
-      let { data: res } = await downloadCouponsLink();
-      const link = document.createElement("a");
-      window.open(`${generateQrFilePath(res.data.zipFileName)}`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setLoading(false);
-    } catch (err) {
-      toastError(err);
-      setLoading(false);
-    }
-  };
+  const handleProductChange = (e) => {
+    const selectedProductId = e.target.value;
+    setproductId(selectedProductId);
 
-  const handleDelete = (row) => {
-    setLoading(true);
-    dispatch(COUPONDelete(row._id)).then(() => {
-      handleGetAllCoupons();
-      setLoading(false);
-    });
+    // Find the selected product from the productArr
+    const selectedProduct = productArr.find(
+      (product) => product._id === selectedProductId
+    );
+    if (selectedProduct) {
+      let query = "";
+      if (selectedProduct.name) query += `productName=${selectedProduct.name}`;
+      dispatch(COUPONGetActive(query, navigate));
+    }
   };
 
   const handlePageChange = (event, value) => {
@@ -96,15 +80,13 @@ function Coupons() {
   useEffect(() => {
     handleGetAllCoupons();
     dispatch(PRODUCTGet());
-  }, []);
-
-  useEffect(() => {
-    handleGetAllCoupons();
   }, [page]);
 
   useEffect(() => {
-    handleGetAllCoupons();
-  }, [usedCoupon, productId]);
+    if (filterType !== "activeCoupons" && filterType !== "productName") {
+      handleGetAllCoupons();
+    }
+  }, [usedCoupon, productId, filterType]);
 
   const handleEdit = (row) => {
     dispatch(SetCOUPONObj(row));
@@ -186,15 +168,36 @@ function Coupons() {
                         </option>
                       ))}
                   </select>
-                  <CustomButton
-                    isBtn
-                    iconName="fa-solid fa-download"
-                    btnName="Download Active Coupons Excel"
-                    path="/Coupon/Coupon-Create"
-                    ClickEvent={handleExportExcel}
-                    small
-                    roundedPill
-                  />
+
+                  <label>Active_Coupons</label>
+                  <select
+                    className="form-control"
+                    value={filterType}
+                    onChange={handleFilterChange}
+                  >
+                    <option value="">Please Select</option>
+                    <option value="activeCoupons" style={{ fontWeight: "500" }}>
+                      View Active Coupons
+                    </option>
+                    <option value="productName">Select Product</option>
+                  </select>
+
+                  {filterType === "productName" && (
+                    <select
+                      className="form-control"
+                      value={productId}
+                      onChange={handleProductChange}
+                    >
+                      <option>Please Select a Product</option>
+                      {productArr &&
+                        productArr.map((product) => (
+                          <option key={product._id} value={product._id}>
+                            {product.name}
+                          </option>
+                        ))}
+                    </select>
+                  )}
+
                   <CustomButton
                     isLink
                     iconName="fa-solid fa-plus"
@@ -206,7 +209,7 @@ function Coupons() {
                 </div>
               </div>
               {loading ? (
-              <Loader />
+                <Loader />
               ) : (
                 <DashboardTable>
                   <DataTable

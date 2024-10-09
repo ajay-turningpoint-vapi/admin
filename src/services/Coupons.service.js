@@ -8,7 +8,6 @@ export const addCoupon = (formData) => {
 };
 
 export const addMultpleCoupons = (formData) => {
-
   return axios.post(serverUrl + "/addMultipleCoupons", formData);
 };
 
@@ -16,12 +15,16 @@ export const getCoupons = (query) => {
   return axios.get(`${serverUrl}/getCoupons?${query}`);
 };
 
+export const getActiveCoupons = (query) => {
+  return axios.get(`${serverUrl}/getActiveCoupons?${query}`);
+};
+
 export const downloadCouponsLink = () => {
   return axios.get(`${serverUrl}/getActiveCouponsQrZip`);
 };
 export const downloadCouponsExcel = () => {
   return axios.get(`${serverUrl}/getActiveCouponsQrExcel`, {
-    responseType: "blob", 
+    responseType: "blob",
   });
 };
 
