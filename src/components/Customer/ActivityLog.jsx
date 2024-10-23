@@ -46,7 +46,7 @@ function ActivityLog() {
     {
       name: "TIME",
       cell: (row) => (
-        <CustomButton redBtn btnName={row.timestamp.slice(10, 22)} />
+        <CustomButton redBtn btnName={row.timestamp.slice(11, 23)} />
       ),
       width: "15%",
     },
