@@ -17,7 +17,7 @@ const initialState = {
   user: null,
   role: null,
   token: null,
-  refreshToken: null,
+  // refreshToken: null,
   loading: false,
   error: null,
 };

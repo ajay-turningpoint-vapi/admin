@@ -18,9 +18,9 @@ export const useAuthCheck = () => {
           const { exp } = jwtDecode(token);
           const currentTime = Math.floor(Date.now() / 1000);
 
-          if (exp < currentTime) {
-            dispatch(refreshTokenThunk());
-          }
+          // if (exp < currentTime) {
+          //   dispatch(refreshTokenThunk());
+          // }
         } catch (error) {
           console.error("Token decoding error:", error);
           dispatch(logoutUser());
