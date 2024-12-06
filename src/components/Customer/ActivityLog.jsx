@@ -9,6 +9,7 @@ import {
   usersGet,
 } from "../../redux/actions/Users/users.actions";
 import { Link, useParams } from "react-router-dom";
+import moment from "moment";
 
 function ActivityLog() {
   let { userId } = useParams();
@@ -39,14 +40,14 @@ function ActivityLog() {
     {
       name: "DATE",
       cell: (row) => (
-        <CustomButton greenBtn btnName={row.timestamp.slice(0, 9)} />
+        <CustomButton greenBtn btnName={moment(row.timestamp).format("DD-MM-YYYY")} />
       ),
       width: "22%",
     },
     {
       name: "TIME",
       cell: (row) => (
-        <CustomButton redBtn btnName={row.timestamp.slice(11, 23)} />
+        <CustomButton redBtn btnName={moment(row.timestamp).format("hh:mm:A")} />
       ),
       width: "15%",
     },
