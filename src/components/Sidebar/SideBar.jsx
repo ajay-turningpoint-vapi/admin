@@ -192,6 +192,14 @@ function SideBar() {
           path: "/Coupons",
           active: false,
         },
+        {
+          isrotated: false,
+          active: false,
+          name: "Scanned Coupons",
+          path: "/scanned-coupons",
+          icon: "fa-solid fa-map",
+          children: [],
+        },
       ],
     },
     {

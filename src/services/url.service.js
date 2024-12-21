@@ -1,4 +1,4 @@
-// export const url = "http://192.168.1.120:4023";
+// export const url = "http://192.168.1.115:4023";
 //live url
-// export const url = "https://13.126.184.197/api";
-export const url = "https://api.turningpointvapi.com/api";
+export const url = "https://13.126.184.197/api";
+// export const url = "https://api.turningpointvapi.com/api";

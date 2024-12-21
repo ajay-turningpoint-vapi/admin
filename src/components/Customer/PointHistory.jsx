@@ -100,11 +100,11 @@ function PointHistory() {
       selector: (row) =>
         row.type === "CREDIT" ? (
           <span className="text-success">
-            <i className="fa fa-arrow-down"> </i> {row.amount}{" "}
+            <i className="fa fa-arrow-up"> </i> {row.amount}{" "}
           </span>
         ) : (
           <span className="text-danger">
-            <i className="fa fa-arrow-up"> </i> {row.amount}
+            <i className="fa fa-arrow-down"> </i> {row.amount}
           </span>
         ),
       width: "10%",

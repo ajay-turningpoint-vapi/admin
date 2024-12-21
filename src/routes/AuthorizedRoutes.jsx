@@ -52,6 +52,7 @@ import AddCurrency from "../components/SetUp/CurrencyList/AddCurrency";
 import Location from "../components/SetUp/Location/Location";
 import Tags from "../components/SetUp/Tags/Tags";
 import Coupons from "../components/Coupons/Coupons";
+import ScannedCouponsMap from "../components/Coupons/ScannedCouponsMap"
 import AddCoupons from "../components/Coupons/AddCoupons";
 import Contest from "../components/Contest/Contest";
 import AddContest from "../components/Contest/AddContest";
@@ -261,6 +262,7 @@ export default function AuthorizedRoutes() {
               element={<AddCoupons />}
             ></Route>
             <Route exact path="/Coupons" element={<Coupons />}></Route>
+            <Route exact path="/scanned-coupons" element={<ScannedCouponsMap />}></Route>
             <Route exact path="/Contests" element={<Contest />}></Route>
             <Route
               exact

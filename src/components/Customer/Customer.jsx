@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -6,7 +7,9 @@ import {
   DialogContentText,
   DialogTitle,
   FormControlLabel,
+  IconButton,
   Menu,
+  MenuItem,
   Radio,
   RadioGroup,
   Switch,
@@ -18,10 +21,12 @@ import { DashboardTable } from "../Utility/DashboardBox";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
 import {
+  blockUser,
   updateUserKycStatus,
   updateUserStatus,
 } from "../../services/users.service";
 import "../../assets/style.css";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import { Link } from "react-router-dom";
 import { generateFilePath } from "../Utility/utils";
@@ -40,6 +45,19 @@ function Customer() {
   const [search, setSearch] = useState("");
   const [userKycStatus, setUserKycStatus] = useState(null);
   const [kycStatus, setKycStatus] = useState("");
+  const [menuRow, setMenuRow] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event, row) => {
+    setAnchorEl(event.currentTarget);
+    setMenuRow(row);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setMenuRow(null);
+  };
 
   useEffect(() => {
     handleGetAllUsers();
@@ -63,6 +81,27 @@ function Customer() {
     if (result.isConfirmed) {
       try {
         const { data: res } = await updateUserStatus(id, { status: value });
+        if (res.message) handleGetAllUsers();
+      } catch (err) {
+        console.error(err.response?.data?.message || err.message);
+        alert(err.response?.data?.message || err.message);
+      }
+    }
+  };
+  const handleChangeBlockUser = async (id, value) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to change block status!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, change it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const { data: res } = await blockUser(id);
         if (res.message) handleGetAllUsers();
       } catch (err) {
         console.error(err.response?.data?.message || err.message);
@@ -128,22 +167,22 @@ function Customer() {
     {
       name: "NAME",
       cell: (row) => <p>{row.name}</p>,
-      width: "15%",
+      width: "17%",
     },
     {
       name: "EMAIL",
       cell: (row) => <p>{row.email}</p>,
-      width: "20%",
+      width: "24%",
     },
     {
       name: "PHONE",
       cell: (row) => <p>{row.phone}</p>,
-      width: "9%",
+      width: "11%",
     },
     {
       name: "ROLE",
       selector: (row) => row.role,
-      width: "9%",
+      width: "11%",
     },
     {
       name: "IS ACTIVE",
@@ -154,7 +193,19 @@ function Customer() {
           checked={row.isActive}
         />
       ),
-      width: "6%",
+      width: "8%",
+    },
+    {
+      name: "BLOCK",
+      button: true,
+      cell: (row) => (
+        <Switch
+          onChange={(e) => handleChangeBlockUser(row._id)}
+          checked={row.isBlocked}
+          color="error"
+        />
+      ),
+      width: "8%",
     },
     {
       name: "KYC Status",
@@ -171,34 +222,71 @@ function Customer() {
           </p>
         );
       },
-      width: "8%",
+      width: "10%",
     },
     {
       name: "Action",
       cell: (row) => (
-        <>
-          <CustomButton
-            btntype="button"
-            ClickEvent={() => handleDialogOpen(row)}
-            isBtn
-            iconName="fa-solid fa-check"
-            btnName="View"
-          />
-          <Link
-            to={`/user-point-history/${row._id}`}
-            className="btn btn-secondary ms-2 text-white"
+        <Box>
+          <IconButton
+            aria-label="more"
+            aria-controls="custom-menu"
+            aria-haspopup="true"
+            onClick={(event) => handleClick(event, row)}
           >
-            Points
-          </Link>
-          <Link
-            to={`/user-activity-log/${row._id}`}
-            className="btn btn-secondary ms-2 text-white"
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            id="custom-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            PaperProps={{
+              style: {
+                padding: "10px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                borderRadius: "8px",
+              },
+            }}
           >
-            Logs
-          </Link>
-        </>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <CustomButton
+                btntype="button"
+                ClickEvent={() => {
+                  handleDialogOpen(menuRow);
+                  handleClose();
+                }}
+                isBtn
+                iconName="fa-solid fa-check"
+                btnName="View"
+              />
+              <Link
+                to={`/user-point-history/${menuRow?._id}`}
+                className="btn btn-secondary text-white"
+                style={{
+                  textDecoration: "none",
+                  padding: "8px 16px",
+                  borderRadius: "4px",
+                }}
+              >
+                Points
+              </Link>
+              <Link
+                to={`/user-activity-log/${menuRow?._id}`}
+                className="btn btn-secondary text-white"
+                style={{
+                  textDecoration: "none",
+                  padding: "8px 16px",
+                  borderRadius: "4px",
+                }}
+              >
+                Logs
+              </Link>
+            </Box>
+          </Menu>
+        </Box>
       ),
-      width: "20%",
+      width: "7%",
     },
   ];
 
@@ -308,22 +396,9 @@ function Customer() {
         <DialogContent>
           <div className="dialog-content-flex">
             <div className="customer-profile text-center">
-              <a
-                href={
-                  typeof selectedData?.image === "string" &&
-                  selectedData?.image.startsWith("https://")
-                    ? selectedData.image
-                    : generateFilePath(selectedData?.image) || "#"
-                }
-                target="_blank"
-              >
+              <a href={selectedData?.image} target="_blank">
                 <img
-                  src={
-                    typeof selectedData?.image === "string" &&
-                    selectedData?.image.startsWith("https://")
-                      ? selectedData.image
-                      : generateFilePath(selectedData?.image)
-                  }
+                  src={selectedData?.image}
                   alt=""
                   className="profile-img"
                   target="_blank"

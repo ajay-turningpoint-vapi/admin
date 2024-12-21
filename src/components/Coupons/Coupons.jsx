@@ -29,6 +29,7 @@ function Coupons() {
   const couponArr = useSelector((state) => state.coupon.coupons);
   const couponArrTotalPages = useSelector((state) => state.coupon.totalPages);
   const productArr = useSelector((state) => state.product.products);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [pageLimit, setPageLimit] = useState(10);
   const [page, setPage] = useState(1);
@@ -43,7 +44,11 @@ function Coupons() {
     if (pageLimit) query += `&limit=${pageLimit}`;
     if (usedCoupon) query += `&couponUsed=${usedCoupon}`;
     if (productId) query += `&productId=${productId}`;
+    if(searchQuery) query +=`&search=${searchQuery}`
     dispatch(COUPONGet(query)).then(() => setLoading(false));
+  };
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   const handleFilterChange = (e) => {
@@ -86,7 +91,7 @@ function Coupons() {
     if (filterType !== "activeCoupons" && filterType !== "productName") {
       handleGetAllCoupons();
     }
-  }, [usedCoupon, productId, filterType]);
+  }, [usedCoupon, productId, filterType,searchQuery]);
 
   const handleEdit = (row) => {
     dispatch(SetCOUPONObj(row));
@@ -102,13 +107,13 @@ function Coupons() {
     {
       name: "Name",
       cell: (row) => <p>{row.name}</p>,
-      width: "17%",
+      width: "15%",
     },
     {
       name: "Coupon Value",
       cell: (row) =>
         row?.productObj ? <p>{row?.value}</p> : <p>No Product</p>,
-      width: "15%",
+      width: "10%",
     },
     {
       name: "Product",
@@ -117,7 +122,7 @@ function Coupons() {
       width: "15%",
     },
     {
-      name: "Maximum No Of Users Allowed",
+      name: "Coupon",
       width: "20%",
       selector: (row) =>
         row.maximumNoOfUsersAllowed === 0 ? (
@@ -125,12 +130,24 @@ function Coupons() {
             {row.maximumNoOfUsersAllowed} (Used)
           </span>
         ) : (
-          row.maximumNoOfUsersAllowed
+          <span className="badge bg-success p-2">
+            (Not Used)
+          </span>
         ),
     },
     {
       name: "Created At",
       cell: (row) => <p>{new Date(row.createdAt).toDateString()}</p>,
+      width: "15%",
+    },
+    {
+      name: "ScannedBy",
+      cell: (row) =>
+        row?.scannedUserName ? (
+          <p>{row.scannedUserName}</p>
+        ) : (
+          <p>Not Scanned</p>
+        ),
       width: "15%",
     },
   ];
@@ -144,6 +161,13 @@ function Coupons() {
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <h5 className="blue-1 m-0">Coupon List</h5>
                 <div className="d-flex align-items-center gap-3">
+                <input
+                type="text"
+                className="form-control"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+              />
                   <label>Coupons</label>
                   <select
                     className="form-control"

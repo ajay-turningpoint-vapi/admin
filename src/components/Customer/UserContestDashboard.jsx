@@ -40,16 +40,15 @@ import Loader from "../Utility/Loader.jsx";
 //     if (page) query += `&page=${page}`;
 //     if (pageLimit) query += `&limit=${pageLimit}`;
 //     if (search) query += `&q=${search}`;
-    
+
 //     try {
 //       const response = await getUserContestsReport(query);
 //       setUserContArrLose("");
 //       setUserContArrTotalPageLose("");
 //       setUserContArr(response.data);
 
-
 //       console.log("response",response.data);
-      
+
 //       setUserContArrTotalPage(response.data.totalPage);
 
 //       const response1 = await getUserContestsCount(contestId);
@@ -66,7 +65,7 @@ import Loader from "../Utility/Loader.jsx";
 //     let query = "";
 //     query += `contestId=${contestId}`;
 //     if (pageLose) query += `&page=${pageLose}`;
-    
+
 //     try {
 //       const response = await getUserContestsReportLose(query);
 //       setUserContArr("");
@@ -320,7 +319,7 @@ function UserContestDashboard() {
       name: "Sr No.",
       selector: (row, index) => index + 1,
       sortable: true,
-      width: "7%",
+      width: "10%",
     },
     {
       name: "Contest",
@@ -336,24 +335,22 @@ function UserContestDashboard() {
     },
     {
       name: "Join Date",
-      width: "15%",
+      width: "20%",
       selector: (row) => (
-        <p>{`${moment(row?.createdAt).format("DD-MM-YYYY")} - ${moment(row?.createdAt).format("hh:mm A")}`}</p>
+        <p>{`${moment(row?.createdAt).format("DD-MM-YYYY")} - ${moment(
+          row?.createdAt
+        ).format("hh:mm A")}`}</p>
       ),
     },
-    {
-      name: "Number Of Time Joined",
-      selector: (row) => (row.joinCount === undefined ? "-" : row.joinCount),
-      width: "15%",
-    },
+
     {
       name: "Status",
-      width: "10%",
+      width: "15%",
       selector: (row) => row?.status,
     },
     {
       name: "Rank",
-      width: "10%",
+      width: "15%",
       selector: (row) => row?.rank,
     },
   ];
@@ -374,7 +371,9 @@ function UserContestDashboard() {
             </div>
             <div className="col-3 gap-2 mb-3">
               <div
-                className={`row mx-1 ${viewMode === "winners" ? "usercontestactive" : ""}`}
+                className={`row mx-1 ${
+                  viewMode === "winners" ? "usercontestactive" : ""
+                }`}
                 onClick={() => handleFilterClick("winners")}
               >
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
@@ -385,7 +384,9 @@ function UserContestDashboard() {
             </div>
             <div className="col-3 gap-2 mb-3">
               <div
-                className={`row mx-1 ${viewMode === "losers" ? "usercontestactive" : ""}`}
+                className={`row mx-1 ${
+                  viewMode === "losers" ? "usercontestactive" : ""
+                }`}
                 onClick={() => handleFilterClick("losers")}
               >
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
@@ -415,7 +416,10 @@ function UserContestDashboard() {
               )}
               {viewMode === "losers" && userContArrLose?.data && (
                 <>
-                  <DataTable columns={points_columns} data={userContArrLose.data} />
+                  <DataTable
+                    columns={points_columns}
+                    data={userContArrLose.data}
+                  />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <Pagination
                       count={totalPages}
