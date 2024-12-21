@@ -55,18 +55,6 @@ function AddCoupons() {
 
   useEffect(() => {
     if (bannerObj) {
-     
-      // setselectedCouponId(bannerObj._id);
-      // setName(bannerObj.name);
-      // setDescription(bannerObj.description);
-      // setValue(bannerObj.value);
-      // setPreviousImage(bannerObj.image);
-      // setValidTill(bannerObj.validTill);
-      // setMaximumNoOfUsersAllowed(bannerObj.maximumNoOfUsersAllowed);
-      // let tempVal = discountTypeArr.find(el => el.value == bannerObj.discountType)
-     
-      // setDiscountType(tempVal);
-      // setSelectedStatus({ value: brandObj.statusInfo, label: brandObj.statusInfo });
       setIsUpdateBanner(true);
     }
     return () => {
@@ -101,37 +89,147 @@ function AddCoupons() {
     }
   };
 
-  const handleMultipleSubmit = async () => {
-    if (`${productId}` == "") {
-      toastError("Please Select Product");
+  
+  const handleMultipleSubmitold = async () => {
+    // Validate Product ID
+    if (!productId || productId.trim() === "") {
+      toastError("Please select a product.");
       return;
     }
-    if (`${couponVal}` == "") {
-      toastError("Please fill Total Coupon Value");
+  
+    // Validate Total Coupon Value
+    if (!couponVal || isNaN(couponVal) || couponVal <= 0) {
+      toastError("Please enter a valid total coupon value.");
       return;
     }
+  
+    // Validate Total Coupon Count
+    if (!totalCoupon || isNaN(totalCoupon) || totalCoupon <= 0) {
+      toastError("Please enter a valid total coupon count.");
+      return;
+    }
+  
+    // Validate Coupons Array
+    const invalidCoupons = coupons.some(
+      (coupon) =>
+        !coupon.value ||
+        isNaN(coupon.value) ||
+        coupon.value <= 0 ||
+        !coupon.count ||
+        isNaN(coupon.count) ||
+        coupon.count <= 0
+    );
+    if (invalidCoupons) {
+      toastError("Please ensure all coupon values and counts are valid.");
+      return;
+    }
+  
     let obj = {
       amount: couponVal,
       count: totalCoupon,
       coupons,
       productId,
     };
-   
-
-    if (isUpdateBanner) {
-      dispatch(COUPONUpdate(obj, selectedCouponId));
-    } else {
-      try {
-        setLoading(true);
+  
+    // Dispatch based on whether it's an update or new addition
+    try {
+      setLoading(true);
+      if (isUpdateBanner) {
+        await dispatch(COUPONUpdate(obj, selectedCouponId));
+      } else {
         await dispatch(CouponMultipleAdd(obj));
         navigate("/Coupon/ViewCoupons");
-      } catch (error) {
-        console.error("Error adding coupon:", error);
-      } finally {
-        setLoading(false); // Hide loader
       }
+    } catch (error) {
+      console.error("Error handling coupons:", error);
+    } finally {
+      setLoading(false); // Hide loader
     }
   };
+  
+  const handleMultipleSubmit = async () => {
+    // Validate Product ID
+    if (!productId || productId.trim() === "") {
+      toastError("Please select a product.");
+      return;
+    }
+  
+    // Validate Total Coupon Value
+    if (!couponVal || isNaN(couponVal) || couponVal <= 0) {
+      toastError("Please enter a valid total coupon value.");
+      return;
+    }
+  
+    // Validate Total Coupon Count
+    if (!totalCoupon || isNaN(totalCoupon) || totalCoupon <= 0) {
+      toastError("Please enter a valid total coupon count.");
+      return;
+    }
+  
+    // Validate Coupons Array
+    const invalidCoupons = coupons.some(
+      (coupon) =>
+        !coupon.value ||
+        isNaN(coupon.value) ||
+        coupon.value <= 0 ||
+        !coupon.count ||
+        isNaN(coupon.count) ||
+        coupon.count <= 0
+    );
+  
+    if (invalidCoupons) {
+      toastError("Please ensure all coupon values and counts are valid.");
+      return;
+    }
+  
+    // Calculate the total value and count from the coupons array
+    const totalCouponsValue = coupons.reduce(
+      (sum, coupon) => sum + parseFloat(coupon.value) * parseInt(coupon.count),
+      0
+    );
+    const totalCouponsCount = coupons.reduce(
+      (sum, coupon) => sum + parseInt(coupon.count),
+      0
+    );
+  
+    // Validate that the total matches
+    if (totalCouponsValue !== parseFloat(couponVal)) {
+      toastError(
+        `The total value of coupons (${totalCouponsValue}) must equal the Total Coupon Value (${couponVal}).`
+      );
+      return;
+    }
+  
+    if (totalCouponsCount !== parseInt(totalCoupon)) {
+      toastError(
+        `The total count of coupons (${totalCouponsCount}) must equal the Total Coupon Count (${totalCoupon}).`
+      );
+      return;
+    }
+  
+    let obj = {
+      amount: couponVal,
+      count: totalCoupon,
+      coupons,
+      productId,
+    };
+  
+    // Dispatch based on whether it's an update or new addition
+    try {
+      setLoading(true);
+      if (isUpdateBanner) {
+        await dispatch(COUPONUpdate(obj, selectedCouponId));
+      } else {
+        await dispatch(CouponMultipleAdd(obj));
+        navigate("/Coupon/ViewCoupons");
+      }
+    } catch (error) {
+      console.error("Error handling coupons:", error);
+    } finally {
+      setLoading(false); // Hide loader
+    }
+  };
+  
 
   let handleCouponArrayAdd = () => {
     setCoupons([...coupons, { value: "", count: "" }]);
