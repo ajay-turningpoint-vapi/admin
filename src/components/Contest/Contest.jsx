@@ -30,6 +30,7 @@ const Contest = () => {
   const handleDelete = (id) => {
     dispatch(CONTESTDelete(id));
   };
+
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };

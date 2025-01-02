@@ -62,12 +62,14 @@ import AddReels from "../components/Reels/AddReels";
 import UserContests from "../components/Customer/UserContests";
 import UpdateReel from "../components/Reels/UpdateReel";
 import GeofenceForm from "../components/Map/GeofenceForm.jsx";
+import WhatsAppClient from "../components/WhatsApp/WhatsAppClient";
 import ActivityLog from "../components/Customer/ActivityLog.jsx";
 import UserContestDashboard from "../components/Customer/UserContestDashboard.jsx";
 import UserActivityAnalysis from "../components/Customer/UserActivityAnalysis.jsx";
 import Referrals from "../components/Customer/Referrals.jsx";
 import NotListedContractors from "../components/Contractors/NotListedContractors.jsx";
 import Contractors from "../components/Contractors/Contractors.jsx";
+import Promotions from "../components/Promotions/Promotions.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -298,6 +300,9 @@ export default function AuthorizedRoutes() {
             <Route exact path="/SetUp/Location" element={<Location />}></Route>
             <Route exact path="/SetUp/Tags" element={<Tags />}></Route>
             <Route exact path="/GeoFencing" element={<GeofenceForm />}></Route>
+            <Route exact path="/whatsapp" element={<WhatsAppClient />}></Route>
+            <Route exact path="/promotion" element={<Promotions />}></Route>
+            
           </Routes>
           <Footer />
         </div>

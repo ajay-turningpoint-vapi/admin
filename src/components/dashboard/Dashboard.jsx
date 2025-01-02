@@ -37,6 +37,7 @@ import {
   getReelsLikeAnalytics,
 } from "../../services/reels.service";
 import { getAllJoinedUserContest } from "../../services/contest.service";
+import { getProductsCount } from "../../services/product.service";
 
 function Dashboard() {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ function Dashboard() {
   const [totalCoupons, setTotalCoupons] = useState(0);
   const [totalContest, setTotalContest] = useState(0);
   const [totalTransactions, setTotalTransactions] = useState(0);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [totalReels, setTotalReels] = useState(0);
   const [userAnalytics, setUserAnalytics] = useState(0);
   const [reelLikeAnalytics, setReelLikeUserAnalytics] = useState(0);
@@ -60,7 +62,6 @@ function Dashboard() {
   const [reelsAnalytics, setReelsAnalytics] = useState(0);
   const [userContestLabel, setUserContestLabel] = useState(0);
   const [userContestCount, setUserContestCount] = useState(0);
-  
 
   const handleTransactionCount = async () => {
     let { data: response } = await getTransactionCount();
@@ -70,6 +71,7 @@ function Dashboard() {
     let { data: response4 } = await getAllCouponsAnalytics();
     let { data: response5 } = await getReelsAnalytics();
     let { data: response6 } = await getAllJoinedUserContest();
+    let { data: response7 } = await getProductsCount();
     setUserAnalytics(response2.data);
     if (response) {
       setTotalTransactions(response);
@@ -87,22 +89,23 @@ function Dashboard() {
       setReelsAnalytics(response5.data);
     }
     if (response6) {
-    
       setUserContestLabel(response6.contestNames);
       setUserContestCount(response6.userCounts);
+    }
+    if (response7) {
+      setTotalProducts(response7);
     }
   };
 
   useEffect(() => {
-   
     if (userArr) {
       setTotalUsers(userArr.length > 0 ? userArr?.length : 0);
     }
- 
+
     if (couponArr) {
       setTotalCoupons(couponArr.length > 0 ? couponArr?.length : 0);
     }
-    
+
     if (contestArr) {
       setTotalContest(contestArr.length > 0 ? contestArr?.length : 0);
     }
@@ -110,7 +113,7 @@ function Dashboard() {
     // if (transactionArr) {
     //   setTotalTransactions(transactionArr || 0);
     // }
-  
+
     if (reelsArr) {
       setTotalReels(reelsArr.length > 0 ? reelsArr?.length : 0);
     }
@@ -675,14 +678,6 @@ function Dashboard() {
               </Link>
             </div>
             <div className="col-12 col-md-6">
-              <Link to="/Coupons">
-                <DashboardBox className="dashboard-summary">
-                  <h5 className="blue-1">Total Coupons</h5>
-                  <h4 className="text-dark mb-0">{totalCoupons}</h4>
-                </DashboardBox>
-              </Link>
-            </div>
-            <div className="col-12 col-md-6">
               <Link to="/Contests">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Total Contests</h5>
@@ -695,6 +690,22 @@ function Dashboard() {
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Transactions</h5>
                   <h4 className="text-dark mb-0">{totalTransactions}</h4>
+                </DashboardBox>
+              </Link>
+            </div>
+            <div className="col-12 col-md-6">
+              <Link to="/Product-list">
+                <DashboardBox className="dashboard-summary">
+                  <h5 className="blue-1">Total Products</h5>
+                  <h4 className="text-dark mb-0">{totalProducts}</h4>
+                </DashboardBox>
+              </Link>
+            </div>
+            <div className="col-12 col-md-6">
+              <Link to="/Coupons">
+                <DashboardBox className="dashboard-summary">
+                  <h5 className="blue-1">Total Coupons</h5>
+                  <h4 className="text-dark mb-0">{totalCoupons}</h4>
                 </DashboardBox>
               </Link>
             </div>

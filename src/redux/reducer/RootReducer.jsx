@@ -12,6 +12,7 @@ import { CouponReducer } from "./Coupon/Coupon.reducer";
 import { ContestReducer } from "./Contest/Contest.reducer";
 import { TransactionReducer } from "./Transaction/Transaction.reducer";
 import { ReelsReducer } from "./Reels/Reels.reducer";
+import promotionReducer from "./Promotion/Promotions.reducer";
 
 const RootReducer = combineReducers({
   auth: authReducer,
@@ -26,6 +27,7 @@ const RootReducer = combineReducers({
   contest: ContestReducer,
   transaction: TransactionReducer,
   reels: ReelsReducer,
+  promotions: promotionReducer
 });
 
 export default RootReducer;

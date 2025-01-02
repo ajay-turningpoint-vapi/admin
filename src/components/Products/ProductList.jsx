@@ -27,7 +27,12 @@ function ProductList() {
   };
 
   const handleDeleteById = (id) => {
-    dispatch(PRODUCTDelete(id));
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+    if (isConfirmed) {
+      dispatch(PRODUCTDelete(id));
+    }
   };
 
   const [ModalType, setModalType] = useState("");

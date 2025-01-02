@@ -55,6 +55,9 @@ function GeneralProduct() {
   const [subAttributesArr, setSubAttributesArr] = useState([]);
   const productObj = useSelector((state) => state.product.productObj);
   const attributes = useSelector((state) => state.attribute.attributes);
+
+  console.log("productObj", productObj);
+
   useEffect(() => {
     // dispatch(getAllNestedCategories());
     // dispatch(BrandGet());
@@ -74,7 +77,6 @@ function GeneralProduct() {
   }, [attributes]);
 
   const handleMainCategorySelection = (obj) => {
-  
     if (obj?.subCategoryArr && obj?.subCategoryArr.length > 0) {
       setSubCategoryArr(obj.subCategoryArr);
     }
@@ -83,14 +85,12 @@ function GeneralProduct() {
   };
 
   const handleMainAttributeSelection = (obj) => {
-   
     if (obj?.attributeValueArr && obj?.attributeValueArr.length > 0) {
       setSubAttributesArr(obj.attributeValueArr);
     }
   };
 
   const handleBrandSelection = (obj) => {
-
     setSelectedBrandId(obj?._id);
   };
 
@@ -99,28 +99,27 @@ function GeneralProduct() {
   };
 
   const handlePdfFileSet = (value) => {
-   
     setSpecificationFile(value);
   };
 
   const handleSubmit = () => {
-    if (name == "") {
+    if (name === "") {
       toastError("Name cannot be empty !");
       return;
     }
-    if (brand == "") {
+    if (brand === "") {
       toastError("brand cannot be empty !");
       return;
     }
-    if (company == "") {
+    if (company === "") {
       toastError("Company cannot be empty !");
       return;
     }
-    if (salePrice == "") {
+    if (salePrice === "") {
       toastError("SalePrice cannot be empty !");
       return;
     }
-    if (commisionAllowed == "") {
+    if (commisionAllowed === "") {
       toastError("CommisionAllowed cannot be empty !");
       return;
     }
@@ -154,6 +153,11 @@ function GeneralProduct() {
       dispatch(PRODUCTUpdate(obj, productObj._id));
     } else {
       dispatch(PRODUCTAdd(obj));
+      setBrand("");
+      setCompany("");
+      setName("");
+      setSalePrice("");
+      setCommisionAllowed("");
     }
   };
 

@@ -248,6 +248,22 @@ function SideBar() {
       icon: "fa-solid fa-map",
       children: [],
     },
+    // {
+    //   isrotated: false,
+    //   active: false,
+    //   name: "WhatsApp",
+    //   path: "/whatsapp",
+    //   icon: "fa-solid fa-phone",
+    //   children: [],
+    // },
+    {
+      isrotated: false,
+      active: false,
+      name: "Promotions",
+      path: "/promotion",
+      icon: "fa-solid fa-bullhorn",
+      children: [],
+    },
 
     // {
     //   isrotated: false,

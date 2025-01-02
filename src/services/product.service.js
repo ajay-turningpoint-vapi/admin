@@ -18,3 +18,7 @@ export const deleteProductById = (id) => {
 export const updateProductById = (formData, id) => {
   return axios.patch(`${serverUrl}/updateById/${id}`, formData);
 };
+
+export const getProductsCount = (query) => {
+  return axios.get(`${serverUrl}/getProductsCount`);
+};

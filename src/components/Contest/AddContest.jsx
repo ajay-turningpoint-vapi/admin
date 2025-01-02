@@ -137,6 +137,7 @@ const AddContest = () => {
     if (isUpdateContest) {
    
       dispatch(CONTESTUpdate(obj, selectedContestId));
+      
     } else {
       dispatch(CONTESTAdd(obj));
       setselectedContestId("");
