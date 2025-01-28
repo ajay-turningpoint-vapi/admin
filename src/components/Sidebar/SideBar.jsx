@@ -240,14 +240,14 @@ function SideBar() {
       icon: "fa-solid fa-video-camera",
       children: [],
     },
-    {
-      isrotated: false,
-      active: false,
-      name: "Map",
-      path: "/GeoFencing",
-      icon: "fa-solid fa-map",
-      children: [],
-    },
+    // {
+    //   isrotated: false,
+    //   active: false,
+    //   name: "Map",
+    //   path: "/GeoFencing",
+    //   icon: "fa-solid fa-map",
+    //   children: [],
+    // },
     // {
     //   isrotated: false,
     //   active: false,
@@ -262,6 +262,14 @@ function SideBar() {
       name: "Promotions",
       path: "/promotion",
       icon: "fa-solid fa-bullhorn",
+      children: [],
+    },
+    {
+      isrotated: false,
+      active: false,
+      name: "Tickets",
+      path: "/tickets",
+      icon: "fa-solid fa-ticket",
       children: [],
     },
 

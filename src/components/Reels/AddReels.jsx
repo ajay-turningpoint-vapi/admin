@@ -13,7 +13,7 @@ const AddReels = () => {
   const dispatch = useDispatch();
   const [isUpdateContest, setIsUpdateContest] = useState(false);
   const reelsObj = useSelector((state) => state.reels.reelsObj);
- 
+
   const [filesArr, setFilesArr] = useState([]);
 
   const handleAddTimeOut = (value, index) => {
@@ -98,7 +98,7 @@ const AddReels = () => {
     if (allFieldsFilled) {
       // Dispatch action only if all fields are filled for each file
       dispatch(ReelsAdd(filesArr));
-    
+
       navigate(-1);
     }
   };
@@ -159,22 +159,6 @@ const AddReels = () => {
                               <div className="row d-flex justify-content-between">
                                 <div className="col-5">
                                   <div className="row">
-                                    <label htmlFor="">
-                                      Enter Time in seconds to display like
-                                      button after ({el?.link?.name})
-                                    </label>
-                                    <input
-                                      className="border rounded me-3 py-2"
-                                      type={"number"}
-                                      onChange={(e) =>
-                                        handleAddTimeOut(e.target.value, index)
-                                      }
-                                      value={el?.displayLikeAfter}
-                                    />
-                                  </div>
-                                </div>
-                                <div className="col-5">
-                                  <div className="row">
                                     <label htmlFor="">Points</label>
                                     <input
                                       className="border rounded me-3 py-2"
@@ -196,41 +180,23 @@ const AddReels = () => {
                                       }
                                       // value={el?.type}
                                     >
-                                      <option value="Jokes/Comedy Reels">
-                                        Jokes/Comedy Reels{" "}
+                                      <option value="Entertainment Reel">
+                                        Entertainment Reel
                                       </option>
-                                      <option value="Technical Reels">
-                                        Technical Reels
+                                      <option value="Knowledge Reel">
+                                        Knowledge Reel
                                       </option>
-                                      <option value="Spiritual Reels">
-                                        Spiritual Reels
+                                      <option value="Knowledge Community Member Reel">
+                                        Knowledge Community Member Reel
                                       </option>
-                                      <option value="Jokes/Comedy Reels">
-                                        Jokes/Comedy Reels
+                                      <option value="Skills Reel">
+                                        Skills Reel
                                       </option>
-                                      <option value="Lifestyle Reels">
-                                        Lifestyle Reels
+                                      <option value="Skills Community Member Reel">
+                                        Skills Community Member Reel
                                       </option>
-                                      <option value="Entertainment Reels">
-                                        Entertainment Reels
-                                      </option>
-                                      <option value="nspiration/Motivational Reels">
-                                        Inspiration/Motivational Reels
-                                      </option>{" "}
-                                      <option value=" Spiritual Reels">
-                                        Spiritual Reels
-                                      </option>
-                                      <option value="DIY/Craft Reels">
-                                        DIY/Craft Reels
-                                      </option>
-                                      <option value="Travel Reels">
-                                        Travel Reels
-                                      </option>
-                                      <option value="Food/Cooking Reels">
-                                        Food/Cooking Reels
-                                      </option>
-                                      <option value="Music/Dance Reels">
-                                        Music/Dance Reels
+                                      <option value="Product Promotion Reel">
+                                        Product Promotion Reel
                                       </option>
                                     </select>
                                   </div>

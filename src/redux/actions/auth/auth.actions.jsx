@@ -12,6 +12,8 @@ export const loginUser = (formData) => async (dispatch) => {
   try {
     dispatch({ type: AUTH });
     let { data: response } = await login(formData);
+    console.log("login resp",response);
+    
     if (response) {
       let decodedToken = await jwtDecode(response.token);
       localStorage.setItem("token", response.token);

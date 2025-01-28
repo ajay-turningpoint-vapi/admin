@@ -19,6 +19,7 @@
     height: 10cm;
     box-sizing: border-box;
     page-break-inside: avoid;
+    background-color: aqua !important;
   }
 
   .coupon {

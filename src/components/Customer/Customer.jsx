@@ -13,6 +13,7 @@ import {
   Radio,
   RadioGroup,
   Switch,
+  TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
@@ -22,7 +23,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
 import {
   blockUser,
+  getAllContractors,
   updateUserKycStatus,
+  updateUserProfileAdmin,
   updateUserStatus,
 } from "../../services/users.service";
 import "../../assets/style.css";
@@ -33,6 +36,8 @@ import { generateFilePath } from "../Utility/utils";
 import Swal from "sweetalert2";
 import Slide from "@mui/material/Slide";
 import noImg from "../../assets/images/noImg.png";
+import SingleFileUpload from "../Utility/SingleFileUpload";
+import toast from "react-hot-toast";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
@@ -48,6 +53,108 @@ function Customer() {
   const [menuRow, setMenuRow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedRowForNote, setSelectedRowForNote] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedData, setEditedData] = useState({});
+  const [note, setNote] = useState("");
+  const [allContractor, setAllContractor] = useState([]);
+
+  const fetchData = async () => {
+    try {
+      const response = await getAllContractors();
+      setAllContractor(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedData) {
+      fetchData();
+      setEditedData(selectedData);
+    }
+  }, [selectedData]);
+
+  const handleEditChange = (field, value, bankIndex = null) => {
+    setEditedData((prev) => {
+      if (bankIndex !== null) {
+        const updatedBankDetails = [...prev.bankDetails];
+        updatedBankDetails[bankIndex] = {
+          ...updatedBankDetails[bankIndex],
+          [field]: value,
+        };
+        return { ...prev, bankDetails: updatedBankDetails };
+      }
+      return { ...prev, [field]: value };
+    });
+  };
+
+  const handleFileSet = (field, fileData) => {
+    // Extract the fileUrl from the fileData object
+    const fileUrl = fileData.fileUrl;
+
+    setEditedData((prev) => ({
+      ...prev,
+      [field]: fileUrl, // Only update with the file URL
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      // Check the role and set appropriate values to null
+      const dataToSend = {
+        userId: editedData._id,
+        ...editedData, // Include the rest of the editedData
+      };
+
+      if (dataToSend.role === "CARPENTER") {
+        // If role is CARPENTER, set businessName to null
+        dataToSend.businessName = null;
+      } else if (dataToSend.role === "CONTRACTOR") {
+        // If role is CONTRACTOR, set contractor to null
+        dataToSend.contractor = null;
+      }
+
+      // Assuming updateUserProfileAdmin is an API function that expects userId and the entire editedData in the request body
+      const response = await updateUserProfileAdmin(dataToSend);
+
+      if (response.data) {
+        handleGetAllUsers();
+        toast.success(response.data.message);
+      }
+
+      // Assuming response.data contains the updated user data or some confirmation message
+      return response.data;
+    } catch (error) {
+      console.error("Error saving note:", error);
+      alert("Failed to save note");
+    }
+  };
+
+  const handleOpenNoteEditor = (row) => {
+    console.log("row", row);
+
+    setSelectedRowForNote(row);
+    setNote(row.note || ""); // Set the note content if any
+  };
+
+  const handleCloseNoteEditor = () => {
+    setDialogOpen(false);
+    setSelectedRowForNote(null);
+  };
+
+  const handleSaveNote = async (rowId) => {
+    try {
+      // Call API to save the note for the specific user
+      await saveNoteForUser(rowId, note);
+      handleGetAllUsers();
+      setSelectedRowForNote(null); // Close the editor after saving
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save note");
+    }
+  };
 
   const handleClick = (event, row) => {
     setAnchorEl(event.currentTarget);
@@ -111,6 +218,7 @@ function Customer() {
   };
 
   const handleDialogOpen = (row) => {
+    console.log("row", row);
     setDialogOpen(true);
     setSelectedData(row);
     setKycStatus(row.kycStatus);
@@ -119,6 +227,7 @@ function Customer() {
   const handleDialogClose = () => {
     setDialogOpen(false);
     setSelectedData(null);
+    setIsEditMode(false);
   };
 
   const handleChangeKycStatus = async (id, value) => {
@@ -157,10 +266,26 @@ function Customer() {
     dispatch(usersGet(query));
   };
 
+  const saveNoteForUser = async (userId, noteData) => {
+    try {
+      // Assuming updateUserProfileAdmin is an API function that expects userId and noteData in the request body
+      const response = await updateUserProfileAdmin({
+        userId: userId,
+        note: noteData,
+      });
+
+      // Assuming response.data contains the updated user data or some confirmation message
+      return response.data;
+    } catch (error) {
+      console.error("Error saving note:", error);
+      throw new Error("Failed to save note");
+    }
+  };
+
   const users_columns = [
     {
       name: "ID",
-      cell: (row, index) => <p>{index + 1}</p>,
+      cell: (row, index) => <p>{index + 1 + currentPage * 10}</p>,
       sortable: true,
       width: "5%",
     },
@@ -181,7 +306,22 @@ function Customer() {
     },
     {
       name: "ROLE",
-      selector: (row) => row.role,
+      selector: (row) => (
+        <p
+          style={{
+            display: "inline-block",
+            padding: "5px 10px",
+            borderRadius: "15px",
+            backgroundColor:
+              row.role === "CONTRACTOR" ? "#ae6f2d" : "transparent",
+            color: row.role === "CONTRACTOR" ? "white" : "inherit",
+
+            textAlign: "center",
+          }}
+        >
+          {row.role}
+        </p>
+      ),
       width: "11%",
     },
     {
@@ -250,6 +390,7 @@ function Customer() {
             }}
           >
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {/* Other menu items */}
               <CustomButton
                 btntype="button"
                 ClickEvent={() => {
@@ -282,6 +423,15 @@ function Customer() {
               >
                 Logs
               </Link>
+
+              {/* Add Note Button */}
+              <CustomButton
+                btntype="button"
+                ClickEvent={() => handleOpenNoteEditor(menuRow)}
+                isBtn
+                iconName="fa-solid fa-edit"
+                btnName="Add Note"
+              />
             </Box>
           </Menu>
         </Box>
@@ -372,201 +522,508 @@ function Customer() {
                 </div>
               </div>
             </div>
+            <Dialog
+              open={dialogOpen}
+              onClose={handleDialogClose}
+              maxWidth="sm"
+              fullWidth
+              TransitionComponent={Transition}
+              style={{ height: "700px" }}
+            >
+              <DialogTitle style={{ background: "#E5E4E2" }}>
+                Customer Information
+                <Button
+                  onClick={() => {
+                    if (isEditMode) {
+                      handleSave(); // Call the save function when in edit mode
+                    } else {
+                      setIsEditMode(true); // Switch to edit mode when in view mode
+                    }
+                  }}
+                  color="primary"
+                  style={{ float: "right" }}
+                >
+                  {isEditMode ? "Save" : "Edit"}
+                </Button>
+              </DialogTitle>
+              <DialogContent>
+                <div className="dialog-content-flex">
+                  <div className="customer-profile text-center">
+                    <a href={selectedData?.image} target="_blank">
+                      <img
+                        src={selectedData?.image}
+                        alt=""
+                        className="profile-img"
+                        target="_blank"
+                      />
+                    </a>
+                    {isEditMode ? (
+                      <input
+                        type="text"
+                        value={editedData?.name}
+                        onChange={(e) =>
+                          handleEditChange("name", e.target.value)
+                        }
+                        className="edit-input"
+                      />
+                    ) : (
+                      <h6 className="blue-1 text-capitalize my-3">
+                        {selectedData?.name}
+                      </h6>
+                    )}
+                  </div>
+                  <div className="details-container">
+                    <ul className="blue-1 fs-14 details-column">
+                      <li>
+                        <span className="fw-600">Email: </span>
+
+                        <span>{selectedData?.email}</span>
+                      </li>
+                      <li>
+                        <span className="fw-600">Phone: </span>
+                        {isEditMode ? (
+                          <input
+                            type="text"
+                            value={editedData?.phone}
+                            onChange={(e) =>
+                              handleEditChange("phone", e.target.value)
+                            }
+                            className="edit-input"
+                          />
+                        ) : (
+                          <span>{selectedData?.phone}</span>
+                        )}
+                      </li>
+
+                      <li>
+                        <span className="fw-600">Role: </span>
+                        {isEditMode ? (
+                          <select
+                            value={editedData?.role}
+                            onChange={(e) => {
+                              const newRole = e.target.value;
+                              handleEditChange("role", newRole); // Update the role
+                              // If the role is changed, reset or update other fields accordingly
+                              if (newRole === "CONTRACTOR") {
+                                // Set businessName editable for contractor and reset contractor name
+                                handleEditChange("contractor", {
+                                  ...editedData.contractor,
+                                  name: "",
+                                });
+                              } else if (newRole === "CARPENTER") {
+                                // Set contractor name editable for carpenter and reset businessName
+                                handleEditChange("businessName", ""); // Reset businessName
+                              }
+                            }}
+                            className="edit-input"
+                          >
+                            <option value="CONTRACTOR">CONTRACTOR</option>
+                            <option value="CARPENTER">CARPENTER</option>
+                          </select>
+                        ) : (
+                          <span>{selectedData?.role}</span>
+                        )}
+                      </li>
+
+                      {/* Show Business Name field for CONTRACTOR role */}
+                      {editedData.role === "CONTRACTOR" && (
+                        <li>
+                          <span className="fw-600">Business Name: </span>
+                          {isEditMode ? (
+                            <input
+                              type="text"
+                              value={editedData?.businessName || ""}
+                              onChange={
+                                (e) =>
+                                  handleEditChange(
+                                    "businessName",
+                                    e.target.value
+                                  ) // Allow editing of businessName
+                              }
+                              className="edit-input"
+                            />
+                          ) : (
+                            <span>
+                              {selectedData?.businessName || "No Business Name"}
+                            </span>
+                          )}
+                        </li>
+                      )}
+
+                      {/* Show Contractor Name and Business Name fields for CARPENTER role */}
+                      {editedData.role === "CARPENTER" && (
+                        <div>
+                          <li>
+                            <span className="fw-600">Contractor Name: </span>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={editedData?.contractor?.name || ""}
+                                readOnly
+                                className="edit-input"
+                              />
+                            ) : (
+                              <span>
+                                {selectedData?.contractor?.name ||
+                                  "No Contractor"}
+                              </span>
+                            )}
+                          </li>
+                          <li>
+                            <span className="fw-600">Business Name: </span>
+                            {isEditMode ? (
+                              <select
+                                value={
+                                  editedData?.contractor?.businessName || ""
+                                }
+                                onChange={(e) => {
+                                  // Find the selected business and update contractor name
+                                  const selectedBusiness = allContractor.find(
+                                    (contractor) =>
+                                      contractor.businessName === e.target.value
+                                  );
+                                  if (selectedBusiness) {
+                                    // Set both business name and contractor name in the state
+                                    handleEditChange("contractor", {
+                                      ...editedData.contractor,
+                                      businessName: e.target.value,
+                                      name: selectedBusiness.name, // Set the contractor name based on the business name
+                                    });
+                                  }
+                                }}
+                                className="edit-input"
+                              >
+                                <option value="">Select Business Name</option>
+                                {allContractor.map((contractor) => (
+                                  <option
+                                    key={contractor.businessName}
+                                    value={contractor.businessName}
+                                  >
+                                    {contractor.businessName}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span>
+                                {selectedData?.contractor?.businessName ||
+                                  "No Business Name"}
+                              </span>
+                            )}
+                          </li>
+                        </div>
+                      )}
+
+                      <li>
+                        <span className="fw-600">Points: </span>
+                        <span>{selectedData?.points ?? 0}</span>
+                      </li>
+                      <li>
+                        <span className="fw-600">Registered Date: </span>
+                        <span>
+                          {new Date(selectedData?.createdAt).toDateString()}
+                        </span>
+                      </li>
+                      <li>
+                        <span className="fw-600">Active Status: </span>
+                        <span>
+                          {selectedData?.isActive ? (
+                            <CustomButton greenBtn btnName="Active" />
+                          ) : (
+                            <CustomButton redBtn btnName="InActive" />
+                          )}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="details-container">
+                    <ul className="blue-1 fs-14 details-column">
+                      {editedData?.bankDetails?.map((bank, i) => (
+                        <React.Fragment key={i}>
+                          <li>
+                            <span className="fw-600">Bank Type: </span>
+                            {isEditMode ? (
+                              <select
+                                value={bank.banktype}
+                                onChange={(e) =>
+                                  handleEditChange(
+                                    "banktype",
+                                    e.target.value,
+                                    i
+                                  )
+                                }
+                                className="edit-select"
+                              >
+                                <option value="savings">Savings</option>
+                                <option value="current">Current</option>
+                              </select>
+                            ) : (
+                              <span>
+                                {bank.banktype.charAt(0).toUpperCase() +
+                                  bank.banktype.slice(1)}
+                              </span>
+                            )}
+                          </li>
+                          <li>
+                            <span className="fw-600">Account Number: </span>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={bank.accountNo}
+                                onChange={(e) =>
+                                  handleEditChange(
+                                    "accountNo",
+                                    e.target.value,
+                                    i
+                                  )
+                                }
+                                className="edit-input"
+                              />
+                            ) : (
+                              <span>{bank.accountNo}</span>
+                            )}
+                          </li>
+                          <li>
+                            <span className="fw-600">Account Name: </span>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={bank.accountName}
+                                onChange={(e) =>
+                                  handleEditChange(
+                                    "accountName",
+                                    e.target.value,
+                                    i
+                                  )
+                                }
+                                className="edit-input"
+                              />
+                            ) : (
+                              <span>{bank.accountName}</span>
+                            )}
+                          </li>
+                          <li>
+                            <span className="fw-600">IFSC Code: </span>
+                            {isEditMode ? (
+                              <input
+                                type="text"
+                                value={bank.ifsc}
+                                onChange={(e) =>
+                                  handleEditChange("ifsc", e.target.value, i)
+                                }
+                                className="edit-input"
+                              />
+                            ) : (
+                              <span>{bank.ifsc}</span>
+                            )}
+                          </li>
+                        </React.Fragment>
+                      ))}
+
+                      <li>
+                        <span className="fw-600">Id Front Image: </span>
+                        {isEditMode ? (
+                          <SingleFileUpload
+                            onFileChange={(fileUrl) =>
+                              handleFileSet("idFrontImage", fileUrl)
+                            }
+                          />
+                        ) : selectedData?.idFrontImage ? (
+                          <span>
+                            <a
+                              href={selectedData?.idFrontImage}
+                              target="_blank"
+                            >
+                              <img
+                                src={selectedData?.idFrontImage}
+                                alt=""
+                                className="kyc-img"
+                              />
+                            </a>
+                          </span>
+                        ) : (
+                          <span>
+                            <img
+                              src={noImg}
+                              alt="Dummy Image"
+                              className="kyc-img"
+                              style={{ height: "150px", width: "150px" }}
+                            />
+                          </span>
+                        )}
+                      </li>
+
+                      {/* Id Back Image */}
+                      <li>
+                        <span className="fw-600">Id Back Image: </span>
+                        {isEditMode ? (
+                          <SingleFileUpload
+                            onFileChange={(fileUrl) =>
+                              handleFileSet("idBackImage", fileUrl)
+                            }
+                          />
+                        ) : selectedData?.idBackImage ? (
+                          <span>
+                            <a href={selectedData?.idBackImage} target="_blank">
+                              <img
+                                src={selectedData?.idBackImage}
+                                alt=""
+                                className="kyc-img"
+                              />
+                            </a>
+                          </span>
+                        ) : (
+                          <span>
+                            <img
+                              src={noImg}
+                              alt="Dummy Image"
+                              className="kyc-img"
+                              style={{ height: "150px", width: "150px" }}
+                            />
+                          </span>
+                        )}
+                      </li>
+
+                      {/* Selfie */}
+                      <li>
+                        <span className="fw-600">Selfie: </span>
+                        {isEditMode ? (
+                          <SingleFileUpload
+                            onFileChange={(fileUrl) =>
+                              handleFileSet("selfie", fileUrl)
+                            }
+                          />
+                        ) : selectedData?.selfie ? (
+                          <span>
+                            <a href={selectedData?.selfie} target="_blank">
+                              <img
+                                src={selectedData?.selfie}
+                                alt=""
+                                className="kyc-img"
+                              />
+                            </a>
+                          </span>
+                        ) : (
+                          <span>
+                            <img
+                              src={noImg}
+                              alt="Dummy Image"
+                              className="kyc-img"
+                              style={{ height: "150px", width: "150px" }}
+                            />
+                          </span>
+                        )}
+                      </li>
+
+                      <li className="kyc-status-container">
+                        <span className="fw-600 kyc-status-label">
+                          KYC status:{" "}
+                        </span>
+                        <RadioGroup
+                          aria-label="kycStatus"
+                          name="kycStatus"
+                          value={kycStatus}
+                          onChange={(e) =>
+                            handleChangeKycStatus(
+                              selectedData._id,
+                              e.target.value
+                            )
+                          }
+                          className="kyc-radio-group"
+                        >
+                          <FormControlLabel
+                            value="pending"
+                            control={<Radio />}
+                            label="Pending"
+                          />
+                          <FormControlLabel
+                            value="submitted"
+                            control={<Radio />}
+                            label="Submitted"
+                          />
+                          <FormControlLabel
+                            value="approved"
+                            control={<Radio />}
+                            label="Approved"
+                          />
+                          <FormControlLabel
+                            value="rejected"
+                            control={<Radio />}
+                            label="Rejected"
+                          />
+                        </RadioGroup>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleDialogClose} color="primary">
+                  Close
+                </Button>
+              </DialogActions>
+            </Dialog>
+            <div>
+              <div>
+                {selectedRowForNote && (
+                  <div
+                    className="note-editor"
+                    style={{
+                      padding: "20px",
+                      border: "1px solid #ccc",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <p>{selectedRowForNote?.name}</p>
+                    <textarea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)} // Update note on change
+                      rows={3}
+                      placeholder="Enter your note..."
+                      style={{ width: "100%", padding: "8px" }}
+                    />
+                    <div>
+                      <button
+                        onClick={() => handleSaveNote(selectedRowForNote)} // Save note for selected row
+                        style={{
+                          backgroundColor: "#4CAF50",
+                          color: "white",
+                          padding: "10px 15px",
+                          marginRight: "10px",
+                          borderRadius: "5px",
+                          border: "none",
+                        }}
+                      >
+                        Save Note
+                      </button>
+                      <button
+                        onClick={handleCloseNoteEditor} // Close editor
+                        style={{
+                          backgroundColor: "#f44336",
+                          color: "white",
+                          padding: "10px 15px",
+                          borderRadius: "5px",
+                          border: "none",
+                        }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
             <DataTable
               paginationPerPage={10}
               columns={users_columns}
               data={usersArr}
               pagination
+              onChangePage={(page) => setCurrentPage(page - 1)} // Update currentPage when page changes
               conditionalRowStyles={conditionalRowStyles}
+              paginationRowsPerPageOptions={[10]}
             />
           </DashboardTable>
         </div>
       </section>
-      <Dialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        maxWidth="sm"
-        fullWidth
-        TransitionComponent={Transition}
-        style={{ height: "700px" }}
-      >
-        <DialogTitle style={{ background: "#E5E4E2" }}>
-          Customer Information
-        </DialogTitle>
-        <DialogContent>
-          <div className="dialog-content-flex">
-            <div className="customer-profile text-center">
-              <a href={selectedData?.image} target="_blank">
-                <img
-                  src={selectedData?.image}
-                  alt=""
-                  className="profile-img"
-                  target="_blank"
-                />
-              </a>
-              <h6 className="blue-1 text-capitalize my-3">
-                {selectedData?.name}
-              </h6>
-            </div>
-            <div className="details-container">
-              <ul className="blue-1 fs-14 details-column">
-                <li>
-                  <span className="fw-600">Email: </span>
-                  <span>{selectedData?.email}</span>
-                </li>
-                <li>
-                  <span className="fw-600">Phone: </span>
-                  <span>{selectedData?.phone}</span>
-                </li>
-                <li>
-                  <span className="fw-600">Business Name: </span>
-                  <span>
-                    {!selectedData?.shopName
-                      ? "No Business"
-                      : selectedData?.shopName}
-                  </span>
-                </li>
-
-                <li>
-                  <span className="fw-600">Points: </span>
-                  <span>{selectedData?.points ?? 0}</span>
-                </li>
-                <li>
-                  <span className="fw-600">Registered Date: </span>
-                  <span>
-                    {new Date(selectedData?.createdAt).toDateString()}
-                  </span>
-                </li>
-                <li>
-                  <span className="fw-600">Active Status: </span>
-                  <span>
-                    {selectedData?.isActive ? (
-                      <CustomButton greenBtn btnName="Active" />
-                    ) : (
-                      <CustomButton redBtn btnName="InActive" />
-                    )}
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div className="details-container">
-              <ul className="blue-1 fs-14 details-column">
-                {selectedData?.bankDetails?.length > 0 &&
-                  selectedData.bankDetails.map((bank, i) => (
-                    <React.Fragment key={i}>
-                      <li>
-                        <span className="fw-600">Bank Name: </span>
-                        {bank.bank}
-                      </li>
-                      <li>
-                        <span className="fw-600">Bank Type: </span>
-                        {bank.banktype.charAt(0).toUpperCase() +
-                          bank.banktype.slice(1)}
-                      </li>
-                      <li>
-                        <span className="fw-600">Account Number: </span>
-                        {bank.accountNo}
-                      </li>
-                      <li>
-                        <span className="fw-600">Account Name: </span>
-                        {bank.accountName}
-                      </li>
-                      <li>
-                        <span className="fw-600">IFSC Code: </span>
-                        {bank.ifsc}
-                      </li>
-                    </React.Fragment>
-                  ))}
-
-                <li>
-                  <span className="fw-600">Id Front Image: </span>
-                  {selectedData?.idFrontImage ? (
-                    <span>
-                      <a href={selectedData?.idFrontImage} target="_blank">
-                        <img
-                          src={selectedData?.idFrontImage}
-                          alt=""
-                          className="kyc-img"
-                        />
-                      </a>
-                    </span>
-                  ) : (
-                    <span>
-                      <img
-                        src={noImg}
-                        alt="Dummy Image"
-                        className="kyc-img"
-                        style={{ height: "150px", width: "150px" }}
-                      />
-                    </span>
-                  )}
-                </li>
-                <li>
-                  <span className="fw-600">Id Front Image: </span>
-                  {selectedData?.idBackImage ? (
-                    <span>
-                      <a href={selectedData?.idBackImage} target="_blank">
-                        <img
-                          src={selectedData?.idBackImage}
-                          alt=""
-                          className="kyc-img"
-                        />
-                      </a>
-                    </span>
-                  ) : (
-                    <span>
-                      <img
-                        src={noImg}
-                        alt="Dummy Image"
-                        className="kyc-img"
-                        style={{ height: "150px", width: "150px" }}
-                      />
-                    </span>
-                  )}
-                </li>
-                <li className="kyc-status-container">
-                  <span className="fw-600 kyc-status-label">KYC status: </span>
-                  <RadioGroup
-                    aria-label="kycStatus"
-                    name="kycStatus"
-                    value={kycStatus}
-                    onChange={(e) =>
-                      handleChangeKycStatus(selectedData._id, e.target.value)
-                    }
-                    className="kyc-radio-group"
-                  >
-                    <FormControlLabel
-                      value="pending"
-                      control={<Radio />}
-                      label="Pending"
-                    />
-                    <FormControlLabel
-                      value="submitted"
-                      control={<Radio />}
-                      label="Submitted"
-                    />
-                    <FormControlLabel
-                      value="approved"
-                      control={<Radio />}
-                      label="Approved"
-                    />
-                    <FormControlLabel
-                      value="rejected"
-                      control={<Radio />}
-                      label="Rejected"
-                    />
-                  </RadioGroup>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
     </main>
   );
 }

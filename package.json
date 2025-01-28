@@ -19,6 +19,7 @@
     "axios": "^0.27.2",
     "bootstrap": "5.2.0-beta1",
     "chart.js": "^3.8.0",
+    "chartjs-plugin-zoom": "^2.2.0",
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
     "file-saver": "^2.0.5",

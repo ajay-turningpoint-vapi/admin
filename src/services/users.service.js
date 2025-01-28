@@ -13,15 +13,15 @@ export const addUser = (formData) => {
 };
 
 export const blockUser = (id) => {
-  return axios.post(serverUrl + "/toggle-block", { userId: id});
+  return axios.post(serverUrl + "/toggle-block", { userId: id });
 };
 
 export const getUser = (query) => {
   return axios.get(`${serverUrl}/getUsers${query}`);
 };
 
-export const getUsersAnalytics = () => {
-  return axios.get(`${serverUrl}/getUsersAnalytics`);
+export const getUsersAnalytics = (queryParams = "") => {
+  return axios.get(`${serverUrl}/getUsersAnalytics${queryParams}`);
 };
 
 export const getUserActivityAnalysis = (query) => {
@@ -64,6 +64,12 @@ export const getUserPointHistory = (query) => {
 
 export const updatePointHistoryStatus = (formData, id) => {
   return axios.patch(`${serverUrl}//update-pointstatus/${id}`, formData);
+};
+
+export const updateUserProfileAdmin = (formData) => {
+  console.log("formData", formData);
+
+  return axios.patch(`${serverUrl}/update-profile-admin`, formData);
 };
 
 export const getUserContestsApi = (query) => {

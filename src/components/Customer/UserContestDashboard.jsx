@@ -317,7 +317,7 @@ function UserContestDashboard() {
   const points_columns = [
     {
       name: "Sr No.",
-      selector: (row, index) => index + 1,
+      selector: (row, index) => index + 1 + (page - 1) * 10,
       sortable: true,
       width: "10%",
     },
@@ -333,6 +333,13 @@ function UserContestDashboard() {
       sortable: true,
       width: "20%",
     },
+    {
+      name: "Phone",
+      selector: (row) => row.userObj?.phone,
+      sortable: true,
+      width: "15%",
+    },
+
     {
       name: "Join Date",
       width: "20%",

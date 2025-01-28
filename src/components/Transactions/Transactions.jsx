@@ -55,7 +55,7 @@ export const Transactions = () => {
       query += `&status=${statusFilter}`;
     }
     query += `&sort=createdAt&order=desc`;
-  
+
     dispatch(TRANSACTIONGet(query)).then(() => setLoading(false));
   };
 
@@ -95,17 +95,23 @@ export const Transactions = () => {
 
   const transaction_columns = [
     {
+      name: "ID",
+      selector: (row, index) => (page - 1) * pageLimit + index + 1,
+      sortable: true,
+      width: "7%",
+    },
+    {
       name: "Transaction Id",
       cell: (row) => <p>{row.transactionId}</p>,
       sortable: true,
       width: "12%",
     },
     { name: "Mobile", cell: (row) => <p>{row?.user?.phone} </p>, width: "10%" },
-    {
-      name: "Transfer",
-      selector: (row) => row?.additionalInfo?.transferType,
-      width: "7%",
-    },
+    // {
+    //   name: "Transfer",
+    //   selector: (row) => row?.additionalInfo?.transferType,
+    //   width: "7%",
+    // },
     { name: "Points", selector: (row) => row.amount, width: "7%" },
     {
       name: "Description",
@@ -149,9 +155,7 @@ export const Transactions = () => {
     { tabName: "Reject Transactions", status: "reject", active: false },
   ]);
 
-  useEffect(() => {
-
-  }, [transactionAllArr]);
+  useEffect(() => {}, [transactionAllArr]);
 
   useEffect(() => {
     if (transactionArr) {
@@ -239,7 +243,7 @@ export const Transactions = () => {
                 </div>
               </div>
               {loading ? (
-                <Loader/>
+                <Loader />
               ) : (
                 <DashboardTable>
                   <DataTable

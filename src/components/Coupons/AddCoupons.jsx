@@ -49,7 +49,6 @@ function AddCoupons() {
   const [productList, setproductList] = useState("");
   const [loading, setLoading] = useState(false);
   const handleFileSet = (value) => {
-
     setImage(value);
   };
 
@@ -89,26 +88,25 @@ function AddCoupons() {
     }
   };
 
-  
   const handleMultipleSubmitold = async () => {
     // Validate Product ID
     if (!productId || productId.trim() === "") {
       toastError("Please select a product.");
       return;
     }
-  
+
     // Validate Total Coupon Value
     if (!couponVal || isNaN(couponVal) || couponVal <= 0) {
       toastError("Please enter a valid total coupon value.");
       return;
     }
-  
+
     // Validate Total Coupon Count
     if (!totalCoupon || isNaN(totalCoupon) || totalCoupon <= 0) {
       toastError("Please enter a valid total coupon count.");
       return;
     }
-  
+
     // Validate Coupons Array
     const invalidCoupons = coupons.some(
       (coupon) =>
@@ -123,14 +121,14 @@ function AddCoupons() {
       toastError("Please ensure all coupon values and counts are valid.");
       return;
     }
-  
+
     let obj = {
       amount: couponVal,
       count: totalCoupon,
       coupons,
       productId,
     };
-  
+
     // Dispatch based on whether it's an update or new addition
     try {
       setLoading(true);
@@ -146,7 +144,7 @@ function AddCoupons() {
       setLoading(false); // Hide loader
     }
   };
-  
+
   const handleMultipleSubmit = async () => {
     // Validate Product ID
     if (!productId || productId.trim() === "") {
@@ -154,31 +152,31 @@ function AddCoupons() {
       return;
     }
   
-    // Validate Total Coupon Value
-    if (!couponVal || isNaN(couponVal) || couponVal <= 0) {
+    // Validate Total Coupon Value (allow 0)
+    if (couponVal === undefined || isNaN(couponVal)) {
       toastError("Please enter a valid total coupon value.");
       return;
     }
   
-    // Validate Total Coupon Count
+    // Validate Total Coupon Count (must be greater than 0)
     if (!totalCoupon || isNaN(totalCoupon) || totalCoupon <= 0) {
-      toastError("Please enter a valid total coupon count.");
+      toastError("Total coupon count must be greater than 0.");
       return;
     }
   
     // Validate Coupons Array
     const invalidCoupons = coupons.some(
       (coupon) =>
-        !coupon.value ||
-        isNaN(coupon.value) ||
-        coupon.value <= 0 ||
-        !coupon.count ||
-        isNaN(coupon.count) ||
-        coupon.count <= 0
+        coupon.value === undefined || // Ensure value is defined
+        isNaN(coupon.value) || // Ensure value is a number
+        coupon.value < 0 || // Allow 0, but not negative
+        coupon.count === undefined || // Ensure count is defined
+        isNaN(coupon.count) || // Ensure count is a number
+        coupon.count <= 0 // Count must be greater than 0
     );
   
     if (invalidCoupons) {
-      toastError("Please ensure all coupon values and counts are valid.");
+      toastError("Please ensure all coupon values and counts are valid. No of Coupons must be greater than 0.");
       return;
     }
   
@@ -230,7 +228,6 @@ function AddCoupons() {
     }
   };
   
-
   let handleCouponArrayAdd = () => {
     setCoupons([...coupons, { value: "", count: "" }]);
   };
@@ -248,10 +245,8 @@ function AddCoupons() {
   };
 
   const handleCoupnValueAdd = (event) => {
-
     if (discountType != "" && discountType.value == "PERCENTAGEOFF") {
       if (!(event.target.value > 100)) {
-   
         setValue(event.target.value);
       } else {
         alert("cannot be more than 100");

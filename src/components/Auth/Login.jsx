@@ -29,7 +29,14 @@ function Login({ Unauth }) {
   };
   return (
     <main className="w-100">
-      <section className={Unauth ? "product-category d-flex align-items-center" : "product-category"} style={{ minHeight: "85vh" }}>
+      <section
+        className={
+          Unauth
+            ? "product-category d-flex align-items-center"
+            : "product-category"
+        }
+        style={{ minHeight: "85vh" }}
+      >
         <div className="container-fluid p-0">
           {Unauth && (
             <div className="text-center col-lg-4 mx-auto mb-4">
@@ -46,18 +53,38 @@ function Login({ Unauth }) {
               <div className="col-12 mb-3">
                 <label>Enter Email Or Phone No</label>
                 <div className="form-input">
-                  <input className="form-control" name="name" value={email} onChange={(event) => setEmail(event.target.value)} type="text" />
+                  <input
+                    className="form-control"
+                    name="name"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    type="text"
+                  />
                 </div>
               </div>
               <div className="col-12 mb-3">
                 <label>Password</label>
                 <div className="form-input password-input">
-                  <input className="form-control" name="email" value={password} type={password} onChange={(event) => setpassword(event.target.value)} />
+                  <input
+                    className="form-control"
+                    name="email"
+                    value={password}
+                    type={password}
+                    onChange={(event) => setpassword(event.target.value)}
+                  />
                   <i className={passwordIcon} onClick={passwordClick}></i>
                 </div>
               </div>
-              <div className={Unauth ? "col-12 mt-2 text-center" : "col-12 mt-2"}>
-                <CustomButton isBtn btntype="button" ClickEvent={handleSubmit} iconName="fa-solid fa-check" btnName="Submit" />
+              <div
+                className={Unauth ? "col-12 mt-2 text-center" : "col-12 mt-2"}
+              >
+                <CustomButton
+                  isBtn
+                  btntype="button"
+                  ClickEvent={handleSubmit}
+                  iconName="fa-solid fa-check"
+                  btnName="Submit"
+                />
               </div>
             </form>
           </DashboardBox>

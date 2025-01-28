@@ -26,6 +26,8 @@ import {
 const Reels = () => {
   const dispatch = useDispatch();
   const reelsArr = useSelector((state) => state.reels.reels);
+  console.log("reelsArr", reelsArr);
+
   useEffect(() => {
     dispatch(ReelsGet());
   }, []);
@@ -49,7 +51,6 @@ const Reels = () => {
 
   useEffect(() => {
     if (reelsArr) {
-    
       setDisplayReelArr([...reelsArr]);
     }
   }, [reelsArr]);
@@ -58,13 +59,16 @@ const Reels = () => {
     dispatch(SetReelsObj(row));
   };
 
+
+
   const handleDelete = (id) => {
-    dispatch(ReelsDelete(id));
+    const confirmed = window.confirm("Are you sure you want to delete this reel?");
+    if (confirmed) {
+      dispatch(ReelsDelete(id));
+    }
   };
-
-  useEffect(() => {
-
-  }, [reelsArr]);
+  
+  useEffect(() => {}, [reelsArr]);
 
   const handleCheckReels = (row, index, e) => {
     let tempArr = displayReelArr.map((el) => {
@@ -93,7 +97,7 @@ const Reels = () => {
         />
       ),
       sortable: true,
-      width: "2%",
+      width: "5%",
     },
     // {
     //   name: "ID",
@@ -104,22 +108,24 @@ const Reels = () => {
     {
       name: "Points",
       selector: (row) => (row?.points ? row?.points : "N.A."),
-      width: "5%",
+      sortable: true,
+      width: "10%",
     },
-    {
-      name: "Display Like Button After (in seconds)",
-      selector: (row) =>
-        row?.displayLikeAfter ? `${row?.displayLikeAfter}s` : "N.A.",
-      width: "20%",
-    },
+    // {
+    //   name: "Display Like Button After (in seconds)",
+    //   selector: (row) =>
+    //     row?.displayLikeAfter ? `${row?.displayLikeAfter}` : "N.A.",
+    //   width: "20%",
+    // },
     {
       name: "Type",
-      selector: (row) => (row?.type ? `${row?.type}s` : "N.A."),
+      selector: (row) => (row?.type ? `${row?.type}` : "N.A."),
       width: "15%",
     },
     {
-      name: "Description",
-      selector: (row) => (row?.description ? `${row?.description}s` : "N.A."),
+      name: "Total Likes",
+      selector: (row) => (row?.totalLikes ? `${row?.totalLikes}` : 0),
+      sortable: true,
       width: "25%",
     },
     {

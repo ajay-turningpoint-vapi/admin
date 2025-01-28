@@ -15,12 +15,24 @@ import {
 import { generateFilePath } from "../Utility/utils";
 function ProductList() {
   const dispatch = useDispatch();
-
   const productArr = useSelector((state) => state.product.products);
+ const [currentPage, setCurrentPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState(productArr);
 
   useEffect(() => {
     dispatch(PRODUCTGet());
-  }, []);
+  }, [dispatch]);
+
+  useEffect(() => {
+    setFilteredProducts(
+      productArr?.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.brand.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, productArr]);
 
   const handleEdit = (row) => {
     dispatch(SetPRODUCTObj(row));
@@ -41,8 +53,8 @@ function ProductList() {
 
   const product_sale_columns = [
     {
-      name: "SL",
-      selector: (row, index) => index + 1,
+      name: "Sr. No.",
+      cell: (row, index) => <p>{index + 1 + currentPage * 10}</p>,
       sortable: true,
       width: "5%",
     },
@@ -71,24 +83,6 @@ function ProductList() {
       selector: (row) => row.commisionAllowed,
       width: "15%",
     },
-    // {
-    //   name: "Image",
-    //   grow: 0,
-    //   cell: (row) => <img height="84px" width="56px" alt={row.Name} src={generateFilePath(row.productImage)} />,
-    //   width: "15%",
-    // },
-    // {
-    //   name: "Stock",
-    //   grow: 0,
-    //   selector: (row) => row.stock,
-    //   width: "10%",
-    // },
-    // {
-    //   name: "Status",
-    //   button: true,
-    //   cell: () => <Switch />,
-    //   width: "10%",
-    // },
     {
       name: "Action",
       width: "15%",
@@ -103,15 +97,7 @@ function ProductList() {
             isRedirected={true}
             onEditClick={() => handleEdit(row)}
             editPath="/Product/AddProduct"
-            // detail
-            // detailClick={(e) => {
-            //   e.preventDefault();
-            //   setModalBox(true);
-            //   setModalType("show-product");
-            //   setModalName(row.Name);
-            // }}
           />
-
           <AddModal
             ModalBox={ModalBox}
             setModalBox={setModalBox}
@@ -131,18 +117,35 @@ function ProductList() {
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">
                 <h5 className="blue-1">Product List</h5>
-                <CustomButton
-                  isLink
-                  iconName="fa-solid fa-plus"
-                  btnName="ADD NEW PRODUCT"
-                  path="/Product/AddProduct"
-                />
+                <div className="d-flex align-items-center">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ marginRight: "10px" }}
+                  />
+                  <CustomButton
+                    isLink
+                    iconName="fa-solid fa-plus"
+                    btnName="ADD NEW PRODUCT"
+                    path="/Product/AddProduct"
+                  />
+                </div>
               </div>
+
               <DashboardTable>
                 <DataTable
                   columns={product_sale_columns}
-                  data={productArr && productArr.length > 0 ? productArr : []}
+                  data={
+                    filteredProducts && filteredProducts.length > 0
+                      ? filteredProducts
+                      : []
+                  }
                   pagination
+                  onChangePage={(page) => setCurrentPage(page - 1)}
+                  paginationRowsPerPageOptions={[10]}
                 />
               </DashboardTable>
             </div>

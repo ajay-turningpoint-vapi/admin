@@ -44,7 +44,7 @@ function Coupons() {
     if (pageLimit) query += `&limit=${pageLimit}`;
     if (usedCoupon) query += `&couponUsed=${usedCoupon}`;
     if (productId) query += `&productId=${productId}`;
-    if(searchQuery) query +=`&search=${searchQuery}`
+    if (searchQuery) query += `&search=${searchQuery}`;
     dispatch(COUPONGet(query)).then(() => setLoading(false));
   };
   const handleSearchChange = (e) => {
@@ -91,7 +91,7 @@ function Coupons() {
     if (filterType !== "activeCoupons" && filterType !== "productName") {
       handleGetAllCoupons();
     }
-  }, [usedCoupon, productId, filterType,searchQuery]);
+  }, [usedCoupon, productId, filterType, searchQuery]);
 
   const handleEdit = (row) => {
     dispatch(SetCOUPONObj(row));
@@ -100,7 +100,7 @@ function Coupons() {
   const brand_columns = [
     {
       name: "ID",
-      selector: (row, index) => index + 1,
+      selector: (row, index) => (page - 1) * pageLimit + index + 1,
       sortable: true,
       width: "7%",
     },
@@ -130,9 +130,7 @@ function Coupons() {
             {row.maximumNoOfUsersAllowed} (Used)
           </span>
         ) : (
-          <span className="badge bg-success p-2">
-            (Not Used)
-          </span>
+          <span className="badge bg-success p-2">(Not Used)</span>
         ),
     },
     {
@@ -161,13 +159,13 @@ function Coupons() {
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <h5 className="blue-1 m-0">Coupon List</h5>
                 <div className="d-flex align-items-center gap-3">
-                <input
-                type="text"
-                className="form-control"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                  />
                   <label>Coupons</label>
                   <select
                     className="form-control"
@@ -238,7 +236,7 @@ function Coupons() {
                 <DashboardTable>
                   <DataTable
                     columns={brand_columns}
-                    data={couponArr && couponArr.length > 0 ? couponArr : []}
+                    data={couponArr && couponArr?.length > 0 ? couponArr : []}
                   />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <h5 className="blue-1 m-0"></h5>

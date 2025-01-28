@@ -70,6 +70,7 @@ import Referrals from "../components/Customer/Referrals.jsx";
 import NotListedContractors from "../components/Contractors/NotListedContractors.jsx";
 import Contractors from "../components/Contractors/Contractors.jsx";
 import Promotions from "../components/Promotions/Promotions.jsx";
+import Ticket from "../components/Ticket/Ticket.js";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -302,6 +303,7 @@ export default function AuthorizedRoutes() {
             <Route exact path="/GeoFencing" element={<GeofenceForm />}></Route>
             <Route exact path="/whatsapp" element={<WhatsAppClient />}></Route>
             <Route exact path="/promotion" element={<Promotions />}></Route>
+            <Route exact path="/tickets" element={<Ticket />}></Route>
             
           </Routes>
           <Footer />
