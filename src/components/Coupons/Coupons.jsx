@@ -66,7 +66,6 @@ function Coupons() {
     const selectedProductId = e.target.value;
     setproductId(selectedProductId);
 
-    // Find the selected product from the productArr
     const selectedProduct = productArr.find(
       (product) => product._id === selectedProductId
     );
