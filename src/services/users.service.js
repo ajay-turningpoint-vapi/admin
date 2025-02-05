@@ -2,6 +2,7 @@ import axios from "axios";
 import { url } from "./url.service";
 
 const serverUrl = url + "/users";
+const serverNoteUrl = url + "/notes";
 const serverPointUrl = url + "/points";
 
 export const login = (formData) => {
@@ -22,6 +23,18 @@ export const getUser = (query) => {
 
 export const getUsersAnalytics = (queryParams = "") => {
   return axios.get(`${serverUrl}/getUsersAnalytics${queryParams}`);
+};
+
+export const getContestsJoinedByUser = (userId) => {
+  return axios.get(`${serverUrl}/getContestsJoinedByUser/${userId}`);
+};
+export const getContestsWonByUser = (userId) => {
+  return axios.get(`${serverUrl}/getContestsWonByUser/${userId}`);
+};
+
+
+export const getDashboardCount = () => {
+  return axios.get(`${serverUrl}/getCounts`);
 };
 
 export const getUserActivityAnalysis = (query) => {
@@ -63,13 +76,23 @@ export const getUserPointHistory = (query) => {
 };
 
 export const updatePointHistoryStatus = (formData, id) => {
-  return axios.patch(`${serverUrl}//update-pointstatus/${id}`, formData);
+  return axios.patch(`${serverUrl}/update-pointstatus/${id}`, formData);
 };
 
 export const updateUserProfileAdmin = (formData) => {
   console.log("formData", formData);
 
   return axios.patch(`${serverUrl}/update-profile-admin`, formData);
+};
+
+export const addNotes = (formData) => {
+  console.log("formData", formData);
+
+  return axios.post(`${serverNoteUrl}/`, formData);
+};
+
+export const getNotesByUser = (userId) => {
+  return axios.get(`${serverNoteUrl}/${userId}`);
 };
 
 export const getUserContestsApi = (query) => {

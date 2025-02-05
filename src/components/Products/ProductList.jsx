@@ -65,21 +65,25 @@ function ProductList() {
     },
     {
       name: "Brand",
+      sortable: true,
       selector: (row) => row.brand,
       width: "15%",
     },
     {
       name: "Company",
+      sortable: true,
       selector: (row) => row.company,
       width: "15%",
     },
     {
       name: "Sale Price",
+      sortable: true,
       selector: (row) => row.salePrice,
       width: "15%",
     },
     {
       name: "Commision Allowed(%)",
+      sortable: true,
       selector: (row) => row.commisionAllowed,
       width: "15%",
     },

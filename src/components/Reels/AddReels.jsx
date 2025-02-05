@@ -31,6 +31,45 @@ const AddReels = () => {
   const handleVideoType = (value, index) => {
     let tempArr = [...filesArr];
     tempArr[index].type = value;
+
+    let randomPoints;
+
+    // Check the video type and generate points within the specified range
+    switch (value) {
+      case "Entertainment":
+        randomPoints = Math.floor(Math.random() * (20 - 5 + 1)) + 5; // Range 5-20
+        break;
+      case "Knowledge Social Media":
+        randomPoints = Math.floor(Math.random() * (30 - 10 + 1)) + 10; // Range 10-30
+        break;
+      case "Knowledge Community Member":
+        randomPoints = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // Range 50-100
+        break;
+      case "Skills Social Media":
+        randomPoints = Math.floor(Math.random() * (30 - 10 + 1)) + 10; // Range 10-30
+        break;
+      case "Skills Community Member":
+        randomPoints = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // Range 50-100
+        break;
+      case "Promotion":
+        randomPoints = Math.floor(Math.random() * (100 - 70 + 1)) + 70; // Range 70-100
+        break;
+      case "Special Event":
+        randomPoints = Math.floor(Math.random() * (100 - 70 + 1)) + 70; // Range 70-100
+        break;
+      default:
+        randomPoints = 0; // Default points if no type matches
+    }
+
+    // Assign the calculated random points
+    tempArr[index].points = randomPoints;
+
+    setFilesArr(tempArr);
+  };
+
+  const handleVideoTypeOld = (value, index) => {
+    let tempArr = [...filesArr];
+    tempArr[index].type = value;
     setFilesArr(tempArr);
   };
   const handleDescription = (value, index) => {
@@ -145,17 +184,7 @@ const AddReels = () => {
                         >
                           <div className="col-12">
                             <div className="row">
-                              <button
-                                className="ms-auto col-1"
-                                style={{
-                                  border: "none",
-                                  outline: "none",
-                                  backgroundColor: "white",
-                                }}
-                                onClick={() => handleDeleteItem(index)}
-                              >
-                                x
-                              </button>
+                             
                               <div className="row d-flex justify-content-between">
                                 <div className="col-5">
                                   <div className="row">
@@ -179,39 +208,33 @@ const AddReels = () => {
                                         handleVideoType(e.target.value, index)
                                       }
                                       // value={el?.type}
+                                      defaultValue=""
                                     >
-                                      <option value="Entertainment Reel">
-                                        Entertainment Reel
+                                      <option value="" disabled>
+                                        Select Video Type
                                       </option>
-                                      <option value="Knowledge Reel">
-                                        Knowledge Reel
+                                      <option value="Entertainment">
+                                        Entertainment
                                       </option>
-                                      <option value="Knowledge Community Member Reel">
-                                        Knowledge Community Member Reel
+                                      <option value="Knowledge Social Media">
+                                        Knowledge (Social Media)
                                       </option>
-                                      <option value="Skills Reel">
-                                        Skills Reel
+                                      <option value="Knowledge Community Member">
+                                        Knowledge (Community Member)
                                       </option>
-                                      <option value="Skills Community Member Reel">
-                                        Skills Community Member Reel
+                                      <option value="Skills Social Media">
+                                        Skills (Social Media)
                                       </option>
-                                      <option value="Product Promotion Reel">
-                                        Product Promotion Reel
+                                      <option value="Skills Community Member">
+                                        Skills (Community Member)
+                                      </option>
+                                      <option value="Promotion">
+                                        Promotion
+                                      </option>
+                                      <option value="Special Event">
+                                        Special Event
                                       </option>
                                     </select>
-                                  </div>
-                                </div>
-                                <div className="col-5">
-                                  <div className="row">
-                                    <label htmlFor="">Description</label>
-                                    <input
-                                      className="border rounded me-3 py-2"
-                                      type={"text"}
-                                      onChange={(e) =>
-                                        handleDescription(e.target.value, index)
-                                      }
-                                      value={el?.description}
-                                    />
                                   </div>
                                 </div>
                               </div>

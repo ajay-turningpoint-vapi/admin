@@ -11,7 +11,8 @@ const MapPicker = ({ onLocationChange }) => {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB_mx6YLhBCVyk1luPlHDC-z1BKwxkPf3o&libraries=places`;
+    // script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB_mx6YLhBCVyk1luPlHDC-z1BKwxkPf3o&libraries=places`;
+    script.src = ``;
     script.async = true;
     script.onload = initializeMap;
     document.body.appendChild(script);

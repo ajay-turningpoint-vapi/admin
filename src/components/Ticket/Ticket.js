@@ -37,42 +37,43 @@ const Ticket = () => {
       name: "ID",
       selector: (row, index) => index + 1,
       sortable: true,
-      width: "5%",
+      width: "2%",
     },
     {
       name: "Title",
       selector: (row) => row.title,
-      width: "15%",
+      width: "7%",
     },
     {
       name: "Description",
       selector: (row) => row.description,
-      width: "18%",
+      
+      width: "15%",
     },
     {
       name: "Creation Date",
       selector: (row) => new Date(row?.createdAt).toDateString(),
-      width: "10%",
+      width: "5%",
     },
     {
       name: "Created By Name",
       selector: (row) => row?.createdBy?.userName,
-      width: "12%",
+      width: "5%",
     },
     {
       name: "Created By Phone",
       selector: (row) => row?.createdBy?.phone,
-      width: "12%",
+      width: "5%",
     },
     {
       name: "Status",
       selector: (row) => row?.status,
-      width: "10%",
+      width: "3%",
     },
 
     {
       name: "Action",
-      width: "15%",
+      width: "5%",
       cell: (row) => {
         const statusOptions = ["Open", "In Progress", "Resolved", "Closed"];
         return (

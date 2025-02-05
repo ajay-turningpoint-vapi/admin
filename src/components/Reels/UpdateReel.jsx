@@ -25,7 +25,6 @@ const UpdateReel = () => {
   const [result, setResult] = useState("");
 
   const handleFileChange = (value) => {
-
     if (`${value.result}`.includes("video")) {
       setIsVideo(true);
       setFileUrl(value.file);
@@ -45,28 +44,44 @@ const UpdateReel = () => {
       setFileUrl(reelsObj?.fileUrl);
       setDescription(reelsObj?.description);
       setType(reelsObj?.type);
-      
     }
     return () => {
       dispatch(SetCONTESTObj(null));
     };
   }, [reelsObj]);
 
-  // const handleFileSet = (value) => {
-  //   if (`${value.result}`.includes("video")) {
-  //     if (value.duration != 0 && value.duration > 60) {
-  //       setDisableSubmitButton(true)
-  //       toastError("Video duration is more than 60 seconds")
-  //     } else {
-  //       setImageStr(value.result);
-  //     }
-  //     setIsVideo(true);
-  //   }
-  //   else {
-  //     setIsVideo(false);
-  //     setImageStr(value.result);
-  //   }
-  // };
+  const handleTypeChange = (value) => {
+    setType(value);
+
+    let randomPoints;
+    switch (value) {
+      case "Entertainment":
+        randomPoints = Math.floor(Math.random() * (20 - 5 + 1)) + 5;
+        break;
+      case "Knowledge Social Media":
+        randomPoints = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
+        break;
+      case "Knowledge Community Member":
+        randomPoints = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+        break;
+      case "Skills Social Media":
+        randomPoints = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
+        break;
+      case "Skills Community Member":
+        randomPoints = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+        break;
+      case "Promotion":
+        randomPoints = Math.floor(Math.random() * (100 - 70 + 1)) + 70;
+        break;
+      case "Special Event":
+        randomPoints = Math.floor(Math.random() * (100 - 70 + 1)) + 70;
+        break;
+      default:
+        randomPoints = 0;
+    }
+
+    setPoints(randomPoints);
+  };
 
   const handleSubmit = () => {
     let obj = {
@@ -79,23 +94,6 @@ const UpdateReel = () => {
     };
 
     dispatch(ReelsUpdate(obj, reelsObj._id));
-    // if (name == "") {
-    //   toastError("Name cannot be empty !")
-    // }
-    // if (description == "") {
-    //   toastError("Description cannot be empty !")
-    // }
-
-    // if (!isUpdateContest) {
-    //   if (imageStr == "") {
-    //     toastError("Image/Video cannot be empty !")
-    //   }
-    // }
-
-    // if (isUpdateContest) {
-    // } else {
-    // }
-    // navigate(-1)
   };
 
   return (
@@ -171,22 +169,6 @@ const UpdateReel = () => {
                           <div className="row d-flex justify-content-between">
                             <div className="col-5">
                               <div className="row">
-                                <label htmlFor="">
-                                  Enter Time in seconds to display like button
-                                  after
-                                </label>
-                                <input
-                                  className="border rounded me-3 py-2"
-                                  type={"number"}
-                                  onChange={(e) =>
-                                    setDisplayLikeAfter(e.target.value)
-                                  }
-                                  value={displayLikeAfter}
-                                />
-                              </div>
-                            </div>
-                            <div className="col-5">
-                              <div className="row">
                                 <label htmlFor="">Points</label>
                                 <input
                                   className="border rounded me-3 py-2"
@@ -201,57 +183,32 @@ const UpdateReel = () => {
                                 <label htmlFor="">Video Type</label>
                                 <select
                                   className="border rounded me-3 py-2"
-                                  onChange={(e) => setType(e.target.value)}
+                                  // onChange={(e) => setType(e.target.value)}
+                                  onChange={(e) =>
+                                    handleTypeChange(e.target.value)
+                                  }
                                   value={type}
                                 >
-                                  <option>Jokes/Comedy Reels </option>
-                                  <option value="Technical Reels">
-                                    Technical Reels
+                                  <option value="Entertainment">
+                                    Entertainment
                                   </option>
-                                  <option value="Spiritual Reels">
-                                    Spiritual Reels
+                                  <option value="Knowledge Social Media">
+                                    Knowledge (Social Media)
                                   </option>
-                                  <option value="Jokes/Comedy Reels">
-                                    Jokes/Comedy Reels
+                                  <option value="Knowledge Community Member">
+                                    Knowledge (Community Member)
                                   </option>
-                                  <option value="Lifestyle Reels">
-                                    Lifestyle Reels
+                                  <option value="Skills Social Media">
+                                    Skills (Social Media)
                                   </option>
-                                  <option value="Entertainment Reels">
-                                    Entertainment Reels
+                                  <option value="Skills Community Member">
+                                    Skills (Community Member)
                                   </option>
-                                  <option value="nspiration/Motivational Reels">
-                                    Inspiration/Motivational Reels
-                                  </option>{" "}
-                                  <option value=" Spiritual Reels">
-                                    Spiritual Reels
-                                  </option>
-                                  <option value="DIY/Craft Reels">
-                                    DIY/Craft Reels
-                                  </option>
-                                  <option value="Travel Reels">
-                                    Travel Reels
-                                  </option>
-                                  <option value="Food/Cooking Reels">
-                                    Food/Cooking Reels
-                                  </option>
-                                  <option value="Music/Dance Reels">
-                                    Music/Dance Reels
+                                  <option value="Promotion">Promotion</option>
+                                  <option value="Special Event">
+                                    Special Event
                                   </option>
                                 </select>
-                              </div>
-                            </div>
-                            <div className="col-5">
-                              <div className="row">
-                                <label htmlFor="">Description</label>
-                                <input
-                                  className="border rounded me-3 py-2"
-                                  type={"text"}
-                                  onChange={(e) =>
-                                    setDescription(e.target.value)
-                                  }
-                                  value={description}
-                                />
                               </div>
                             </div>
                           </div>

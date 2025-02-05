@@ -36,6 +36,25 @@ function Coupons() {
   const [usedCoupon, setUsedCoupon] = useState("All");
   const [productId, setproductId] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [searchText, setSearchText] = useState("");
+
+  const handleoptionSearchChange = (e) => {
+    setSearchText(e.target.value);
+  };
+
+  const handleSearch = () => {
+    if (!searchText.trim()) {
+      alert("Please enter a name to search!");
+      return;
+    }
+    console.log("Searching for:", searchText);
+
+    let query = `name=${searchText}`;
+
+    dispatch(COUPONGetActive(query, navigate));
+
+    // Call your API or filtering function here
+  };
 
   const handleGetAllCoupons = () => {
     setLoading(true);
@@ -110,18 +129,21 @@ function Coupons() {
     },
     {
       name: "Coupon Value",
+      sortable: true,
       cell: (row) =>
         row?.productObj ? <p>{row?.value}</p> : <p>No Product</p>,
       width: "10%",
     },
     {
       name: "Product",
+      sortable: true,
       cell: (row) =>
         row?.productObj ? <p>{row.productObj?.name}</p> : <p>No Product</p>,
       width: "15%",
     },
     {
       name: "Coupon",
+      sortable: true,
       width: "20%",
       selector: (row) =>
         row.maximumNoOfUsersAllowed === 0 ? (
@@ -134,11 +156,13 @@ function Coupons() {
     },
     {
       name: "Created At",
+      sortable: true,
       cell: (row) => <p>{new Date(row.createdAt).toDateString()}</p>,
       width: "15%",
     },
     {
       name: "ScannedBy",
+      sortable: true,
       cell: (row) =>
         row?.scannedUserName ? (
           <p>{row.scannedUserName}</p>
@@ -155,33 +179,66 @@ function Coupons() {
         <div className="container-fluid p-0">
           <div className="row">
             <div className="col-12">
-              <div className="d-flex align-items-center justify-content-between mb-3">
-                <h5 className="blue-1 m-0">Coupon List</h5>
-                <div className="d-flex align-items-center gap-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  />
-                  <label>Coupons</label>
+              <h5 className="blue-1 mb-2">Coupon List</h5>
+              <div className="d-flex align-items-center gap-3 flex-wrap mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  style={{ width: "200px" }}
+                  onChange={handleSearchChange}
+                />
+                <label>Coupons</label>
+                <select
+                  style={{ width: "200px" }}
+                  className="form-control"
+                  value={usedCoupon}
+                  onChange={(e) => setUsedCoupon(e.target.value)}
+                >
+                  <option value="All">All</option>
+                  <option value="0">Used</option>
+                  <option value="1">Unused</option>
+                </select>
+                <label>Products</label>
+                <select
+                  style={{ width: "300px" }}
+                  className="form-control"
+                  value={productId}
+                  onChange={(e) => setproductId(e.target.value)}
+                >
+                  <option>Please Select </option>
+                  {productArr &&
+                    productArr.map((product) => (
+                      <option key={product._id} value={product._id}>
+                        {product.name}
+                      </option>
+                    ))}
+                </select>
+
+                <label>Active_Coupons</label>
+                <select
+                  style={{ width: "200px" }}
+                  className="form-control"
+                  value={filterType}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">Please Select</option>
+                  <option value="activeCoupons" style={{ fontWeight: "500" }}>
+                    View Active Coupons
+                  </option>
+                  <option value="productName">Select Product</option>
+                  <option value="search">Search by Name</option>
+                </select>
+
+                {filterType === "productName" && (
                   <select
-                    className="form-control"
-                    value={usedCoupon}
-                    onChange={(e) => setUsedCoupon(e.target.value)}
-                  >
-                    <option value="All">All</option>
-                    <option value="0">Used</option>
-                    <option value="1">Unused</option>
-                  </select>
-                  <label>Products</label>
-                  <select
+                    style={{ width: "400px" }}
                     className="form-control"
                     value={productId}
-                    onChange={(e) => setproductId(e.target.value)}
+                    onChange={handleProductChange}
                   >
-                    <option>Please Select </option>
+                    <option>Please Select a Product</option>
                     {productArr &&
                       productArr.map((product) => (
                         <option key={product._id} value={product._id}>
@@ -189,46 +246,39 @@ function Coupons() {
                         </option>
                       ))}
                   </select>
+                )}
 
-                  <label>Active_Coupons</label>
-                  <select
-                    className="form-control"
-                    value={filterType}
-                    onChange={handleFilterChange}
+                {filterType === "search" && (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      marginTop: "10px",
+                    }}
                   >
-                    <option value="">Please Select</option>
-                    <option value="activeCoupons" style={{ fontWeight: "500" }}>
-                      View Active Coupons
-                    </option>
-                    <option value="productName">Select Product</option>
-                  </select>
-
-                  {filterType === "productName" && (
-                    <select
+                    <input
+                      type="text"
                       className="form-control"
-                      value={productId}
-                      onChange={handleProductChange}
-                    >
-                      <option>Please Select a Product</option>
-                      {productArr &&
-                        productArr.map((product) => (
-                          <option key={product._id} value={product._id}>
-                            {product.name}
-                          </option>
-                        ))}
-                    </select>
-                  )}
+                      placeholder="Enter name to search"
+                      value={searchText}
+                      onChange={handleoptionSearchChange}
+                    />
+                    <button className="btn btn-primary" onClick={handleSearch}>
+                      Search
+                    </button>
+                  </div>
+                )}
 
-                  <CustomButton
-                    isLink
-                    iconName="fa-solid fa-plus"
-                    btnName="ADD NEW Coupon"
-                    path="/Coupon/Coupon-Create"
-                    small
-                    roundedPill
-                  />
-                </div>
+                <CustomButton
+                  isLink
+                  iconName="fa-solid fa-plus"
+                  btnName="ADD NEW Coupon"
+                  path="/Coupon/Coupon-Create"
+                  small
+                  roundedPill
+                />
               </div>
+
               {loading ? (
                 <Loader />
               ) : (

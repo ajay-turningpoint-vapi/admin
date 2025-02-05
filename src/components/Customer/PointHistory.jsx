@@ -176,7 +176,7 @@ function PointHistory() {
                 }}
               >
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
-                  <h6 className="blue-1 mb-4">Points from products</h6>
+                  <h6 className="blue-1 mb-4">Points from Coupons</h6>
                   <div
                     className={`div ${
                       activeDiv === "div2" ? "usercontestactive" : ""

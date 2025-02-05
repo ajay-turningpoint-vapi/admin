@@ -4,7 +4,12 @@ import toast from "react-hot-toast";
 import { url } from "../../services/url.service";
 import { useDispatch, useSelector } from "react-redux";
 import { PRODUCTGet } from "../../redux/actions/Product/Product.actions";
+import { useLocation } from "react-router-dom";
 const ScannedCouponsMap = () => {
+  const location = useLocation();
+  const couponData = location.state?.couponData;
+  console.log(couponData);
+
   const dispatch = useDispatch();
   const [map, setMap] = useState(null);
   const [coupons, setCoupons] = useState([]);
@@ -18,13 +23,13 @@ const ScannedCouponsMap = () => {
     const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB_mx6YLhBCVyk1luPlHDC-z1BKwxkPf3o&libraries=places`;
     script.async = true;
-    
+
     // Load the map script and dispatch the PRODUCTGet action after it's loaded
     script.onload = () => {
       initializeMap();
       dispatch(PRODUCTGet()); // Dispatch your action when the script is loaded
     };
-    
+
     document.body.appendChild(script);
 
     // Clean up the script when the component is unmounted
@@ -33,13 +38,15 @@ const ScannedCouponsMap = () => {
     };
   }, [dispatch]);
 
-  
-
   useEffect(() => {
     if (map) {
-      fetchCoupons();
+      if (couponData) {
+        fetchCouponsByEmail();
+      } else {
+        fetchCoupons();
+      }
     }
-  }, [map]);
+  }, [map, couponData]);
 
   useEffect(() => {
     // Fetch and filter coupons whenever search parameters change
@@ -95,7 +102,28 @@ const ScannedCouponsMap = () => {
 
       setCoupons(data.data);
       placeCouponsOnMap(data.data);
-      
+    } catch (error) {
+      console.error("Error fetching coupons:", error);
+    }
+  };
+
+  const fetchCouponsByEmail = async () => {
+    try {
+      // Include search parameters in the request
+      const response = await axios.get(
+        url + `/coupon/getScannedCouponsByEmail?scannedEmail=${couponData}`,
+        {
+          params: {
+            productName: searchProductName, // Pass the productName query parameter
+            name: searchName, // Pass the name query parameter
+            location: searchLocation, // Pass the location query parameter
+          },
+        }
+      );
+      const data = response.data; // Assuming the response contains the coupons
+
+      setCoupons(data.data);
+      placeCouponsOnMap(data.data);
     } catch (error) {
       console.error("Error fetching coupons:", error);
     }
@@ -149,64 +177,62 @@ const ScannedCouponsMap = () => {
 
   return (
     <div style={{ marginLeft: "15px" }}>
-      
-      
-     <div style={{display:"flex"}}>
-     <input
-        type="text"
-        ref={autocompleteRef}
-        value={searchLocation}
-        onChange={(e) => setSearchLocation(e.target.value)}
-        placeholder="Search by location"
-        style={{
-          marginTop: "10px",
-          marginRight: "30px",
-          width: "25%",
-          padding: "10px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      />
-      <input
-        type="text"
-        value={searchName}
-        onChange={(e) => setSearchName(e.target.value)}
-        placeholder="Search by coupon number"
-        style={{
-          marginTop: "10px",
-          marginRight: "10px",
-          width: "15%",
-          padding: "10px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      />
-
-      {productArr && (
-        <select
-          value={searchProductName}
-          onChange={(e) => setSearchProductName(e.target.value)}
+      <div style={{ display: "flex" }}>
+        <input
+          type="text"
+          ref={autocompleteRef}
+          value={searchLocation}
+          onChange={(e) => setSearchLocation(e.target.value)}
+          placeholder="Search by location"
           style={{
             marginTop: "10px",
+            marginRight: "30px",
+            width: "25%",
+            padding: "10px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+        />
+        <input
+          type="text"
+          value={searchName}
+          onChange={(e) => setSearchName(e.target.value)}
+          placeholder="Search by coupon number"
+          style={{
+            marginTop: "10px",
+            marginRight: "10px",
             width: "15%",
             padding: "10px",
             borderRadius: "5px",
             border: "1px solid #ccc",
-            display: "block",
           }}
-        >
-          <option value="" disabled>
-            Select a product
-          </option>
+        />
 
-          {productArr.length > 0 &&
-            productArr.map((product) => (
-              <option key={product.id} value={product.name}>
-                {product.name}
-              </option>
-            ))}
-        </select>
-      )}
+        {productArr && (
+          <select
+            value={searchProductName}
+            onChange={(e) => setSearchProductName(e.target.value)}
+            style={{
+              marginTop: "10px",
+              width: "15%",
+              padding: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              display: "block",
+            }}
+          >
+            <option value="" disabled>
+              Select a product
+            </option>
+
+            {productArr.length > 0 &&
+              productArr.map((product) => (
+                <option key={product.id} value={product.name}>
+                  {product.name}
+                </option>
+              ))}
+          </select>
+        )}
       </div>
       <div
         id="map"

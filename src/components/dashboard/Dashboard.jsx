@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
   Chart as ChartJS,
@@ -31,7 +31,10 @@ import {
   getAllCouponsAnalytics,
   getCouponsCount,
 } from "../../services/Coupons.service";
-import { getUsersAnalytics } from "../../services/users.service";
+import {
+  getDashboardCount,
+  getUsersAnalytics,
+} from "../../services/users.service";
 import {
   getReelsAnalytics,
   getReelsLikeAnalytics,
@@ -39,247 +42,171 @@ import {
 import { getAllJoinedUserContest } from "../../services/contest.service";
 import { getProductsCount } from "../../services/product.service";
 
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title
+);
+
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "top",
+    },
+  },
+};
+
+const labels = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+// **Helper function to aggregate and sum data by month**
+const aggregateAndSumDataByMonth = (data) => {
+  return labels.reduce((acc, month, index) => {
+    acc[month] = Array.isArray(data[index])
+      ? data[index].reduce((sum, val) => sum + val, 0)
+      : data[index] || 0;
+    return acc;
+  }, {});
+};
+
 function Dashboard() {
   const dispatch = useDispatch();
+  const [dashboardData, setDashboardData] = useState({});
+  const [userAnalytics, setUserAnalytics] = useState([]);
+  const [reelLikeUserAnalytics, setReelLikeUserAnalytics] = useState([]);
+  const [couponAnalytics, setCouponAnalytics] = useState([]);
+  const [reelsAnalytics, setReelsAnalytics] = useState([]);
+  const [userContestLabel, setUserContestLabel] = useState([]);
+  const [userContestCount, setUserContestCount] = useState([]);
 
-  const userArr = useSelector((state) => state.users.users);
-  const couponArr = useSelector((state) => state.coupon.coupons);
-  const contestArr = useSelector((state) => state.contest.Contests);
-  const transactionArr = useSelector(
-    (state) => state.transaction.transactionCount
-  );
-  const reelsArr = useSelector((state) => state.reels.reels);
+  const fetchDashboardCounts = async () => {
+    try {
+      console.time("Dashboard Count Fetch Time"); // Start timer
+      const response = await getDashboardCount();
+      setDashboardData(response.data?.data || {});
+      console.timeEnd("Dashboard Count Fetch Time"); // End timer and log duration
+    } catch (error) {
+      console.error("Error fetching dashboard counts:", error);
+    }
+  };
 
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [totalCoupons, setTotalCoupons] = useState(0);
-  const [totalContest, setTotalContest] = useState(0);
-  const [totalTransactions, setTotalTransactions] = useState(0);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [totalReels, setTotalReels] = useState(0);
-  const [userAnalytics, setUserAnalytics] = useState(0);
-  const [reelLikeAnalytics, setReelLikeUserAnalytics] = useState(0);
-  const [couponAnalytics, setCouponAnalytics] = useState(0);
-  const [reelsAnalytics, setReelsAnalytics] = useState(0);
-  const [userContestLabel, setUserContestLabel] = useState(0);
-  const [userContestCount, setUserContestCount] = useState(0);
+  const fetchAnalyticsData = async () => {
+    try {
+      console.time("Analytics Data Fetch Time"); // Start timer
 
-  const handleTransactionCount = async () => {
-    let { data: response } = await getTransactionCount();
-    let { data: response1 } = await getCouponsCount();
-    let { data: response2 } = await getUsersAnalytics();
-    let { data: response3 } = await getReelsLikeAnalytics();
-    let { data: response4 } = await getAllCouponsAnalytics();
-    let { data: response5 } = await getReelsAnalytics();
-    let { data: response6 } = await getAllJoinedUserContest();
-    let { data: response7 } = await getProductsCount();
-    setUserAnalytics(response2.data);
-    if (response) {
-      setTotalTransactions(response);
-    }
-    if (response1) {
-      setTotalCoupons(response1);
-    }
-    if (response3) {
-      setReelLikeUserAnalytics(response3.data);
-    }
-    if (response4) {
-      setCouponAnalytics(response4.data);
-    }
-    if (response5) {
-      setReelsAnalytics(response5.data);
-    }
-    if (response6) {
-      setUserContestLabel(response6.contestNames);
-      setUserContestCount(response6.userCounts);
-    }
-    if (response7) {
-      setTotalProducts(response7);
+      const [
+        userAnalyticsData,
+        reelsLikeAnalyticsData,
+        couponAnalyticsData,
+        reelsAnalyticsData,
+        userContestData,
+      ] = await Promise.allSettled([
+        getUsersAnalytics(),
+        getReelsLikeAnalytics(),
+        getAllCouponsAnalytics(),
+        getReelsAnalytics(),
+        getAllJoinedUserContest(),
+      ]);
+
+      // Ensure only successful API responses are processed
+      if (userAnalyticsData.status === "fulfilled")
+        setUserAnalytics(userAnalyticsData.value.data?.data || []);
+      if (reelsLikeAnalyticsData.status === "fulfilled")
+        setReelLikeUserAnalytics(reelsLikeAnalyticsData.value.data?.data || []);
+      if (couponAnalyticsData.status === "fulfilled")
+        console.log(couponAnalyticsData);
+
+      setCouponAnalytics(couponAnalyticsData.value.data?.data || []);
+      if (reelsAnalyticsData.status === "fulfilled")
+        setReelsAnalytics(reelsAnalyticsData.value.data?.data || []);
+      if (userContestData.status === "fulfilled") {
+        setUserContestLabel(userContestData.value.data?.contestNames || []);
+        setUserContestCount(userContestData.value.data?.userCounts || []);
+      }
+
+      console.timeEnd("Analytics Data Fetch Time"); // End timer and log duration
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
     }
   };
 
   useEffect(() => {
-    if (userArr) {
-      setTotalUsers(userArr.length > 0 ? userArr?.length : 0);
-    }
-
-    if (couponArr) {
-      setTotalCoupons(couponArr.length > 0 ? couponArr?.length : 0);
-    }
-
-    if (contestArr) {
-      setTotalContest(contestArr.length > 0 ? contestArr?.length : 0);
-    }
-
-    if (reelsArr) {
-      setTotalReels(reelsArr.length > 0 ? reelsArr?.length : 0);
-    }
-  }, [userArr, couponArr, contestArr, transactionArr, reelsArr]);
-
-  useEffect(() => {
-    handleTransactionCount();
-    let query = "";
-    query += "?role=CARPENTER";
-    dispatch(usersGet(query));
-    dispatch(ReelsGet());
-    dispatch(CONTESTGet("admin=true"));
+    fetchDashboardCounts();
+    fetchAnalyticsData();
   }, []);
 
-  ChartJS.register(
-    ArcElement,
-    Tooltip,
-    Legend,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title
+  const aggregatedData = useMemo(
+    () => aggregateAndSumDataByMonth(userAnalytics),
+    [userAnalytics]
+  );
+  const aggregatedReelLikeData = useMemo(
+    () => aggregateAndSumDataByMonth(reelLikeUserAnalytics),
+    [reelLikeUserAnalytics]
+  );
+  const aggregatedReelsData = useMemo(
+    () => aggregateAndSumDataByMonth(reelsAnalytics),
+    [reelsAnalytics]
   );
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-    },
-  };
-
-  const labels = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-
-  // Aggregate data for each month
-  const aggregateDataByMonth = () => {
-    const monthData = {};
-    for (let i = 0; i < labels.length; i++) {
-      const month = labels[i];
-      monthData[month] = userAnalytics[i];
-    }
-    return monthData;
-  };
-  const aggregateDataByMonthforReelsLike = () => {
-    const monthData = {};
-    for (let i = 0; i < labels.length; i++) {
-      const month = labels[i];
-      monthData[month] = reelLikeAnalytics[i];
-    }
-    return monthData;
-  };
-
-  const aggregateDataByMonthforReels = () => {
-    const monthData = {};
-    for (let i = 0; i < labels.length; i++) {
-      const month = labels[i];
-      monthData[month] = reelsAnalytics[i];
-    }
-    return monthData;
-  };
-
-  // Generate aggregated data for each month
-  const aggregatedData = userAnalytics && aggregateDataByMonth();
-  const aggregatedData1 =
-    reelLikeAnalytics && aggregateDataByMonthforReelsLike();
-  const aggregatedData2 = reelsAnalytics && aggregateDataByMonthforReels();
-  // Sum up data for each month
-  const sumDataByMonth = () => {
-    const aggregatedMonthData = {};
-    for (const month in aggregatedData) {
-      const monthValues = aggregatedData[month];
-      const sum = monthValues.reduce((acc, curr) => acc + curr, 0);
-      aggregatedMonthData[month] = sum;
-    }
-    return aggregatedMonthData;
-  };
-  const sumDataByMonthReelsLike = () => {
-    const aggregatedMonthData = {};
-    for (const month in aggregatedData1) {
-      const monthValues = aggregatedData1[month];
-      const sum = monthValues.reduce((acc, curr) => acc + curr, 0);
-      aggregatedMonthData[month] = sum;
-    }
-    return aggregatedMonthData;
-  };
-  const sumDataByMonthReels = () => {
-    const aggregatedMonthData = {};
-    for (const month in aggregatedData2) {
-      const monthValues = aggregatedData2[month];
-      const sum = monthValues.reduce((acc, curr) => acc + curr, 0);
-      aggregatedMonthData[month] = sum;
-    }
-    return aggregatedMonthData;
-  };
-  // Generate final data for the chart
-  const aggregatedMonthData = sumDataByMonth();
-  const aggregatedMonthDataReelLike = sumDataByMonthReelsLike();
-  const aggregatedMonthDataReels = sumDataByMonthReels();
-  const data = {
-    labels: Object.keys(aggregatedMonthData),
+  const chartData = (label, aggregatedData, bgColor) => ({
+    labels: Object.keys(aggregatedData),
     datasets: [
-      {
-        label: "User Registered",
-        data: Object.values(aggregatedMonthData),
-        backgroundColor: "rgba(53, 162, 235, 0.5)",
-      },
+      { label, data: Object.values(aggregatedData), backgroundColor: bgColor },
     ],
-  };
-  const data1 = {
-    labels: Object.keys(aggregatedMonthDataReelLike),
-    datasets: [
-      {
-        label: "User Reels Like",
-        data: Object.values(aggregatedMonthDataReelLike),
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-      },
-    ],
-  };
-  const data2 = {
-    labels: Object.keys(aggregatedMonthDataReels),
-    datasets: [
-      {
-        label: "Reels Upload",
-        data: Object.values(aggregatedMonthDataReels),
-        backgroundColor: "rgba(255, 159, 64, 1)",
-      },
-    ],
-  };
+  });
+
+  const data = chartData(
+    "User Registered",
+    aggregatedData,
+    "rgba(53, 162, 235, 0.5)"
+  );
+  const data1 = chartData(
+    "User Reels Like",
+    aggregatedReelLikeData,
+    "rgba(255, 99, 132, 0.5)"
+  );
+  const data2 = chartData(
+    "Reels Upload",
+    aggregatedReelsData,
+    "rgba(255, 159, 64, 1)"
+  );
 
   const data3 = {
-    labels: userContestLabel || "dummy",
+    labels: userContestLabel || ["Dummy"],
     datasets: [
       {
         label: "Participants",
-        data: userContestCount || 0,
+        data: userContestCount || [0],
         backgroundColor: "rgba(75, 192, 192)",
       },
     ],
   };
 
   const couponChartData = {
-    labels: ["All Coupons", "Used Coupons", "Unused Coupons"],
+    labels: ["Used Coupons", "Unused Coupons"],
     datasets: [
       {
         label: "Coupons",
-        data: couponAnalytics || [0, 0, 0],
-        backgroundColor: [
-          "rgba(54, 162, 235, 0.2)",
-          "rgba(75, 192, 192, 0.2)",
-          "rgba(255, 206, 86, 0.2)",
-        ],
-        borderColor: [
-          "rgba(54, 162, 235)",
-          "rgba(75, 192, 192)",
-          "rgba(255, 206, 86, 1)",
-        ],
+        data: couponAnalytics || [0, 0],
+        backgroundColor: ["rgba(75, 192, 192, 0.2)", "rgba(255, 206, 86, 0.2)"],
+        borderColor: ["rgba(75, 192, 192)", "rgba(255, 206, 86, 1)"],
         borderWidth: 1,
       },
     ],
@@ -300,7 +227,9 @@ function Dashboard() {
               <Link to="/Reels/View">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Total Reels</h5>
-                  <h4 className="text-dark mb-0">{totalReels}</h4>
+                  <h4 className="text-dark mb-0">
+                    {dashboardData.reelsCount || 0}
+                  </h4>
                 </DashboardBox>
               </Link>
             </div>
@@ -308,15 +237,20 @@ function Dashboard() {
               <Link to="/Users-list">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Total Customer</h5>
-                  <h4 className="text-dark mb-0">{totalUsers}</h4>
+                  <h4 className="text-dark mb-0">
+                    {dashboardData.userCount || 0}
+                  </h4>
                 </DashboardBox>
               </Link>
             </div>
+
             <div className="col-12 col-md-6">
               <Link to="/Contests">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Total Contests</h5>
-                  <h4 className="text-dark mb-0">{totalContest}</h4>
+                  <h4 className="text-dark mb-0">
+                    {dashboardData.contestCount || 0}
+                  </h4>
                 </DashboardBox>
               </Link>
             </div>
@@ -324,7 +258,9 @@ function Dashboard() {
               <Link to="/transactions">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Transactions</h5>
-                  <h4 className="text-dark mb-0">{totalTransactions}</h4>
+                  <h4 className="text-dark mb-0">
+                    {dashboardData.pointHistoryCount || 0}
+                  </h4>
                 </DashboardBox>
               </Link>
             </div>
@@ -332,7 +268,9 @@ function Dashboard() {
               <Link to="/Product-list">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Total Products</h5>
-                  <h4 className="text-dark mb-0">{totalProducts}</h4>
+                  <h4 className="text-dark mb-0">
+                    {dashboardData.productCount || 0}
+                  </h4>
                 </DashboardBox>
               </Link>
             </div>
@@ -340,14 +278,15 @@ function Dashboard() {
               <Link to="/Coupons">
                 <DashboardBox className="dashboard-summary">
                   <h5 className="blue-1">Total Coupons</h5>
-                  <h4 className="text-dark mb-0">{totalCoupons}</h4>
+                  <h4 className="text-dark mb-0">
+                    {dashboardData.couponsCount || 0}
+                  </h4>
                 </DashboardBox>
               </Link>
             </div>
           </div>
         </div>
       </section>
-
       <section>
         <div className="container-fluid">
           <div className="row">

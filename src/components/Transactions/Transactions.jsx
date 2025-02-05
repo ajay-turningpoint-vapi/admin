@@ -112,7 +112,7 @@ export const Transactions = () => {
     //   selector: (row) => row?.additionalInfo?.transferType,
     //   width: "7%",
     // },
-    { name: "Points", selector: (row) => row.amount, width: "7%" },
+    { name: "Points",sortable:true, selector: (row) => row.amount, width: "7%" },
     {
       name: "Description",
       cell: (row) => <p>{row.description}</p>,
@@ -130,6 +130,7 @@ export const Transactions = () => {
     },
     {
       name: "Date Time",
+      sortable: true,
       selector: (row) => `${moment(row.createdAt).format("YYYY-MM-DD, HH:mm")}`,
       width: "15%",
     },

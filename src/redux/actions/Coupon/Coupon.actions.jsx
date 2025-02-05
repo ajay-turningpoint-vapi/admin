@@ -36,7 +36,10 @@ export const DELETE_COUPON_BY_ID_FAIL = "DELETE_COUPON_BY_ID_FAIL";
 export const GET_ACTIVE_COUPONS = "GET_ACTIVE_COUPONS";
 export const GET_ACTIVE_COUPONS_SUCCESS = "GET_ACTIVE_COUPONS_SUCCESS";
 export const GET_ACTIVE_COUPONS_FAIL = "GET_ACTIVE_COUPONS_FAIL";
+
+
 export const COUPONGetActive = (formData, navigate) => async (dispatch) => {
+
   try {
     // Dispatch action to indicate that we're fetching the active coupons
     dispatch({ type: GET_ACTIVE_COUPONS });

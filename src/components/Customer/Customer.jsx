@@ -22,8 +22,10 @@ import { DashboardTable } from "../Utility/DashboardBox";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
 import {
+  addNotes,
   blockUser,
   getAllContractors,
+  getNotesByUser,
   updateUserKycStatus,
   updateUserProfileAdmin,
   updateUserStatus,
@@ -38,6 +40,7 @@ import Slide from "@mui/material/Slide";
 import noImg from "../../assets/images/noImg.png";
 import SingleFileUpload from "../Utility/SingleFileUpload";
 import toast from "react-hot-toast";
+import moment from "moment";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
@@ -57,6 +60,7 @@ function Customer() {
   const [selectedRowForNote, setSelectedRowForNote] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
+  const [userNote, setUserNote] = useState([]);
   const [note, setNote] = useState("");
   const [allContractor, setAllContractor] = useState([]);
 
@@ -69,9 +73,21 @@ function Customer() {
     }
   };
 
+  const fetchNotesofUser = async (userId) => {
+    try {
+      const response = await getNotesByUser(userId);
+      console.log("response1", response.data);
+
+      setUserNote(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   useEffect(() => {
     if (selectedData) {
       fetchData();
+      fetchNotesofUser(selectedData._id);
       setEditedData(selectedData);
     }
   }, [selectedData]);
@@ -100,12 +116,16 @@ function Customer() {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSaveOld = async () => {
+    if (!note) {
+      toast.error("Please enter a note");
+      return;
+    }
     try {
       // Check the role and set appropriate values to null
       const dataToSend = {
         userId: editedData._id,
-        ...editedData, // Include the rest of the editedData
+        ...editedData,
       };
 
       if (dataToSend.role === "CARPENTER") {
@@ -122,19 +142,57 @@ function Customer() {
       if (response.data) {
         handleGetAllUsers();
         toast.success(response.data.message);
+        setEditedData({});
       }
 
       // Assuming response.data contains the updated user data or some confirmation message
       return response.data;
     } catch (error) {
       console.error("Error saving note:", error);
-      alert("Failed to save note");
+      toast.error("Failed to save note");
+    }
+  };
+
+  const handleSave = async () => {
+    if (!note) {
+      toast.error("Please enter a note before saving changes");
+      return;
+    }
+
+    try {
+      // Prepare data to send
+      const dataToSend = {
+        userId: editedData._id,
+        ...editedData,
+      };
+
+      if (dataToSend.role === "CARPENTER") {
+        dataToSend.businessName = null;
+      } else if (dataToSend.role === "CONTRACTOR") {
+        dataToSend.contractor = null;
+      }
+
+      // Send updated user data
+      const response = await updateUserProfileAdmin(dataToSend);
+
+      if (response.data) {
+        // Save the note if the user update is successful
+        await addNotes({ text: note, userId: editedData._id });
+
+        handleGetAllUsers();
+        toast.success("Changes saved successfully");
+        setNote(""); // Clear the note after saving
+        setEditedData({});
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error("Error saving note:", error);
+      toast.error("Failed to save note");
     }
   };
 
   const handleOpenNoteEditor = (row) => {
-    console.log("row", row);
-
     setSelectedRowForNote(row);
     setNote(row.note || ""); // Set the note content if any
   };
@@ -153,6 +211,22 @@ function Customer() {
     } catch (err) {
       console.error(err);
       alert("Failed to save note");
+    }
+  };
+
+  const saveNoteForUser = async (userId, noteData) => {
+    try {
+      // Assuming updateUserProfileAdmin is an API function that expects userId and noteData in the request body
+
+      const response = await addNotes({ text: noteData, userId: userId });
+      if (response.data) {
+        toast.success("Note saved successfully");
+        setNote(""); // Clear the note after saving
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error saving note:", error);
+      toast.error("Failed to save note");
     }
   };
 
@@ -225,6 +299,7 @@ function Customer() {
   };
 
   const handleDialogClose = () => {
+    setNote("");
     setDialogOpen(false);
     setSelectedData(null);
     setIsEditMode(false);
@@ -266,22 +341,6 @@ function Customer() {
     dispatch(usersGet(query));
   };
 
-  const saveNoteForUser = async (userId, noteData) => {
-    try {
-      // Assuming updateUserProfileAdmin is an API function that expects userId and noteData in the request body
-      const response = await updateUserProfileAdmin({
-        userId: userId,
-        note: noteData,
-      });
-
-      // Assuming response.data contains the updated user data or some confirmation message
-      return response.data;
-    } catch (error) {
-      console.error("Error saving note:", error);
-      throw new Error("Failed to save note");
-    }
-  };
-
   const users_columns = [
     {
       name: "ID",
@@ -306,6 +365,7 @@ function Customer() {
     },
     {
       name: "ROLE",
+      sortable: true,
       selector: (row) => (
         <p
           style={{
@@ -720,7 +780,9 @@ function Customer() {
                       <li>
                         <span className="fw-600">Registered Date: </span>
                         <span>
-                          {new Date(selectedData?.createdAt).toDateString()}
+                          {moment(selectedData?.createdAt).format(
+                            "DD-MM-YYYY hh:mm A"
+                          )}
                         </span>
                       </li>
                       <li>
@@ -730,6 +792,15 @@ function Customer() {
                             <CustomButton greenBtn btnName="Active" />
                           ) : (
                             <CustomButton redBtn btnName="InActive" />
+                          )}
+                        </span>
+                      </li>
+
+                      <li>
+                        <span className="fw-600">Approved Date : </span>
+                        <span>
+                          {moment(selectedData?.updatedAt).format(
+                            "DD-MM-YYYY hh:mm A"
                           )}
                         </span>
                       </li>
@@ -954,6 +1025,40 @@ function Customer() {
                       </li>
                     </ul>
                   </div>
+                </div>
+                {isEditMode && (
+                  <div>
+                    <TextField
+                      label="Note (required to save changes)"
+                      multiline
+                      rows={4}
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      fullWidth
+                      variant="outlined"
+                      margin="normal"
+                      disabled={!isEditMode}
+                    />
+                  </div>
+                )}
+                <div>
+                  <table style={{ width: "100%", fontSize: "14px" }}>
+                    {userNote &&
+                      userNote.map((note) => {
+                        return (
+                          <>
+                            <tr style={{ borderBottom: "1px solid #ccc" }}>
+                              <td style={{ fontSize: "12px", width: "32%" }}>
+                                {moment(note.createdAt).format(
+                                  "DD-MM-YYYY hh:mm A"
+                                )}
+                              </td>
+                              <td>{note.text}</td>
+                            </tr>
+                          </>
+                        );
+                      })}
+                  </table>
                 </div>
               </DialogContent>
               <DialogActions>

@@ -54,9 +54,11 @@ export const ReelsGet = (formData) => async (dispatch) => {
     let { data: response } = await getReels(formData);
     if (response) {
   
+      
+  
       dispatch({
         type: GET_ALL_REELS_SUCCESS,
-        payload: { data: response.data, message: response.message },
+        payload: { data: response, message: response.message },
       });
     }
   } catch (err) {
