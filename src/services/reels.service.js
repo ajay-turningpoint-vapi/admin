@@ -12,6 +12,10 @@ export const getReels = (query) => {
   return axios.get(`${serverUrl}/getReels?${query}`);
 };
 
+export const getReelsType = () => {
+  return axios.get(`${serverUrl}/getReelsType`);
+};
+
 export const deleteReelsById = (id) => {
   return axios.delete(`${serverUrl}/deleteById/${id}`);
 };

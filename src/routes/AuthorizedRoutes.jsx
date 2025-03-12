@@ -57,7 +57,9 @@ import AddCoupons from "../components/Coupons/AddCoupons";
 import Contest from "../components/Contest/Contest";
 import AddContest from "../components/Contest/AddContest";
 import { Transactions } from "../components/Transactions/Transactions";
+
 import Reels from "../components/Reels/Reels";
+
 import AddReels from "../components/Reels/AddReels";
 import UserContests from "../components/Customer/UserContests";
 import UpdateReel from "../components/Reels/UpdateReel";
@@ -71,6 +73,9 @@ import NotListedContractors from "../components/Contractors/NotListedContractors
 import Contractors from "../components/Contractors/Contractors.jsx";
 import Promotions from "../components/Promotions/Promotions.jsx";
 import Ticket from "../components/Ticket/Ticket.js";
+import RedeemPoints from "../components/Customer/RedeemPoints.jsx";
+import RedeemableProductList from "../components/Products/RedeemableProductList.jsx";
+import AddRedeemableProduct from "../components/Products/AddProduct/AddRedeemableProduct.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -131,10 +136,14 @@ export default function AuthorizedRoutes() {
               element={<BulkBrandUpload />}
             ></Route>
             <Route exact path="/Product-List" element={<ProductList />}></Route>
+            <Route exact path="/redeem-product" element={<RedeemableProductList />}></Route>
+            <Route exact path="/add-redeem-product" element={<AddRedeemableProduct />}></Route>
             <Route exact path="/Product/Config" element={<Config />}></Route>
             <Route exact path="/Admin/Profile" element={<Profile />}></Route>
             <Route exact path="/Blog/post" element={<Blog />}></Route>
+
             <Route exact path="/Reels/View" element={<Reels />}></Route>
+            
             <Route exact path="/Reels/Add" element={<AddReels />}></Route>
             <Route
               exact

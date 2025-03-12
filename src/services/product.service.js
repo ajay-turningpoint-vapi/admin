@@ -2,6 +2,7 @@ import axios from "axios";
 import { url } from "./url.service";
 
 const serverUrl = url + "/product";
+const redeemableProductsUrl = url + "/redeemableProduct";
 
 export const addProduct = (formData) => {
   return axios.post(serverUrl + "/addProduct", formData);
@@ -21,4 +22,22 @@ export const updateProductById = (formData, id) => {
 
 export const getProductsCount = (query) => {
   return axios.get(`${serverUrl}/getProductsCount`);
+};
+
+
+
+export const getReedemableProducts = (query) => {
+  return axios.get(`${redeemableProductsUrl}/?${query}`);
+}
+
+export const addReedemableProduct = (formData) => {
+  return axios.post(redeemableProductsUrl + "/add", formData);
+};
+
+export const deleteReedemableProductById = (id) => {  
+  return axios.delete(`${redeemableProductsUrl}/${id}`);
+};
+ 
+export const updateReedemableProductById = (formData, id) => {      
+  return axios.put(`${redeemableProductsUrl}/${id}`, formData);
 };

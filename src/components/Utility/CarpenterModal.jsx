@@ -28,7 +28,7 @@ export default function CarpenterModal({ data }) {
 
       setState(response.data);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error:", error); 
     }
   };
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function CarpenterModal({ data }) {
     },
     {
       name: "Profile",
-      selector: (row) =>(row.isActive === true ? "Active" : "Block"),
+      selector: (row) => (row.isActive === true ? "Active" : "Block"),
       width: "10%",
     },
     {

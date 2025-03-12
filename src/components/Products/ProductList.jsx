@@ -56,24 +56,24 @@ function ProductList() {
       name: "Sr. No.",
       cell: (row, index) => <p>{index + 1 + currentPage * 10}</p>,
       sortable: true,
-      width: "5%",
+      width: "7%",
     },
     {
       name: "Name",
       cell: (row) => <p>{row.name}</p>,
-      width: "15%",
+      width: "20%",
     },
     {
       name: "Brand",
       sortable: true,
       selector: (row) => row.brand,
-      width: "15%",
+      width: "12%",
     },
     {
       name: "Company",
       sortable: true,
       selector: (row) => row.company,
-      width: "15%",
+      width: "12%",
     },
     {
       name: "Sale Price",
@@ -120,7 +120,7 @@ function ProductList() {
           <div className="row">
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">
-                <h5 className="blue-1">Product List</h5>
+                <h5 className="blue-1">Coupon Product List</h5>
                 <div className="d-flex align-items-center">
                   <input
                     type="text"

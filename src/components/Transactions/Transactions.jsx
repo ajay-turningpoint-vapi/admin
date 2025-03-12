@@ -104,19 +104,24 @@ export const Transactions = () => {
       name: "Transaction Id",
       cell: (row) => <p>{row.transactionId}</p>,
       sortable: true,
-      width: "12%",
+      width: "15%",
     },
-    { name: "Mobile", cell: (row) => <p>{row?.user?.phone} </p>, width: "10%" },
+    // { name: "Mobile", cell: (row) => <p>{row?.user?.phone} </p>, width: "10%" },
     // {
     //   name: "Transfer",
     //   selector: (row) => row?.additionalInfo?.transferType,
     //   width: "7%",
     // },
-    { name: "Points",sortable:true, selector: (row) => row.amount, width: "7%" },
+    {
+      name: "Points",
+      sortable: true,
+      selector: (row) => row.amount,
+      width: "10%",
+    },
     {
       name: "Description",
       cell: (row) => <p>{row.description}</p>,
-      width: "25%",
+      width: "40%",
     },
     {
       name: "Status",
@@ -131,22 +136,22 @@ export const Transactions = () => {
     {
       name: "Date Time",
       sortable: true,
-      selector: (row) => `${moment(row.createdAt).format("YYYY-MM-DD, HH:mm")}`,
+      selector: (row) => `${moment(row.createdAt).format("DD-MM-YY, HH:mm")}`,
       width: "15%",
     },
-    {
-      name: "Action",
-      cell: (row) => (
-        <CustomButton
-          btntype="button"
-          ClickEvent={(e) => handleModalSet(e, row)}
-          isBtn
-          iconName="fa-solid fa-check"
-          btnName="View"
-        />
-      ),
-      width: "10%",
-    },
+    // {
+    //   name: "Action",
+    //   cell: (row) => (
+    //     <CustomButton
+    //       btntype="button"
+    //       ClickEvent={(e) => handleModalSet(e, row)}
+    //       isBtn
+    //       iconName="fa-solid fa-check"
+    //       btnName="View"
+    //     />
+    //   ),
+    //   width: "10%",
+    // },
   ];
 
   const [tabList, setTabList] = useState([

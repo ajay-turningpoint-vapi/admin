@@ -21,6 +21,7 @@ import CustomButton from "../Utility/Button";
 import { DashboardTable } from "../Utility/DashboardBox";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
+import DiamondIcon from "@mui/icons-material/Diamond";
 import {
   addNotes,
   blockUser,
@@ -32,7 +33,7 @@ import {
 } from "../../services/users.service";
 import "../../assets/style.css";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-
+import VerifiedIcon from "@mui/icons-material/Verified";
 import { Link } from "react-router-dom";
 import { generateFilePath } from "../Utility/utils";
 import Swal from "sweetalert2";
@@ -41,44 +42,54 @@ import noImg from "../../assets/images/noImg.png";
 import SingleFileUpload from "../Utility/SingleFileUpload";
 import toast from "react-hot-toast";
 import moment from "moment";
+import { debounce } from "lodash";
+import Select from "react-select";
+import AddNote from "./AddNote";
+import ScheduleSelector from "./ScheduleSelector";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { url } from "../../services/url.service";
+import { useDebounce } from "use-debounce";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
 function Customer() {
   const dispatch = useDispatch();
+  const [openAddNote, setOpenAddNote] = useState(false);
+  const [addScheduler, setAddScheduler] = useState(false);
+  const [selectedAction, setSelectedAction] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [usersArr, setUsersArr] = useState([]);
   const userArr = useSelector((state) => state.users.users);
+  const loading = useSelector((state) => state.users.loading);
   const [selectedData, setSelectedData] = useState(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
   const [userKycStatus, setUserKycStatus] = useState(null);
   const [kycStatus, setKycStatus] = useState("");
   const [menuRow, setMenuRow] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedRowForNote, setSelectedRowForNote] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState({});
   const [userNote, setUserNote] = useState([]);
   const [note, setNote] = useState("");
   const [allContractor, setAllContractor] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [totalRows, setTotalRows] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const fetchData = async () => {
     try {
       const response = await getAllContractors();
       setAllContractor(response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const fetchNotesofUser = async (userId) => {
-    try {
-      const response = await getNotesByUser(userId);
-      console.log("response1", response.data);
-
-      setUserNote(response.data);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -92,7 +103,79 @@ function Customer() {
     }
   }, [selectedData]);
 
+  const handleGetAllUsers = () => {
+    const params = new URLSearchParams();
+    if (debouncedSearch) params.append("search", debouncedSearch);
+    if (page) params.append("page", page);
+    if (limit) params.append("limit", limit);
+    if (sortBy) params.append("sortBy", sortBy);
+    if (sortOrder) params.append("sortOrder", sortOrder);
+    if (userKycStatus) params.append("kycStatus", userKycStatus);
+    if (startDate && endDate) {
+      params.append("startDate", startDate);
+      params.append("endDate", endDate);
+    }
+
+    const queryString = params.toString();
+    const finalURL = queryString ? `?${queryString}` : "";
+
+    dispatch(usersGet(finalURL));
+  };
+
+  useEffect(() => {
+    handleGetAllUsers();
+  }, [
+    debouncedSearch,
+    page,
+    limit,
+    sortBy,
+    sortOrder,
+    userKycStatus,
+    startDate,
+    endDate,
+  ]);
+
+  useEffect(() => {
+    if (userArr?.data) {
+      setUsersArr(userArr.data);
+      setTotalRows(userArr.total || 0);
+    }
+  }, [userArr]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (newPerPage, newPage) => {
+    setLimit(newPerPage);
+    setPage(newPage);
+  };
+
+  const handleSort = (column, direction) => {
+    if (!column?.selector) {
+      console.warn("Sorting triggered with an undefined column!");
+      setSortBy("createdAt");
+      return;
+    }
+    console.log("Sorting triggered:", column.selector, direction);
+    setSortBy(column.selector);
+    setSortOrder(direction);
+  };
+
+  const fetchNotesofUser = async (userId) => {
+    try {
+      const response = await getNotesByUser(userId);
+      console.log("response1", response.data);
+
+      setUserNote(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const handleEditChange = (field, value, bankIndex = null) => {
+    console.log("handleEditChange called with:", field, value);
+
     setEditedData((prev) => {
       if (bankIndex !== null) {
         const updatedBankDetails = [...prev.bankDetails];
@@ -116,43 +199,6 @@ function Customer() {
     }));
   };
 
-  const handleSaveOld = async () => {
-    if (!note) {
-      toast.error("Please enter a note");
-      return;
-    }
-    try {
-      // Check the role and set appropriate values to null
-      const dataToSend = {
-        userId: editedData._id,
-        ...editedData,
-      };
-
-      if (dataToSend.role === "CARPENTER") {
-        // If role is CARPENTER, set businessName to null
-        dataToSend.businessName = null;
-      } else if (dataToSend.role === "CONTRACTOR") {
-        // If role is CONTRACTOR, set contractor to null
-        dataToSend.contractor = null;
-      }
-
-      // Assuming updateUserProfileAdmin is an API function that expects userId and the entire editedData in the request body
-      const response = await updateUserProfileAdmin(dataToSend);
-
-      if (response.data) {
-        handleGetAllUsers();
-        toast.success(response.data.message);
-        setEditedData({});
-      }
-
-      // Assuming response.data contains the updated user data or some confirmation message
-      return response.data;
-    } catch (error) {
-      console.error("Error saving note:", error);
-      toast.error("Failed to save note");
-    }
-  };
-
   const handleSave = async () => {
     if (!note) {
       toast.error("Please enter a note before saving changes");
@@ -160,73 +206,37 @@ function Customer() {
     }
 
     try {
-      // Prepare data to send
+      // Prepare user update data
+      const { _id: userId, role, ...otherFields } = editedData;
+
+      console.log("editedData", editedData);
+
       const dataToSend = {
-        userId: editedData._id,
-        ...editedData,
+        userId,
+        role,
+        ...otherFields,
+        businessName: role === "CARPENTER" ? null : otherFields.businessName,
+        contractor: role === "CONTRACTOR" ? null : otherFields.contractor,
+        note: [],
       };
 
-      if (dataToSend.role === "CARPENTER") {
-        dataToSend.businessName = null;
-      } else if (dataToSend.role === "CONTRACTOR") {
-        dataToSend.contractor = null;
-      }
+      // Execute both API calls concurrently
+      const [userUpdateResponse, noteResponse] = await Promise.all([
+        updateUserProfileAdmin(dataToSend),
+        addNotes({ text: note, userId }),
+      ]);
 
-      // Send updated user data
-      const response = await updateUserProfileAdmin(dataToSend);
-
-      if (response.data) {
-        // Save the note if the user update is successful
-        await addNotes({ text: note, userId: editedData._id });
-
-        handleGetAllUsers();
+      if (userUpdateResponse?.data && noteResponse) {
         toast.success("Changes saved successfully");
+        handleGetAllUsers();
         setNote(""); // Clear the note after saving
         setEditedData({});
+        setIsEditMode(false);
+        setDialogOpen(false);
       }
-
-      return response.data;
     } catch (error) {
-      console.error("Error saving note:", error);
-      toast.error("Failed to save note");
-    }
-  };
-
-  const handleOpenNoteEditor = (row) => {
-    setSelectedRowForNote(row);
-    setNote(row.note || ""); // Set the note content if any
-  };
-
-  const handleCloseNoteEditor = () => {
-    setDialogOpen(false);
-    setSelectedRowForNote(null);
-  };
-
-  const handleSaveNote = async (rowId) => {
-    try {
-      // Call API to save the note for the specific user
-      await saveNoteForUser(rowId, note);
-      handleGetAllUsers();
-      setSelectedRowForNote(null); // Close the editor after saving
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save note");
-    }
-  };
-
-  const saveNoteForUser = async (userId, noteData) => {
-    try {
-      // Assuming updateUserProfileAdmin is an API function that expects userId and noteData in the request body
-
-      const response = await addNotes({ text: noteData, userId: userId });
-      if (response.data) {
-        toast.success("Note saved successfully");
-        setNote(""); // Clear the note after saving
-      }
-      return response.data;
-    } catch (error) {
-      console.error("Error saving note:", error);
-      toast.error("Failed to save note");
+      console.error("Error saving changes:", error);
+      toast.error("Failed to save changes");
     }
   };
 
@@ -240,14 +250,6 @@ function Customer() {
     setMenuRow(null);
   };
 
-  useEffect(() => {
-    handleGetAllUsers();
-  }, [userKycStatus]);
-
-  useEffect(() => {
-    setUsersArr(userArr?.length ? userArr : []);
-  }, [userArr]);
-
   const handleChangeActiveStatus = async (id, value) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -260,15 +262,13 @@ function Customer() {
     });
 
     if (result.isConfirmed) {
-      try {
-        const { data: res } = await updateUserStatus(id, { status: value });
-        if (res.message) handleGetAllUsers();
-      } catch (err) {
-        console.error(err.response?.data?.message || err.message);
-        alert(err.response?.data?.message || err.message);
-      }
+      setSelectedUser({ userId: id, isActive: value });
+
+      setSelectedUserId(id);
+      setOpenAddNote(true); // Open AddNote dialog
     }
   };
+
   const handleChangeBlockUser = async (id, value) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -281,13 +281,25 @@ function Customer() {
     });
 
     if (result.isConfirmed) {
-      try {
-        const { data: res } = await blockUser(id);
-        if (res.message) handleGetAllUsers();
-      } catch (err) {
-        console.error(err.response?.data?.message || err.message);
-        alert(err.response?.data?.message || err.message);
-      }
+      setSelectedUser({ userId: id, isBlocked: value });
+
+      setSelectedAction("blockedActivity"); // Mark as Active Status Change
+      setOpenAddNote(true);
+      setSelectedUserId(id);
+    }
+  };
+
+  const handleNoteSubmit = async () => {
+    if (!selectedUser) return;
+
+    try {
+      handleGetAllUsers();
+      setOpenAddNote(false);
+      setSelectedUser(null);
+      setSelectedAction("");
+    } catch (err) {
+      console.error(err.response?.data?.message || err.message);
+      alert(err.response?.data?.message || err.message);
     }
   };
 
@@ -306,51 +318,56 @@ function Customer() {
   };
 
   const handleChangeKycStatus = async (id, value) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to update KYC status?"
-    );
-    if (!confirmed) return;
+    setEditedData((prev) => ({
+      ...prev,
+      kycStatus: value,
+    }));
+  };
 
-    try {
-      await updateUserKycStatus(id, { kycStatus: value });
-      setKycStatus(value);
-      handleGetAllUsers();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update KYC status");
+  const handleStartDateChange = (e) => setStartDate(e.target.value);
+  const handleEndDateChange = (e) => setEndDate(e.target.value);
+
+  const contractorOptions = allContractor.map((contractor) => ({
+    value: contractor.phone, // Search by phone
+    label: `${contractor.businessName} (${contractor.phone})`, // Show business name with phone
+    businessName: contractor.businessName,
+    name: contractor.name,
+  }));
+
+  const handleSelectChange = (selectedOption) => {
+    const selectedBusiness = allContractor.find(
+      (contractor) => contractor.phone === selectedOption.value
+    );
+
+    if (selectedBusiness) {
+      handleEditChange("contractor", {
+        ...editedData.contractor,
+        businessName: selectedBusiness?.businessName,
+        name: selectedBusiness.name,
+        phone: selectedBusiness.phone,
+      });
     }
   };
 
-  const handleSearch = (q) => {
-    setSearch(q);
-    setUsersArr(
-      q
-        ? userArr.filter(
-            (el) =>
-              el.name.toLowerCase().includes(q.toLowerCase()) ||
-              el.phone.toLowerCase().includes(q.toLowerCase()) ||
-              el.email.toLowerCase().includes(q.toLowerCase())
-          )
-        : userArr
-    );
-  };
-
-  const handleGetAllUsers = () => {
-    let query = "?role=CARPENTER";
-    if (userKycStatus) query += `&kycStatus=${userKycStatus}`;
-    dispatch(usersGet(query));
-  };
+  // Ensure the selected value is properly formatted
+  const selectedValue = contractorOptions.find(
+    (option) => option.businessName === editedData.contractor?.businessName
+  );
 
   const users_columns = [
     {
       name: "ID",
       cell: (row, index) => <p>{index + 1 + currentPage * 10}</p>,
-      sortable: true,
       width: "5%",
     },
     {
       name: "NAME",
-      cell: (row) => <p>{row.name}</p>,
+      cell: (row) => (
+        <p>
+          {row.isVerified && <VerifiedIcon style={{ marginRight: "5px" }} />}
+          {row.name}
+        </p>
+      ),
       width: "17%",
     },
     {
@@ -366,7 +383,8 @@ function Customer() {
     {
       name: "ROLE",
       sortable: true,
-      selector: (row) => (
+      selector: "role",
+      cell: (row) => (
         <p
           style={{
             display: "inline-block",
@@ -384,9 +402,12 @@ function Customer() {
       ),
       width: "11%",
     },
+
     {
       name: "IS ACTIVE",
       button: true,
+      sortable: true,
+      selector: "isActive",
       cell: (row) => (
         <Switch
           onChange={(e) => handleChangeActiveStatus(row._id, e.target.checked)}
@@ -395,12 +416,15 @@ function Customer() {
       ),
       width: "8%",
     },
+
     {
       name: "BLOCK",
       button: true,
+      sortable: true,
+      selector: "isBlocked",
       cell: (row) => (
         <Switch
-          onChange={(e) => handleChangeBlockUser(row._id)}
+          onChange={(e) => handleChangeBlockUser(row._id, e.target.checked)}
           checked={row.isBlocked}
           color="error"
         />
@@ -409,7 +433,7 @@ function Customer() {
     },
     {
       name: "KYC Status",
-      selector: (row) => {
+      cell: (row) => {
         const kycColors = {
           pending: "#FFBF00",
           submitted: "red",
@@ -483,15 +507,6 @@ function Customer() {
               >
                 Logs
               </Link>
-
-              {/* Add Note Button */}
-              <CustomButton
-                btntype="button"
-                ClickEvent={() => handleOpenNoteEditor(menuRow)}
-                isBtn
-                iconName="fa-solid fa-edit"
-                btnName="Add Note"
-              />
             </Box>
           </Menu>
         </Box>
@@ -513,22 +528,48 @@ function Customer() {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
-          <div className="d-flex align-items-center justify-content-between mb-3">
-            <ul
-              className="nav nav-pills dashboard-pills justify-content-end"
-              id="pills-tab"
-              role="tablist"
+          <div className="d-flex align-items-center justify-content-end mb-3">
+            <div style={{ marginRight: "30px" }}>
+              <a
+                href={`${url}/users/getExcelReportOfUser`}
+                download="users-report.xlsx"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  backgroundColor: "black",
+                  color: "white",
+                  padding: "11px",
+                  borderRadius: "20px",
+                  fontSize: "11px",
+                }}
+              >
+                Excel Report
+              </a>
+            </div>
+
+            <Button
+              onClick={() => setAddScheduler((prev) => !prev)}
+              sx={{
+                backgroundColor: "black",
+                color: "white",
+                borderRadius: "50px", // Pill shape
+                height: "35px", // Set height
+                minHeight: "35px", // Ensure height is enforced
+                padding: "0 20px", // Adjust padding (no vertical padding)
+                fontSize: "10px", // Adjust font size to fit within 15px height
+                "&:hover": {
+                  backgroundColor: "#333", // Slightly lighter black on hover
+                },
+              }}
             >
-              <li>
-                <CustomButton
-                  navPills
-                  btnName={"All Users"}
-                  pillActive={true}
-                  path={"Users"}
-                  extraClass={"test"}
-                />
-              </li>
-            </ul>
+              {addScheduler ? "Close Scheduler" : "Add Scheduler"}
+            </Button>
+
+            {addScheduler && (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <ScheduleSelector />
+              </LocalizationProvider>
+            )}
           </div>
           <DashboardTable>
             <div className="d-flex align-items-center justify-content-between mb-5">
@@ -564,6 +605,27 @@ function Customer() {
                   <option value="rejected">Rejected</option>
                   <option value="submitted">Submitted</option>
                 </select>
+
+                <input
+                  className="form-control"
+                  type={startDate ? "date" : "text"}
+                  value={startDate}
+                  style={{ width: "auto" }}
+                  onChange={handleStartDateChange}
+                  placeholder="Start Date"
+                  onFocus={(e) => (e.target.type = "date")}
+                />
+
+                <input
+                  className="form-control"
+                  type={endDate ? "date" : "text"}
+                  value={endDate}
+                  style={{ width: "auto" }}
+                  onChange={handleEndDateChange}
+                  placeholder="End Date"
+                  onFocus={(e) => (e.target.type = "date")}
+                />
+
                 <div className="search-field">
                   <form action="#" className="form">
                     <div className="input-group">
@@ -575,7 +637,7 @@ function Customer() {
                         className="form-control"
                         placeholder="Search"
                         value={search}
-                        onChange={(e) => handleSearch(e.target.value)}
+                        onChange={(e) => setSearch(e.target.value)}
                       />
                     </div>
                   </form>
@@ -609,14 +671,25 @@ function Customer() {
               <DialogContent>
                 <div className="dialog-content-flex">
                   <div className="customer-profile text-center">
-                    <a href={selectedData?.image} target="_blank">
-                      <img
-                        src={selectedData?.image}
-                        alt=""
-                        className="profile-img"
-                        target="_blank"
+                    {isEditMode ? (
+                      <SingleFileUpload
+                        onFileChange={(fileUrl) =>
+                          handleFileSet("image", fileUrl)
+                        }
                       />
-                    </a>
+                    ) : (
+                      <span>
+                        <a href={selectedData?.image} target="_blank">
+                          <img
+                            src={selectedData?.image}
+                            alt=""
+                            className="profile-img"
+                            target="_blank"
+                          />
+                        </a>
+                      </span>
+                    )}
+
                     {isEditMode ? (
                       <input
                         type="text"
@@ -659,21 +732,28 @@ function Customer() {
                         <span className="fw-600">Role: </span>
                         {isEditMode ? (
                           <select
-                            value={editedData?.role}
+                            value={editedData?.role || ""}
                             onChange={(e) => {
                               const newRole = e.target.value;
-                              handleEditChange("role", newRole); // Update the role
-                              // If the role is changed, reset or update other fields accordingly
-                              if (newRole === "CONTRACTOR") {
-                                // Set businessName editable for contractor and reset contractor name
-                                handleEditChange("contractor", {
-                                  ...editedData.contractor,
-                                  name: "",
-                                });
-                              } else if (newRole === "CARPENTER") {
-                                // Set contractor name editable for carpenter and reset businessName
-                                handleEditChange("businessName", ""); // Reset businessName
-                              }
+
+                              setEditedData((prev) => {
+                                if (!prev) return prev;
+
+                                return {
+                                  ...prev,
+                                  role: newRole,
+                                  contractor:
+                                    newRole === "CONTRACTOR"
+                                      ? { name: "" }
+                                      : prev.contractor,
+                                  businessName:
+                                    newRole === "CARPENTER"
+                                      ? ""
+                                      : prev.businessName,
+                                };
+                              });
+
+                              console.log("Role changed to:", newRole);
                             }}
                             className="edit-input"
                           >
@@ -693,12 +773,8 @@ function Customer() {
                             <input
                               type="text"
                               value={editedData?.businessName || ""}
-                              onChange={
-                                (e) =>
-                                  handleEditChange(
-                                    "businessName",
-                                    e.target.value
-                                  ) // Allow editing of businessName
+                              onChange={(e) =>
+                                handleEditChange("businessName", e.target.value)
                               }
                               className="edit-input"
                             />
@@ -732,43 +808,27 @@ function Customer() {
                           <li>
                             <span className="fw-600">Business Name: </span>
                             {isEditMode ? (
-                              <select
-                                value={
-                                  editedData?.contractor?.businessName || ""
-                                }
-                                onChange={(e) => {
-                                  // Find the selected business and update contractor name
-                                  const selectedBusiness = allContractor.find(
-                                    (contractor) =>
-                                      contractor.businessName === e.target.value
-                                  );
-                                  if (selectedBusiness) {
-                                    // Set both business name and contractor name in the state
-                                    handleEditChange("contractor", {
-                                      ...editedData.contractor,
-                                      businessName: e.target.value,
-                                      name: selectedBusiness.name, // Set the contractor name based on the business name
-                                    });
-                                  }
-                                }}
-                                className="edit-input"
-                              >
-                                <option value="">Select Business Name</option>
-                                {allContractor.map((contractor) => (
-                                  <option
-                                    key={contractor.businessName}
-                                    value={contractor.businessName}
-                                  >
-                                    {contractor.businessName}
-                                  </option>
-                                ))}
-                              </select>
+                              <Select
+                                options={contractorOptions}
+                                value={selectedValue} // Ensures correct display of selected businessName
+                                onChange={handleSelectChange}
+                                getOptionLabel={(e) => e.label} // Show businessName (phone) in options
+                              />
                             ) : (
                               <span>
                                 {selectedData?.contractor?.businessName ||
                                   "No Business Name"}
                               </span>
                             )}
+                          </li>
+
+                          <li>
+                            <span className="fw-600">Contractor Phone: </span>
+
+                            <span>
+                              {selectedData?.contractor?.phone ||
+                                "No Contractor"}
+                            </span>
                           </li>
                         </div>
                       )}
@@ -777,6 +837,20 @@ function Customer() {
                         <span className="fw-600">Points: </span>
                         <span>{selectedData?.points ?? 0}</span>
                       </li>
+
+                      <li>
+                        <span className="fw-600">Diamond Points: </span>
+                        <span>{selectedData?.accumulatedPoints ?? 0}</span>
+                      </li>
+
+                      <li>
+                        <span className="fw-600">Diamonds: </span>
+                        <span>
+                          {selectedData?.diamonds ?? 0}{" "}
+                          <DiamondIcon style={{ color: "#FFD700" }} />
+                        </span>
+                      </li>
+
                       <li>
                         <span className="fw-600">Registered Date: </span>
                         <span>
@@ -799,10 +873,27 @@ function Customer() {
                       <li>
                         <span className="fw-600">Approved Date : </span>
                         <span>
-                          {moment(selectedData?.updatedAt).format(
+                          {moment(selectedData?.isActiveDate).format(
                             "DD-MM-YYYY hh:mm A"
                           )}
                         </span>
+                      </li>
+                      <li>
+                        <span className="fw-600">Is Verified: </span>
+                        {isEditMode ? (
+                          <input
+                            type="checkbox"
+                            checked={editedData?.isVerified || false}
+                            onChange={(e) =>
+                              handleEditChange("isVerified", e.target.checked)
+                            }
+                          />
+                        ) : (
+                          <input
+                            type="checkbox"
+                            checked={selectedData?.isVerified || false}
+                          />
+                        )}
                       </li>
                     </ul>
                   </div>
@@ -987,41 +1078,50 @@ function Customer() {
 
                       <li className="kyc-status-container">
                         <span className="fw-600 kyc-status-label">
-                          KYC status:{" "}
+                          KYC status:
                         </span>
-                        <RadioGroup
-                          aria-label="kycStatus"
-                          name="kycStatus"
-                          value={kycStatus}
-                          onChange={(e) =>
-                            handleChangeKycStatus(
-                              selectedData._id,
-                              e.target.value
-                            )
-                          }
-                          className="kyc-radio-group"
-                        >
-                          <FormControlLabel
-                            value="pending"
-                            control={<Radio />}
-                            label="Pending"
-                          />
-                          <FormControlLabel
-                            value="submitted"
-                            control={<Radio />}
-                            label="Submitted"
-                          />
-                          <FormControlLabel
-                            value="approved"
-                            control={<Radio />}
-                            label="Approved"
-                          />
-                          <FormControlLabel
-                            value="rejected"
-                            control={<Radio />}
-                            label="Rejected"
-                          />
-                        </RadioGroup>
+                        {isEditMode ? (
+                          <RadioGroup
+                            aria-label="kycStatus"
+                            name="kycStatus"
+                            value={editedData?.kycStatus}
+                            onChange={(e) =>
+                              handleChangeKycStatus(
+                                selectedData._id,
+                                e.target.value
+                              )
+                            }
+                            className="kyc-radio-group"
+                          >
+                            <FormControlLabel
+                              value="pending"
+                              control={<Radio />}
+                              label="Pending"
+                            />
+                            <FormControlLabel
+                              value="submitted"
+                              control={<Radio />}
+                              label="Submitted"
+                            />
+                            <FormControlLabel
+                              value="approved"
+                              control={<Radio />}
+                              label="Approved"
+                            />
+                            <FormControlLabel
+                              value="rejected"
+                              control={<Radio />}
+                              label="Rejected"
+                            />
+                          </RadioGroup>
+                        ) : (
+                          <span>
+                            {selectedData?.kycStatus
+                              ? selectedData.kycStatus.charAt(0).toUpperCase() +
+                                selectedData.kycStatus.slice(1)
+                              : "No Status"}
+                          </span>
+                        )}
                       </li>
                     </ul>
                   </div>
@@ -1067,64 +1167,33 @@ function Customer() {
                 </Button>
               </DialogActions>
             </Dialog>
+
             <div>
-              <div>
-                {selectedRowForNote && (
-                  <div
-                    className="note-editor"
-                    style={{
-                      padding: "20px",
-                      border: "1px solid #ccc",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <p>{selectedRowForNote?.name}</p>
-                    <textarea
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)} // Update note on change
-                      rows={3}
-                      placeholder="Enter your note..."
-                      style={{ width: "100%", padding: "8px" }}
-                    />
-                    <div>
-                      <button
-                        onClick={() => handleSaveNote(selectedRowForNote)} // Save note for selected row
-                        style={{
-                          backgroundColor: "#4CAF50",
-                          color: "white",
-                          padding: "10px 15px",
-                          marginRight: "10px",
-                          borderRadius: "5px",
-                          border: "none",
-                        }}
-                      >
-                        Save Note
-                      </button>
-                      <button
-                        onClick={handleCloseNoteEditor} // Close editor
-                        style={{
-                          backgroundColor: "#f44336",
-                          color: "white",
-                          padding: "10px 15px",
-                          borderRadius: "5px",
-                          border: "none",
-                        }}
-                      >
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              {openAddNote && (
+                <AddNote
+                  open={openAddNote}
+                  handleClose={() => setOpenAddNote(false)}
+                  handleAddNote={handleNoteSubmit}
+                  userId={selectedUserId}
+                  selectedUser={selectedUser}
+                />
+              )}
             </div>
             <DataTable
-              paginationPerPage={10}
               columns={users_columns}
               data={usersArr}
               pagination
-              onChangePage={(page) => setCurrentPage(page - 1)} // Update currentPage when page changes
+              paginationServer
+              paginationTotalRows={totalRows}
+              onChangePage={handlePageChange}
+              onChangeRowsPerPage={handleRowsPerPageChange}
+              progressPending={loading}
+              defaultSortAsc={false}
+              sortServer
+              onSort={handleSort}
+              sortColumn={sortBy}
+              sortDirection={sortOrder}
               conditionalRowStyles={conditionalRowStyles}
-              paginationRowsPerPageOptions={[10]}
             />
           </DashboardTable>
         </div>

@@ -21,9 +21,15 @@ function PointHistory() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [activeDiv, setActiveDiv] = useState(null);
+  const [order, setOrder] = useState("desc");
   const [totalPagesCount, settTotalPagesCount] = useState("");
-  const pointHistoryArr = useSelector((state) => state.users.pointHistoryByUserObj);
+  const pointHistoryArr = useSelector(
+    (state) => state.users.pointHistoryByUserObj
+  );
 
   const [userPointsReportsData, setUserPointsReportsData] = useState({});
 
@@ -43,6 +49,10 @@ function PointHistory() {
     if (search) {
       query += `&s=${search}`;
     }
+    if (order) query += `&order=${order}`;
+    if (sortBy) query += `&sortBy=${sortBy}`; // Include sorting
+    if (startDate) query += `&startDate=${startDate}`; // Include startDate
+    if (endDate) query += `&endDate=${endDate}`; // Include endDate
     const response = await getUserPointHistoryById(query);
     setPointHistoriesArr(response.data.data);
     settTotalPagesCount(response.data.totalPages);
@@ -63,14 +73,12 @@ function PointHistory() {
 
   useEffect(() => {
     handlePointHistory();
-  }, [search, page]);
+  }, [search, page, sortBy, endDate]);
 
   const HandleGetUserStatsReport = async (userIdValue) => {
     try {
-  
       let { data: res } = await getUserStatsReport(userIdValue);
       if (res.data) {
-    
         setUserPointsReportsData(res.data);
       }
     } catch (err) {
@@ -79,8 +87,16 @@ function PointHistory() {
   };
 
   const handlePageChange = (event, value) => {
-    setLoading(true)
+    setLoading(true);
     setPage(value);
+  };
+
+  const handleStartDateChange = (e) => setStartDate(e.target.value);
+  const handleEndDateChange = (e) => setEndDate(e.target.value);
+
+  const handleSort = (column, sortDirection) => {
+    setSortBy(column.selector);
+    setOrder(sortDirection === "asc" ? "1" : "-1");
   };
 
   const points_columns = [
@@ -90,14 +106,12 @@ function PointHistory() {
       sortable: true,
       width: "15%",
     },
-    {
-      name: "Type",
-      selector: (row) => row.type,
-      width: "10%",
-    },
+
     {
       name: "Amount",
-      selector: (row) =>
+      selector: (row) => "amount",
+      sortable: true,
+      cell: (row) =>
         row.type === "CREDIT" ? (
           <span className="text-success">
             <i className="fa fa-arrow-up"> </i> {row.amount}{" "}
@@ -112,7 +126,7 @@ function PointHistory() {
     {
       name: "Description",
       selector: (row) => row.description,
-      width: "25%",
+      width: "50%",
     },
     {
       name: "Status",
@@ -121,7 +135,8 @@ function PointHistory() {
     },
     {
       name: "Date Time",
-      selector: (row) => `${moment(row.createdAt).format("YYYY-MM-DD, HH:mm")}`,
+      selector: (row) =>
+        `${moment(row.createdAt).format("DD-MM-YYYY, hh:mm A ")}`,
       width: "15%",
     },
   ];
@@ -245,7 +260,7 @@ function PointHistory() {
                 }}
               >
                 <div className="col-12 py-4 border rounded bg-white usercontestactivediv">
-                  <h6 className="blue-1 mb-4 ">Points red. for contest</h6>
+                  <h6 className="blue-1 mb-4 ">Points redeemed for contest</h6>
                   <div
                     className={`div ${
                       activeDiv === "div4" ? "usercontestactive" : ""
@@ -283,7 +298,34 @@ function PointHistory() {
             <Loader />
           ) : (
             <DashboardTable>
-              <DataTable columns={points_columns} data={pointHistoriesArr} />
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                {" "}
+                <input
+                  className="form-control"
+                  type={startDate ? "date" : "text"}
+                  value={startDate}
+                  style={{ width: "auto", marginRight: "10px" }}
+                  onChange={handleStartDateChange}
+                  placeholder="Start Date"
+                  onFocus={(e) => (e.target.type = "date")}
+                />
+                <input
+                  className="form-control"
+                  type={endDate ? "date" : "text"}
+                  value={endDate}
+                  style={{ width: "auto" }}
+                  onChange={handleEndDateChange}
+                  placeholder="End Date"
+                  onFocus={(e) => (e.target.type = "date")}
+                />
+              </div>
+
+              <DataTable
+                columns={points_columns}
+                data={pointHistoriesArr}
+                onSort={handleSort}
+                sortServer
+              />
               <div className="d-flex align-items-center justify-content-between mt-4">
                 <h5 className="blue-1 m-0"></h5>
                 <Pagination

@@ -102,7 +102,7 @@ const Promotions = () => {
       toast.error("An image is required for new promotions.");
       return;
     }
-  
+
     if (editingPromotion) {
       dispatch(updatePromotion(editingPromotion._id, { ...newPromotion }));
     } else {
@@ -301,7 +301,7 @@ const Promotions = () => {
       title,
       message,
       imageUrl,
-      role: selectedRole !== "All" ? selectedRole : undefined // Include role if not "All"
+      role: selectedRole !== "All" ? selectedRole : undefined, // Include role if not "All"
     };
 
     try {

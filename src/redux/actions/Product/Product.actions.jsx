@@ -28,6 +28,12 @@ export const DELETE_PRODUCT_BY_ID_FAIL = "DELETE_PRODUCT_BY_ID_FAIL";
 // export const GET_ALL_NESTED_CATEGORIES_SUCCESS = "GET_ALL_NESTED_CATEGORIES_SUCCESS";
 // export const GET_ALL_NESTED_CATEGORIES_FAIL = "GET_ALL_NESTED_CATEGORIES_FAIL";
 
+
+
+
+
+
+
 export const PRODUCTAdd = (formData) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_ADD });

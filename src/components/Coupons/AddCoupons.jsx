@@ -24,6 +24,7 @@ function AddCoupons() {
   const navigate = useNavigate();
   const productArr = useSelector((state) => state.product.products);
 
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [value, setValue] = useState(0);
@@ -45,8 +46,8 @@ function AddCoupons() {
   const [couponVal, setCouponVal] = useState("");
   const [totalCoupon, setTotalCoupon] = useState();
   const [coupons, setCoupons] = useState([{ value: 0, count: 0 }]);
-  const [productId, setproductId] = useState("");
-  const [productList, setproductList] = useState("");
+  const [productId, setproductId] = useState(null);
+  const [productList, setproductList] = useState([]);
   const [loading, setLoading] = useState(false);
   const handleFileSet = (value) => {
     setImage(value);
@@ -65,7 +66,7 @@ function AddCoupons() {
     dispatch(PRODUCTGet());
   }, []);
   useEffect(() => {
-    if (productArr) {
+    if (productArr) {      
       setproductList(productArr);
     }
   }, [productArr]);
@@ -151,19 +152,19 @@ function AddCoupons() {
       toastError("Please select a product.");
       return;
     }
-  
+
     // Validate Total Coupon Value (allow 0)
     if (couponVal === undefined || isNaN(couponVal)) {
       toastError("Please enter a valid total coupon value.");
       return;
     }
-  
+
     // Validate Total Coupon Count (must be greater than 0)
     if (!totalCoupon || isNaN(totalCoupon) || totalCoupon <= 0) {
       toastError("Total coupon count must be greater than 0.");
       return;
     }
-  
+
     // Validate Coupons Array
     const invalidCoupons = coupons.some(
       (coupon) =>
@@ -174,12 +175,14 @@ function AddCoupons() {
         isNaN(coupon.count) || // Ensure count is a number
         coupon.count <= 0 // Count must be greater than 0
     );
-  
+
     if (invalidCoupons) {
-      toastError("Please ensure all coupon values and counts are valid. No of Coupons must be greater than 0.");
+      toastError(
+        "Please ensure all coupon values and counts are valid. No of Coupons must be greater than 0."
+      );
       return;
     }
-  
+
     // Calculate the total value and count from the coupons array
     const totalCouponsValue = coupons.reduce(
       (sum, coupon) => sum + parseFloat(coupon.value) * parseInt(coupon.count),
@@ -189,7 +192,7 @@ function AddCoupons() {
       (sum, coupon) => sum + parseInt(coupon.count),
       0
     );
-  
+
     // Validate that the total matches
     if (totalCouponsValue !== parseFloat(couponVal)) {
       toastError(
@@ -197,21 +200,21 @@ function AddCoupons() {
       );
       return;
     }
-  
+
     if (totalCouponsCount !== parseInt(totalCoupon)) {
       toastError(
         `The total count of coupons (${totalCouponsCount}) must equal the Total Coupon Count (${totalCoupon}).`
       );
       return;
     }
-  
+
     let obj = {
       amount: couponVal,
       count: totalCoupon,
       coupons,
       productId,
     };
-  
+
     // Dispatch based on whether it's an update or new addition
     try {
       setLoading(true);
@@ -227,7 +230,7 @@ function AddCoupons() {
       setLoading(false); // Hide loader
     }
   };
-  
+
   let handleCouponArrayAdd = () => {
     setCoupons([...coupons, { value: "", count: "" }]);
   };
@@ -257,6 +260,17 @@ function AddCoupons() {
     }
   };
 
+  const handleChange = (selectedOption) => {
+    setproductId(selectedOption ? selectedOption.value : null);
+  };
+
+  const productOptions = productList?.map((product) => ({
+    value: product._id,
+    label: product.name,
+  }));
+
+  console.log("productOptions",productOptions,productList);
+  
   return (
     <main>
       <section className="product-category">
@@ -291,21 +305,14 @@ function AddCoupons() {
                         <label>
                           Product List <span className="red">*</span>
                         </label>
-                        <select
-                          className="form-control"
-                          value={productId}
-                          onChange={(e) => {
-                            setproductId(e.target.value);
-                          }}
-                        >
-                          <option value="">Please Select Product</option>
-                          {productList &&
-                            productList.map((product) => (
-                              <option value={product?._id}>
-                                {product?.name}
-                              </option>
-                            ))}
-                        </select>
+                        <Select
+                          options={productOptions}
+                          value={productOptions.find(
+                            (option) => option.value === productId
+                          )}
+                          onChange={handleChange}
+                          placeholder="Please Select Product"
+                        />
                       </div>
                       <div className="col-md-6">
                         <label>

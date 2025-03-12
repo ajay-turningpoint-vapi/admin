@@ -148,6 +148,8 @@ function SideBar() {
           path: "/referrals",
           active: false,
         },
+        
+
       ],
     },
     {
@@ -174,8 +176,13 @@ function SideBar() {
       icon: "fa-solid fa-shopping-cart",
       children: [
         {
-          name: "All Product",
+          name: "All Coupons Product",
           path: "/Product-list",
+          active: false,
+        },
+        {
+          name: "All Product",
+          path: "/redeem-product",
           active: false,
         },
       ],

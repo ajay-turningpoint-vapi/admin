@@ -19,7 +19,7 @@ import { DashboardTable } from "../Utility/DashboardBox";
 import SearchBox from "../Utility/SearchBox";
 import { toastError } from "../Utility/ToastUtils";
 import { generateFilePath, generateQrFilePath } from "../Utility/utils";
-import { Pagination } from "@mui/material";
+import { Button, Pagination } from "@mui/material";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import Loader from "../Utility/Loader.jsx";
@@ -28,6 +28,7 @@ function Coupons() {
   const navigate = useNavigate();
   const couponArr = useSelector((state) => state.coupon.coupons);
   const couponArrTotalPages = useSelector((state) => state.coupon.totalPages);
+  const couponArrCount = useSelector((state) => state.coupon.couponsCount);
   const productArr = useSelector((state) => state.product.products);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -37,6 +38,10 @@ function Coupons() {
   const [productId, setproductId] = useState("");
   const [filterType, setFilterType] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  // const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   const handleoptionSearchChange = (e) => {
     setSearchText(e.target.value);
@@ -64,8 +69,13 @@ function Coupons() {
     if (usedCoupon) query += `&couponUsed=${usedCoupon}`;
     if (productId) query += `&productId=${productId}`;
     if (searchQuery) query += `&search=${searchQuery}`;
+    if (startDate) query += `&startDate=${startDate}`;
+    if (endDate) query += `&endDate=${endDate}`;
+    // if (sortBy) query += `&sortBy=${sortBy}`;
+    if (sortOrder) query += `&sortOrder=${sortOrder}`;
     dispatch(COUPONGet(query)).then(() => setLoading(false));
   };
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -103,7 +113,7 @@ function Coupons() {
   useEffect(() => {
     handleGetAllCoupons();
     dispatch(PRODUCTGet());
-  }, [page]);
+  }, [page, endDate, sortOrder]);
 
   useEffect(() => {
     if (filterType !== "activeCoupons" && filterType !== "productName") {
@@ -115,6 +125,9 @@ function Coupons() {
     dispatch(SetCOUPONObj(row));
   };
 
+  const handleStartDateChange = (e) => setStartDate(e.target.value);
+  const handleEndDateChange = (e) => setEndDate(e.target.value);
+
   const brand_columns = [
     {
       name: "ID",
@@ -125,11 +138,12 @@ function Coupons() {
     {
       name: "Name",
       cell: (row) => <p>{row.name}</p>,
-      width: "15%",
+      width: "12%",
     },
     {
       name: "Coupon Value",
       sortable: true,
+      selector: "value",
       cell: (row) =>
         row?.productObj ? <p>{row?.value}</p> : <p>No Product</p>,
       width: "10%",
@@ -139,12 +153,12 @@ function Coupons() {
       sortable: true,
       cell: (row) =>
         row?.productObj ? <p>{row.productObj?.name}</p> : <p>No Product</p>,
-      width: "15%",
+      width: "20%",
     },
     {
       name: "Coupon",
       sortable: true,
-      width: "20%",
+      width: "10%",
       selector: (row) =>
         row.maximumNoOfUsersAllowed === 0 ? (
           <span className="badge bg-danger p-2">
@@ -155,7 +169,7 @@ function Coupons() {
         ),
     },
     {
-      name: "Created At",
+      name: "Coupon Created At",
       sortable: true,
       cell: (row) => <p>{new Date(row.createdAt).toDateString()}</p>,
       width: "15%",
@@ -171,7 +185,26 @@ function Coupons() {
         ),
       width: "15%",
     },
+
+    {
+      name: "Scanned At",
+      sortable: true,
+      cell: (row) => (
+        <p className={row?.scannedUserName ? "badge bg-danger" : ""}>
+          {row?.scannedUserName
+            ? new Date(row?.updatedAt).toDateString()
+            : "Not Scanned"}
+        </p>
+      ),
+      width: "15%",
+    },
   ];
+
+  const handleSort = (column, direction) => {
+    console.log("Sorting by:", column.selector);
+    // setSortBy(column.selector); // ✅ Fixed
+    setSortOrder(direction); // ✅ Fixed
+  };
 
   return (
     <main>
@@ -202,7 +235,7 @@ function Coupons() {
                 </select>
                 <label>Products</label>
                 <select
-                  style={{ width: "300px" }}
+                  style={{ width: "400px" }}
                   className="form-control"
                   value={productId}
                   onChange={(e) => setproductId(e.target.value)}
@@ -218,7 +251,7 @@ function Coupons() {
 
                 <label>Active_Coupons</label>
                 <select
-                  style={{ width: "200px" }}
+                  style={{ width: "250px" }}
                   className="form-control"
                   value={filterType}
                   onChange={handleFilterChange}
@@ -269,6 +302,37 @@ function Coupons() {
                   </div>
                 )}
 
+                <input
+                  className="form-control"
+                  type={startDate ? "date" : "text"}
+                  value={startDate}
+                  style={{ width: "auto" }}
+                  onChange={handleStartDateChange}
+                  placeholder="Start Date"
+                  onFocus={(e) => (e.target.type = "date")}
+                />
+
+                <input
+                  className="form-control"
+                  type={endDate ? "date" : "text"}
+                  value={endDate}
+                  style={{ width: "auto" }}
+                  onChange={handleEndDateChange}
+                  placeholder="End Date"
+                  onFocus={(e) => (e.target.type = "date")}
+                />
+
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "black",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#333" },
+                  }}
+                >
+                  Total Coupons ({couponArrCount || 0})
+                </Button>
+
                 <CustomButton
                   isLink
                   iconName="fa-solid fa-plus"
@@ -285,7 +349,11 @@ function Coupons() {
                 <DashboardTable>
                   <DataTable
                     columns={brand_columns}
-                    data={couponArr && couponArr?.length > 0 ? couponArr : []}
+                    data={couponArr && couponArr.length > 0 ? couponArr : []}
+                    onSort={handleSort}
+                    sortServer
+                    // defaultSortFieldId={sortBy} // ✅ Initial sorting field
+                    defaultSortAsc={sortOrder === "asc"}
                   />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <h5 className="blue-1 m-0"></h5>

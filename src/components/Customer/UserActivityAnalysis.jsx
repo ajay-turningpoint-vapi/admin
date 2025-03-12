@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from "react";
-import DataTable from "react-data-table-component";
+import React, { useCallback, useEffect, useState } from "react";
 import { DashboardTable } from "../Utility/DashboardBox";
+import DataTable from "react-data-table-component";
+
 import {
   getContestsJoinedByUser,
   getContestsWonByUser,
-  getUserActivityAnalysis,
 } from "../../services/users.service";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers-pro";
-import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
-import NotificationAddIcon from "@mui/icons-material/NotificationAdd";
+
+import Loader from "../Utility/Loader.jsx";
+import { useDebounce } from "use-debounce";
 import {
   Button,
   Card,
@@ -33,381 +31,282 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
-function UserActivityAnalysis() {
+import { url } from "../../services/url.service";
+import axios from "axios";
+
+const UserActivityAnalysis = () => {
   const navigate = useNavigate();
-  const [usersArr, setUsersArr] = useState([]);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [dateRange, setDateRange] = useState([null, null]);
-  const [originalUsersArr, setOriginalUsersArr] = useState([]);
-  const [usersArrTotal, setUsersArrTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalRows, setTotalRows] = useState(0);
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [debouncedSearch] = useDebounce(search, 500);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserName, setSelectedUserName] = useState(null);
-  const [dialogType, setDialogType] = useState("joined");
+  const [dialogType, setDialogType] = useState("");
+
+  const fieldMap = {
+    totalReelsLikeCount: "reelsLikeCount",
+    totalContestJoinCount: "contestJoinCount",
+    totalScannedCouponCount: "totalScannedCoupon",
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${url}/users/getUserActivityAnalysis`, {
+        params: {
+          search,
+          page,
+          limit: 10,
+          sortField,
+          sortOrder,
+          search: debouncedSearch,
+        },
+      });
+      setData(response.data.data);
+      setTotalRows(response.data.pagination.totalUsers);
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [search, page, sortField, sortOrder, debouncedSearch]);
+
+  const handleSort = (column, direction) => {
+    const mappedField = fieldMap[column.selector] || column.selector;
+
+    setSortField(mappedField);
+    setSortOrder(direction);
+
+    const sortedData = [...data].sort((a, b) => {
+      const aValue = a[mappedField] ?? 0;
+      const bValue = b[mappedField] ?? 0;
+      return direction === "asc" ? aValue - bValue : bValue - aValue;
+    });
+
+    setData(sortedData);
+  };
+
+  const handleDoubleClick = (row) => {
+    if (window.confirm("Are you sure you want to view scanned coupons?")) {
+      navigate("/scanned-coupons", { state: { couponData: row.email } });
+    }
+  };
+
+  const handleCloseDialog = useCallback(() => {
+    setOpenDialog(false);
+    setSelectedUserName(null);
+    setSelectedUser(null);
+  }, []);
+
   const handleDoubleClickContest = async (row) => {
     try {
-      setLoading(true); // Start loading state
+      setLoading(true);
       const response = await getContestsJoinedByUser(row._id);
-
-      if (response?.data?.contests && Array.isArray(response.data.contests)) {
-        setSelectedUserName(row.name);
-        setSelectedUser(response.data.contests);
-        setDialogType("joined");
-      } else {
-        setSelectedUser([]); // Ensure empty array if no contests are found
-      }
-
+      setSelectedUser(response?.data?.contests || []);
+      setSelectedUserName(row.name);
+      setDialogType("joined");
       setOpenDialog(true);
     } catch (error) {
       console.error("Error fetching contests:", error);
-
-      // Optional: Show an alert or toast notification
       alert("Failed to fetch contest details. Please try again later.");
-
-      setSelectedUser([]); // Ensure selected user data is cleared on error
     } finally {
-      setLoading(false); // Stop loading state
+      setLoading(false);
     }
   };
 
   const handleDoubleClickContestWin = async (row) => {
     try {
-      setLoading(true); // Start loading state
+      setLoading(true);
       const response = await getContestsWonByUser(row._id);
-
-      if (response?.data?.contests && Array.isArray(response.data.contests)) {
-        setSelectedUserName(row.name);
-        setSelectedUser(response.data.contests);
-        setDialogType("won");
-      } else {
-        setSelectedUser([]); // Ensure empty array if no contests are found
-      }
-
+      setSelectedUser(response?.data?.contests || []);
+      setSelectedUserName(row.name);
+      setDialogType("won");
       setOpenDialog(true);
     } catch (error) {
       console.error("Error fetching contests:", error);
-
-      // Optional: Show an alert or toast notification
       alert("Failed to fetch contest details. Please try again later.");
-
-      setSelectedUser([]); // Ensure selected user data is cleared on error
     } finally {
-      setLoading(false); // Stop loading state
+      setLoading(false);
     }
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setSelectedUserName(null);
-    setSelectedUser(null);
-  };
-
-  const conditionalRowStyles = [
-    {
-      when: (row) =>
-        row.reelsLikeCount === 0 &&
-        row.contestJoinCount === 0 &&
-        row.contestWinCount === 0,
-      style: {
-        backgroundColor: "#f0c6c6",
-      },
-    },
-  ];
-
-  const handleDoubleClick = (row) => {
-    const confirmRedirect = window.confirm(
-      `Are you sure you want to view scanned coupons?`
-    );
-    if (confirmRedirect) {
-      if (confirmRedirect) {
-        navigate("/scanned-coupons", { state: { couponData: row.email } });
-      }
-    }
-  };
-
-  const users_columns = [
+  const columns = [
     {
       name: "ID",
       cell: (row, index) => <p>{index + 1}</p>,
-      sortable: true,
       width: "5%",
     },
-    {
-      name: "NAME",
-      cell: (row) => <p>{row.name}</p>,
-      width: "13%",
-    },
-    {
-      name: "EMAIL",
-      cell: (row) => <p>{row.email}</p>,
-      width: "20%",
-    },
-    {
-      name: "PHONE",
-      cell: (row) => <p>{row.phone}</p>,
-      width: "11%",
-    },
-    {
-      name: "ROLE",
-      sortable: true,
-      selector: (row) => row.role,
-      width: "10%",
-    },
+    { name: "Name", selector: (row) => row.name, sortable: true },
+    { name: "Phone", selector: (row) => row.phone },
+    { name: "Email", selector: (row) => row.email },
+    { name: "Role", selector: (row) => row.role },
     {
       name: "Reel View Qty",
+      selector: (row) => "totalReelsLikeCount",
+      cell: (row) => <p>{row.reelsLikeCount}</p>,
       sortable: true,
-      selector: (row) => <span>{row.reelsLikeCount}</span>,
-      width: "10%",
-    },
-    {
-      name: "Coupon Qty",
-      sortable: true,
-      selector: (row) => (
-        <Tooltip title={`Double Click to View on Map`} arrow>
-          <span
-            onDoubleClick={() => handleDoubleClick(row)}
-            style={{ cursor: "pointer" }}
-          >
-            {row.totalScannedCoupon}
-          </span>
-        </Tooltip>
-      ),
-      width: "9%",
     },
     {
       name: "Contest Join Qty",
-      sortable: true,
-      selector: (row) => (
-        <Tooltip title={`Double Click to View User Contest`} arrow>
+      selector: (row) => "totalContestJoinCount",
+      cell: (row) => (
+        <Tooltip title="Double Click to View User Contest" arrow>
           <span
             onDoubleClick={() => handleDoubleClickContest(row)}
             style={{ cursor: "pointer" }}
           >
-            {row.contestJoinCount}
+            {row.contestJoinCount ?? 0}
           </span>
         </Tooltip>
       ),
-      width: "11%",
+      sortable: true,
     },
     {
       name: "Contest Win Qty",
+      selector: "contestWinCount",
       sortable: true,
-      selector: (row) => (
-        <Tooltip title={`Double Click to View User Won Contest`} arrow>
+      cell: (row) => (
+        <Tooltip title="Double Click to View User Won Contest" arrow>
           <span
             onDoubleClick={() => handleDoubleClickContestWin(row)}
             style={{ cursor: "pointer" }}
           >
-            {row.contestWinCount}
+            {row.contestWinCount ?? 0}
           </span>
         </Tooltip>
       ),
       width: "11%",
     },
+
+    {
+      name: "Coupon Qty",
+      selector: (row) => "totalScannedCouponCount",
+      cell: (row) => (
+        <Tooltip title="Double Click to View on Map" arrow>
+          <span
+            onDoubleClick={() => handleDoubleClick(row)}
+            style={{ cursor: "pointer" }}
+          >
+            {row.totalScannedCoupon ?? 0}
+          </span>
+        </Tooltip>
+      ),
+      sortable: true,
+    },
   ];
 
-  const handleGetAllUsers = async (query) => {
-    setLoading(true);
-    const { data: response } = await getUserActivityAnalysis(query);
-    setUsersArrTotal(response);
-    setUsersArr(response.data);
-    setOriginalUsersArr(response.data);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (dateRange !== null) {
-      const startDate = dateRange[0]
-        ? dayjs(dateRange[0]).format("YYYY-MM-DD")
-        : null;
-      const endDate = dateRange[1]
-        ? dayjs(dateRange[1]).format("YYYY-MM-DD")
-        : null;
-      const query =
-        startDate && endDate
-          ? `?startDate=${startDate}&endDate=${endDate}`
-          : "";
-      handleGetAllUsers(query);
-    }
-  }, [dateRange]);
-
-  const handleSearch = (q) => {
-    setSearch(q);
-    if (q) {
-      const searchArr = usersArr.filter(
-        (el) =>
-          `${el.name}`.toLowerCase().includes(`${q}`.toLowerCase()) ||
-          `${el.phone}`.toLowerCase().includes(`${q}`.toLowerCase())
-      );
-      setUsersArr(searchArr);
-    } else {
-      setUsersArr(originalUsersArr);
-    }
-  };
-
   return (
-    <main>
-      <section className="product-category">
-        <div className="container-fluid p-0">
-          <div className="d-flex align-items-center justify-content-between"></div>
-          <DashboardTable>
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <h5 className="blue-1 m-0">Active Customer Analysis</h5>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                In-Active-Users
-                <div
-                  style={{
-                    backgroundColor: "#f0c6c6",
-                    width: "50px",
-                    height: "20px",
-                    marginLeft: "10px",
-                  }}
-                ></div>
-              </div>
-              <div className="d-flex align-items-center gap-3">
-                <label>Select Date</label>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DateRangePicker
-                    startText="Start Date"
-                    endText="End Date"
-                    value={dateRange}
-                    onChange={(newDateRange) => {
-                      setDateRange(newDateRange);
-                    }}
-                    renderInput={(startProps, endProps) => (
-                      <>
-                        <TextField {...startProps} />
-                        <TextField {...endProps} />
-                      </>
-                    )}
-                  />
-                </LocalizationProvider>
-                <div className="search-field">
-                  <form action="#" className="form">
-                    <div className="input-group">
-                      <div className="input-group-text">
-                        <i className="ion-ios-search-strong blue-1"></i>
-                      </div>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search"
-                        value={search}
-                        onChange={(e) => {
-                          handleSearch(e.target.value);
-                        }}
-                      />
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                marginBottom: "10px",
-                alignContent: "center",
-                justifyContent: "flex-end",
-              }}
-            >
-              <Card style={{ marginRight: "20px" }}>
-                <CardContent>
-                  <Typography variant="body2" color="#415094" component="h1">
-                    Total Reel View Qty (
-                    <b>{usersArrTotal.totalReelsLikeCount}</b>)
-                  </Typography>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent>
-                  <Typography variant="body2" color="#415094" component="h1">
-                    Total Contest Join Qty (
-                    <b>{usersArrTotal.totalContestJoinCount}</b>)
-                  </Typography>
-                </CardContent>
-              </Card>
-            </div>
-            {loading ? (
-              <div className="text-center">Loading...</div>
-            ) : (
-              <DataTable
-                paginationPerPage={10}
-                columns={users_columns}
-                data={usersArr}
-                pagination
-                conditionalRowStyles={conditionalRowStyles}
-              />
-            )}
-          </DashboardTable>
-        </div>
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          maxWidth="md"
-          fullWidth
+    <div style={{ padding: "20px" }}>
+      <DashboardTable>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          <DialogTitle>
-            {selectedUserName || "User Contest Details"}
-          </DialogTitle>
+          <h5 className="blue-1 m-0">Active Customer Analysis</h5>
+          <TextField
+            label="Search..."
+            variant="outlined"
+            value={search}
+            size="small"
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ marginBottom: "10px", width: "300px" }}
+          />
+        </div>
+        <DataTable
+          columns={columns}
+          data={data}
+          progressPending={loading}
+          pagination
+          paginationServer
+          paginationTotalRows={totalRows}
+          onChangePage={setPage}
+          onSort={handleSort}
+          sortServer
+          defaultSortAsc={false}
+          sortField={sortField}
+          sortDirection={sortOrder}
+          highlightOnHover
+          persistTableHead
+          conditionalRowStyles={[
+            {
+              when: (row) =>
+                row.reelsLikeCount === 0 &&
+                row.contestJoinCount === 0 &&
+                row.contestWinCount === 0,
+              style: { backgroundColor: "#f0c6c6" },
+            },
+          ]}
+        />
+      </DashboardTable>
+      <Dialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{selectedUserName || "User Contest Details"}</DialogTitle>
 
-          <DialogContent>
-            {selectedUser && (
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
+        <DialogContent>
+          {selectedUser && (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <strong>Contest Name</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Date</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>Time</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>
+                        {dialogType === "joined" ? "Join Count" : "Rank"}
+                      </strong>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedUser.map((contest, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{contest.name}</TableCell>
                       <TableCell>
-                        <strong>Contest Name</strong>
+                        {new Date(contest.endDate).toLocaleDateString()}
                       </TableCell>
+                      <TableCell>{contest.endTime}</TableCell>
                       <TableCell>
-                        <strong>Date</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>Time</strong>
-                      </TableCell>
-                      <TableCell>
-                        <strong>
-                          {dialogType === "joined" ? "Join Count" : "Rank"}
-                        </strong>
+                        {dialogType === "joined" ? contest.count : contest.rank}
                       </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {selectedUser.map((contest, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{contest.name}</TableCell>
-                        <TableCell>
-                          {new Date(contest.endDate).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>{contest.endTime}</TableCell>
-                        <TableCell>
-                          {dialogType === "joined"
-                            ? contest.count
-                            : contest.rank}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary">
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </section>
-    </main>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
-}
+};
 
 export default UserActivityAnalysis;
+

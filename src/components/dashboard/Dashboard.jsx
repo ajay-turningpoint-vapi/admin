@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import DataTable from "react-data-table-component";
 import {
   Chart as ChartJS,
@@ -41,6 +41,7 @@ import {
 } from "../../services/reels.service";
 import { getAllJoinedUserContest } from "../../services/contest.service";
 import { getProductsCount } from "../../services/product.service";
+import { WebSocketContext } from "../../App";
 
 ChartJS.register(
   ArcElement,
@@ -87,6 +88,8 @@ const aggregateAndSumDataByMonth = (data) => {
 };
 
 function Dashboard() {
+  const { messages } = useContext(WebSocketContext);
+
   const dispatch = useDispatch();
   const [dashboardData, setDashboardData] = useState({});
   const [userAnalytics, setUserAnalytics] = useState([]);
@@ -98,10 +101,8 @@ function Dashboard() {
 
   const fetchDashboardCounts = async () => {
     try {
-      console.time("Dashboard Count Fetch Time"); // Start timer
       const response = await getDashboardCount();
       setDashboardData(response.data?.data || {});
-      console.timeEnd("Dashboard Count Fetch Time"); // End timer and log duration
     } catch (error) {
       console.error("Error fetching dashboard counts:", error);
     }
@@ -109,8 +110,6 @@ function Dashboard() {
 
   const fetchAnalyticsData = async () => {
     try {
-      console.time("Analytics Data Fetch Time"); // Start timer
-
       const [
         userAnalyticsData,
         reelsLikeAnalyticsData,
@@ -131,17 +130,13 @@ function Dashboard() {
       if (reelsLikeAnalyticsData.status === "fulfilled")
         setReelLikeUserAnalytics(reelsLikeAnalyticsData.value.data?.data || []);
       if (couponAnalyticsData.status === "fulfilled")
-        console.log(couponAnalyticsData);
-
-      setCouponAnalytics(couponAnalyticsData.value.data?.data || []);
+        setCouponAnalytics(couponAnalyticsData.value.data?.data || []);
       if (reelsAnalyticsData.status === "fulfilled")
         setReelsAnalytics(reelsAnalyticsData.value.data?.data || []);
       if (userContestData.status === "fulfilled") {
         setUserContestLabel(userContestData.value.data?.contestNames || []);
         setUserContestCount(userContestData.value.data?.userCounts || []);
       }
-
-      console.timeEnd("Analytics Data Fetch Time"); // End timer and log duration
     } catch (error) {
       console.error("Error fetching analytics data:", error);
     }
@@ -151,6 +146,19 @@ function Dashboard() {
     fetchDashboardCounts();
     fetchAnalyticsData();
   }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      console.log("Latest WebSocket Message:", messages[messages.length - 1]);
+    }
+  }, [messages]);
+
+  // useEffect(() => {
+  //   const latestMessage = messages[messages.length - 1]; // Get the latest WebSocket message
+  //   if (latestMessage?.type === "UPDATE_COUNTS") {
+  //     fetchDashboardCounts(); // Fetch new dashboard counts
+  //   }
+  // }, [messages]);
 
   const aggregatedData = useMemo(
     () => aggregateAndSumDataByMonth(userAnalytics),
@@ -316,7 +324,7 @@ function Dashboard() {
             </div>
             <div className="col-12 col-md-4 mb-5" style={{ width: "auto" }}>
               <DashboardChart>
-                <h5 className="blue-1 mb-4">Coupons</h5>
+                <h5 className="blue-1 mb-4">Coupons Qty</h5>
                 <Doughnut data={couponChartData} />
               </DashboardChart>
             </div>

@@ -14,6 +14,7 @@ import { TransactionReducer } from "./Transaction/Transaction.reducer";
 import { ReelsReducer } from "./Reels/Reels.reducer";
 import promotionReducer from "./Promotion/Promotions.reducer";
 import { ticketReducer } from "./Ticket/Ticket.reducer";
+import { redeemproductReducer } from "./Product/RedeemableProduct.reducer";
 
 const RootReducer = combineReducers({
   auth: authReducer,
@@ -30,6 +31,7 @@ const RootReducer = combineReducers({
   reels: ReelsReducer,
   promotions: promotionReducer,
   tickets: ticketReducer,
+  redeemableProduct: redeemproductReducer,
 });
 
 export default RootReducer;

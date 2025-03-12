@@ -17,9 +17,6 @@ function Header() {
     <header>
       <div className="header print-none">
         <div className="d-flex align-items-center gap-4">
-          <div className="collaspe_icon">
-            <i className="ion-navicon-round blue-1"></i>
-          </div>
           {/* <SearchBox extraClass="" /> */}
         </div>
         <div className="link-to-website">

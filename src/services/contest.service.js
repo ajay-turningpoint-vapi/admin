@@ -7,6 +7,10 @@ export const addContest = (formData) => {
   return axios.post(serverUrl + "/addContest", formData);
 };
 
+export const addUserContestNote = (formData) => {
+  return axios.post(`${serverUrl}/addUserContestNote`, formData);
+};
+
 export const getContest = (query) => {
   return axios.get(`${serverUrl}/getContestAdmin?${query}`);
 };

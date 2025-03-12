@@ -17,8 +17,16 @@ export const blockUser = (id) => {
   return axios.post(serverUrl + "/toggle-block", { userId: id });
 };
 
+export const bulkupdateWinnersBlockStatus = (formData) => {
+  return axios.post(serverUrl + "/bulkupdateWinnersBlockStatus", formData);
+};
+
 export const getUser = (query) => {
   return axios.get(`${serverUrl}/getUsers${query}`);
+};
+
+export const getAllUser = () => {
+  return axios.get(`${serverUrl}/getAllUsers`);
 };
 
 export const getUsersAnalytics = (queryParams = "") => {
@@ -31,7 +39,6 @@ export const getContestsJoinedByUser = (userId) => {
 export const getContestsWonByUser = (userId) => {
   return axios.get(`${serverUrl}/getContestsWonByUser/${userId}`);
 };
-
 
 export const getDashboardCount = () => {
   return axios.get(`${serverUrl}/getCounts`);

@@ -71,7 +71,7 @@ export const usersGet = (formData) => async (dispatch) => {
     if (response) {
       dispatch({
         type: USER_GET_SUCCESS,
-        payload: { users: response.data, message: response.message },
+        payload: { users: response, message: response.message },
       });
     }
   } catch (error) {
@@ -79,6 +79,8 @@ export const usersGet = (formData) => async (dispatch) => {
     dispatch({ type: USER_GET_FAIL, payload: error });
   }
 };
+
+
 export const userActivityLog = (userId) => async (dispatch) => {
   try {
     dispatch({ type: GET_USER_ACTIVITY_LOG_BY_ID });

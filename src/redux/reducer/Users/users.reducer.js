@@ -8,7 +8,7 @@ const initialState = {
   userContests: {},
   pointHistoryByUserObj: {},
   error: null,
-  loading: null,
+  loading: false,
   userActivtyLog: [],
   userContestCount: 0,
   userContestTotalPages: 0,

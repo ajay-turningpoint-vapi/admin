@@ -184,7 +184,6 @@ const AddReels = () => {
                         >
                           <div className="col-12">
                             <div className="row">
-                             
                               <div className="row d-flex justify-content-between">
                                 <div className="col-5">
                                   <div className="row">
