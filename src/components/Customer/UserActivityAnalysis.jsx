@@ -155,6 +155,22 @@ const UserActivityAnalysis = () => {
       cell: (row) => <p>{row.reelsLikeCount}</p>,
       sortable: true,
     },
+
+    {
+      name: "Coupon Qty",
+      selector: (row) => "totalScannedCouponCount",
+      cell: (row) => (
+        <Tooltip title="Double Click to View on Map" arrow>
+          <span
+            onDoubleClick={() => handleDoubleClick(row)}
+            style={{ cursor: "pointer" }}
+          >
+            {row.totalScannedCoupon ?? 0}
+          </span>
+        </Tooltip>
+      ),
+      sortable: true,
+    },
     {
       name: "Contest Join Qty",
       selector: (row) => "totalContestJoinCount",
@@ -187,21 +203,7 @@ const UserActivityAnalysis = () => {
       width: "11%",
     },
 
-    {
-      name: "Coupon Qty",
-      selector: (row) => "totalScannedCouponCount",
-      cell: (row) => (
-        <Tooltip title="Double Click to View on Map" arrow>
-          <span
-            onDoubleClick={() => handleDoubleClick(row)}
-            style={{ cursor: "pointer" }}
-          >
-            {row.totalScannedCoupon ?? 0}
-          </span>
-        </Tooltip>
-      ),
-      sortable: true,
-    },
+   
   ];
 
   return (
@@ -243,6 +245,7 @@ const UserActivityAnalysis = () => {
             {
               when: (row) =>
                 row.reelsLikeCount === 0 &&
+              row.totalScannedCoupon === 0 &&
                 row.contestJoinCount === 0 &&
                 row.contestWinCount === 0,
               style: { backgroundColor: "#f0c6c6" },

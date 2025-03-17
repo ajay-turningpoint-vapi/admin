@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import ActionIcon from "../Utility/ActionIcon";
 import { DashboardTable } from "../Utility/DashboardBox";
@@ -26,7 +26,7 @@ function PointHistory() {
   const [endDate, setEndDate] = useState("");
   const [activeDiv, setActiveDiv] = useState(null);
   const [order, setOrder] = useState("desc");
-  const [totalPagesCount, settTotalPagesCount] = useState("");
+  const [totalPagesCount, setTotalPagesCount] = useState("");
   const pointHistoryArr = useSelector(
     (state) => state.users.pointHistoryByUserObj
   );
@@ -55,7 +55,7 @@ function PointHistory() {
     if (endDate) query += `&endDate=${endDate}`; // Include endDate
     const response = await getUserPointHistoryById(query);
     setPointHistoriesArr(response.data.data);
-    settTotalPagesCount(response.data.totalPages);
+    setTotalPagesCount(response.data.totalPages);
     setLoading(false);
   };
 
@@ -178,6 +178,14 @@ function PointHistory() {
                     {userPointsReportsData.totalPointsRedeemedForLiking
                       ? userPointsReportsData.totalPointsRedeemedForLiking
                       : 0}
+
+                    <span style={{ paddingLeft: "20px" }}>
+                      Count: (
+                      {userPointsReportsData.totalPointsRedeemedForLikingCount
+                        ? userPointsReportsData.totalPointsRedeemedForLikingCount
+                        : 0}
+                      )
+                    </span>
                   </div>
                 </div>
               </div>
@@ -200,6 +208,15 @@ function PointHistory() {
                     {userPointsReportsData.totalPointsRedeemedForProducts
                       ? userPointsReportsData.totalPointsRedeemedForProducts
                       : 0}
+
+                    <span style={{ paddingLeft: "20px" }}>
+                      {" "}
+                      Count: (
+                      {userPointsReportsData.totalPointsRedeemedForProductsCount
+                        ? userPointsReportsData.totalPointsRedeemedForProductsCount
+                        : 0}
+                      )
+                    </span>
                   </div>
                 </div>
               </div>

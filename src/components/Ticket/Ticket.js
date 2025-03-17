@@ -48,7 +48,7 @@ const Ticket = () => {
       name: "Description",
       selector: (row) => row.description,
       
-      width: "15%",
+      width: "12%",
     },
     {
       name: "Creation Date",

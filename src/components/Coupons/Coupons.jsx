@@ -23,6 +23,7 @@ import { Button, Pagination } from "@mui/material";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import Loader from "../Utility/Loader.jsx";
+import { url } from "../../services/url.service.js";
 function Coupons() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -187,7 +188,7 @@ function Coupons() {
     },
 
     {
-      name: "Scanned At",
+      name: "Scanned On",
       sortable: true,
       cell: (row) => (
         <p className={row?.scannedUserName ? "badge bg-danger" : ""}>
@@ -332,6 +333,23 @@ function Coupons() {
                 >
                   Total Coupons ({couponArrCount || 0})
                 </Button>
+
+                <a
+                  href={`${url}/coupon/exportCouponReport`}
+                  download="coupon-report.xlsx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    backgroundColor: "black",
+                    color: "white",
+                    padding: "7px",
+                    borderRadius: "20px",
+                    fontSize: "11px",
+                    width: "auto",
+                  }}
+                >
+                  Excel Report
+                </a>
 
                 <CustomButton
                   isLink

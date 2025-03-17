@@ -873,9 +873,11 @@ function Customer() {
                       <li>
                         <span className="fw-600">Approved Date : </span>
                         <span>
-                          {moment(selectedData?.isActiveDate).format(
-                            "DD-MM-YYYY hh:mm A"
-                          )}
+                          {selectedData?.isActiveDate
+                            ? moment(selectedData.isActiveDate).format(
+                                "DD-MM-YYYY hh:mm A"
+                              )
+                            : "N/A"}
                         </span>
                       </li>
                       <li>
