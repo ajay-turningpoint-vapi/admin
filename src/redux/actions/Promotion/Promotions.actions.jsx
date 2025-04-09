@@ -88,6 +88,9 @@ export const fetchPromotionById = (id) => async (dispatch) => {
 };
 
 export const updatePromotion = (id, formData) => async (dispatch) => {
+
+  console.log("updatePromotion", id, formData);
+  
   try {
     dispatch({ type: UPDATE_PROMOTION_REQUEST });
 

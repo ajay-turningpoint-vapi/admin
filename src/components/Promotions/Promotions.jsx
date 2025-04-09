@@ -32,6 +32,7 @@ import { url } from "../../services/url.service.js";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { sendPromotion } from "../../services/promotions.service.js";
+import { set } from "lodash";
 const Promotions = () => {
   const dispatch = useDispatch();
   const { promotions, loading, error } = useSelector(
@@ -42,12 +43,15 @@ const Promotions = () => {
     title: "",
     message: "",
     imageUrl: "",
+    videoUrl: "",
   });
   const [selectedRoles, setSelectedRoles] = React.useState({});
   const [open, setOpen] = useState(false); // State to control the modal visibility
   const [editingPromotion, setEditingPromotion] = useState(null); // State to manage editing
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     dispatch(fetchPromotions());
   }, [dispatch]);
@@ -63,25 +67,39 @@ const Promotions = () => {
 
     if (selectedFile) {
       const formData = new FormData();
-      formData.append("images", selectedFile);
+      formData.append("images", selectedFile); // Use correct field name
 
       try {
+
+        setIsUploading(true);
         const response = await axios.post(`${url}/upload`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
+
         const [generatedUrl] = response.data;
-        setPreviewUrl(generatedUrl); // Set the preview URL after upload
+        console.log("Generated URL:", generatedUrl);
+
+        setPreviewUrl(generatedUrl); // Set preview URL after upload
+
+        const fileType = selectedFile.type.startsWith("video")
+          ? "videoUrl"
+          : "imageUrl";
+
         handleChange({
-          target: { name: "imageUrl", value: generatedUrl },
-        }); // Update the URL in the promotion data
+          target: { name: fileType, value: generatedUrl },
+        });
       } catch (error) {
+        console.log(error.response?.data); // Log exact error
         console.error(
           "Error uploading file:",
           error.response?.data || error.message
         );
         alert("File upload failed. Please try again.");
+      }
+      finally {
+        setIsUploading(false); // Stop loader
       }
     }
   };
@@ -99,7 +117,7 @@ const Promotions = () => {
       return;
     }
     if (!editingPromotion && !previewUrl) {
-      toast.error("An image is required for new promotions.");
+      toast.error("An image/video is required for new promotions.");
       return;
     }
 
@@ -108,7 +126,8 @@ const Promotions = () => {
     } else {
       dispatch(createPromotion(newPromotion));
     }
-    setNewPromotion({ title: "", message: "", imageUrl: "" });
+    setNewPromotion({ title: "", message: "", imageUrl: "", videoUrl: "" });
+    setFile(null); // Reset file state
     setPreviewUrl(null);
     setOpen(false); // Close modal after submission
   };
@@ -127,6 +146,7 @@ const Promotions = () => {
       title: promotion.title,
       message: promotion.message,
       imageUrl: promotion.imageUrl,
+      videoUrl: promotion.videoUrl,
     });
     setOpen(true); // Open the modal for editing
   };
@@ -148,15 +168,33 @@ const Promotions = () => {
       width: "7%",
     },
     {
-      name: "Image",
-      cell: (row) =>
-        row?.imageUrl ? (
-          <img src={row.imageUrl} alt={row.title} width={100} height={100} />
+      name: "Image/Video",
+      cell: (row) => {
+        console.log("Row Data:", row); // Log the entire row data
+
+        return row?.imageUrl ? (
+          <img
+            src={row.imageUrl}
+            alt={row.title}
+            width={100}
+            height={100}
+            style={{ objectFit: "cover" }}
+          />
+        ) : row?.videoPromotion?.fileUrl ? ( // Ensure fileUrl exists inside videoPromotion
+          <video
+            src={row.videoPromotion.fileUrl}
+            controls
+            width={100}
+            height={100}
+            style={{ objectFit: "cover" }}
+          />
         ) : (
-          <p>No Image</p>
-        ),
+          <p>No Media</p>
+        );
+      },
       width: "10%",
     },
+
     {
       name: "Title",
       cell: (row) => <p>{row.title}</p>,
@@ -296,11 +334,12 @@ const Promotions = () => {
 
   const handleSend = async (row) => {
     const selectedRole = selectedRoles[row._id] || "All"; // Default to "All" if not set
-    const { title, message, imageUrl } = row;
+    const { title, message, imageUrl,videoPromotion } = row;
     const formData = {
       title,
       message,
       imageUrl,
+      videoPromotion,
       role: selectedRole !== "All" ? selectedRole : undefined, // Include role if not "All"
     };
 
@@ -339,8 +378,8 @@ const Promotions = () => {
                   ADD NEW Promotion
                 </Button>
               </div>
-
-              {/* Promotions Table */}
+              {isUploading && <p>Uploading file, please wait...</p>}
+             
               {loading ? (
                 <Loader />
               ) : error ? (
@@ -386,25 +425,39 @@ const Promotions = () => {
             />
             <Box mt={2}>
               <Typography variant="subtitle1" gutterBottom>
-                Upload Image:
+                Upload Image/Video:
               </Typography>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={handleFileChange}
                 style={{ marginBottom: 16 }}
               />
               {previewUrl && (
                 <Box mt={2} textAlign="center">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    style={{
-                      width: "100%",
-                      maxHeight: 200,
-                      objectFit: "contain",
-                    }}
-                  />
+                  {previewUrl.match(/\.(jpeg|jpg|png|gif)$/i) ? (
+                    <img
+                      src={previewUrl}
+                      alt="Preview"
+                      style={{
+                        width: "100%",
+                        maxHeight: 200,
+                        objectFit: "contain",
+                      }}
+                    />
+                  ) : previewUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+                    <video
+                      src={previewUrl}
+                      controls
+                      style={{
+                        width: "100%",
+                        maxHeight: 200,
+                        objectFit: "contain",
+                      }}
+                    />
+                  ) : (
+                    <p>Unsupported file format</p>
+                  )}
                 </Box>
               )}
             </Box>

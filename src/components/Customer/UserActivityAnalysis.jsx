@@ -13,11 +13,14 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  FormGroup,
   Paper,
   Table,
   TableBody,
@@ -33,6 +36,7 @@ import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { url } from "../../services/url.service";
 import axios from "axios";
+import { pink } from "@mui/material/colors";
 
 const UserActivityAnalysis = () => {
   const navigate = useNavigate();
@@ -48,6 +52,7 @@ const UserActivityAnalysis = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedUserName, setSelectedUserName] = useState(null);
   const [dialogType, setDialogType] = useState("");
+  const [filterZero, setFilterZero] = useState(false);
 
   const fieldMap = {
     totalReelsLikeCount: "reelsLikeCount",
@@ -66,6 +71,7 @@ const UserActivityAnalysis = () => {
           sortField,
           sortOrder,
           search: debouncedSearch,
+          filterZeroActivity: filterZero,
         },
       });
       setData(response.data.data);
@@ -78,7 +84,7 @@ const UserActivityAnalysis = () => {
 
   useEffect(() => {
     fetchData();
-  }, [search, page, sortField, sortOrder, debouncedSearch]);
+  }, [search, page, sortField, sortOrder, debouncedSearch, filterZero]);
 
   const handleSort = (column, direction) => {
     const mappedField = fieldMap[column.selector] || column.selector;
@@ -202,8 +208,6 @@ const UserActivityAnalysis = () => {
       ),
       width: "11%",
     },
-
-   
   ];
 
   return (
@@ -217,14 +221,35 @@ const UserActivityAnalysis = () => {
           }}
         >
           <h5 className="blue-1 m-0">Active Customer Analysis</h5>
-          <TextField
-            label="Search..."
-            variant="outlined"
-            value={search}
-            size="small"
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ marginBottom: "10px", width: "300px" }}
-          />
+
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={filterZero}
+                    onChange={(e) => setFilterZero(e.target.checked)}
+                    sx={{
+                      color: "#000000",
+                      "&.Mui-checked": {
+                        color: "#f0c6c6",
+                      },
+                    }}
+                  />
+                }
+                label="In-Active"
+              />
+            </FormGroup>
+
+            <TextField
+              label="Search..."
+              variant="outlined"
+              value={search}
+              size="small"
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ marginBottom: "10px", width: "300px" }}
+            />
+          </div>
         </div>
         <DataTable
           columns={columns}
@@ -245,7 +270,7 @@ const UserActivityAnalysis = () => {
             {
               when: (row) =>
                 row.reelsLikeCount === 0 &&
-              row.totalScannedCoupon === 0 &&
+                row.totalScannedCoupon === 0 &&
                 row.contestJoinCount === 0 &&
                 row.contestWinCount === 0,
               style: { backgroundColor: "#f0c6c6" },
@@ -312,4 +337,3 @@ const UserActivityAnalysis = () => {
 };
 
 export default UserActivityAnalysis;
-

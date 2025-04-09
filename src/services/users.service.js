@@ -25,6 +25,10 @@ export const getUser = (query) => {
   return axios.get(`${serverUrl}/getUsers${query}`);
 };
 
+export const getOnlineUsersCount = () => {
+  return axios.get(`${serverUrl}/getOnlineUsersCount`);
+};
+
 export const getAllUser = () => {
   return axios.get(`${serverUrl}/getAllUsers`);
 };

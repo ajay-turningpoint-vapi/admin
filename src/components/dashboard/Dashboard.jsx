@@ -41,7 +41,7 @@ import {
 } from "../../services/reels.service";
 import { getAllJoinedUserContest } from "../../services/contest.service";
 import { getProductsCount } from "../../services/product.service";
-import { WebSocketContext } from "../../App";
+
 
 ChartJS.register(
   ArcElement,
@@ -88,7 +88,7 @@ const aggregateAndSumDataByMonth = (data) => {
 };
 
 function Dashboard() {
-  const { messages } = useContext(WebSocketContext);
+
 
   const dispatch = useDispatch();
   const [dashboardData, setDashboardData] = useState({});
@@ -147,18 +147,8 @@ function Dashboard() {
     fetchAnalyticsData();
   }, []);
 
-  useEffect(() => {
-    if (messages.length > 0) {
-      console.log("Latest WebSocket Message:", messages[messages.length - 1]);
-    }
-  }, [messages]);
+ 
 
-  // useEffect(() => {
-  //   const latestMessage = messages[messages.length - 1]; // Get the latest WebSocket message
-  //   if (latestMessage?.type === "UPDATE_COUNTS") {
-  //     fetchDashboardCounts(); // Fetch new dashboard counts
-  //   }
-  // }, [messages]);
 
   const aggregatedData = useMemo(
     () => aggregateAndSumDataByMonth(userAnalytics),

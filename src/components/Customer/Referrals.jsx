@@ -3,23 +3,46 @@ import { userReferrals } from "../../services/users.service";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
 import { DashboardTable } from "../Utility/DashboardBox";
-import { Card, CardContent, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Modal,
+  Typography,
+} from "@mui/material";
+import { useEffect } from "react";
+import { useState } from "react";
 
 export default function Referrals() {
-  const [state, setState] = React.useState();
-  const [total, setTotal] = React.useState(0);
+  const [state, setState] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [selectedReferrals, setSelectedReferrals] = useState([]);
+
   const fetchData = async () => {
     try {
       const response = await userReferrals();
-      setState(response.data.usersReports);
-      setTotal(response.data.grandTotalRewardPointsEarned);
+      setState(response.data.usersReports || []);
+      setTotal(response.data.grandTotalRewardPointsEarned || 0);
     } catch (error) {
       console.error("Error:", error);
     }
   };
-  React.useEffect(() => {
+
+  useEffect(() => {
     fetchData();
   }, []);
+
+  const handleOpenModal = (referrals) => {
+    setSelectedReferrals(referrals || []);
+    setOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelectedReferrals([]);
+  };
 
   const columns = [
     {
@@ -29,38 +52,41 @@ export default function Referrals() {
       width: "5%",
     },
     {
-      name: "NAME",
-      cell: (row) => <p>{row.name}</p>,
-      width: "12%",
+      name: "Name",
+      cell: (row) => <p>{row.name || "N/A"}</p>,
+      width: "15%",
     },
     {
       name: "Phone",
-      cell: (row) => <p>{row.phone}</p>,
-      width: "10%",
+      cell: (row) => <p>{row.phone || "N/A"}</p>,
+      width: "15%",
     },
     {
       name: "Email",
-      cell: (row) => <p>{row.email}</p>,
-      width: "18%",
+      cell: (row) => <p>{row.email || "N/A"}</p>,
+      width: "20%",
     },
     {
-      name: "Rewards Count",
-      cell: (row) => <p>{row.referralRewardsTotal}</p>,
+      name: "Total Referrals",
+      cell: (row) => <p>{row.totalReferrals || 0}</p>,
       width: "10%",
     },
     {
-      name: "Applied Rewards Count",
-      cell: (row) => <p>{row.appliedRewardsTotal}</p>,
-      width: "13%",
-    },
-    {
-      name: "Pending Rewards Count",
-      cell: (row) => <p>{row.pendingRewardsTotal}</p>,
-      width: "13%",
+      name: "Referrals",
+      cell: (row) => (
+        <Button
+          variant="contained"
+          size="small"
+          onClick={() => handleOpenModal(row.referrals)}
+        >
+          View Referrals
+        </Button>
+      ),
+      width: "15%",
     },
     {
       name: "Total Reward Points Earned",
-      cell: (row) => <p>{row.totalRewardPointsEarned}</p>,
+      cell: (row) => <p>{row.totalRewardPointsEarned || 0}</p>,
       width: "15%",
     },
   ];
@@ -82,16 +108,50 @@ export default function Referrals() {
                 </Card>
               </div>
               <DashboardTable>
-                <DataTable
-                  columns={columns}
-                  data={state}
-                  pagination
-                ></DataTable>
+                <DataTable columns={columns} data={state} pagination />
               </DashboardTable>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Modal for Viewing Referrals */}
+      <Modal open={open} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+            width: 400,
+          }}
+        >
+          <Typography variant="h6" component="h2" gutterBottom>
+            Referral Details
+          </Typography>
+          {selectedReferrals.length > 0 ? (
+            selectedReferrals.map((ref, index) => (
+              <Typography key={index} variant="body1">
+                {index + 1}. {ref.name} ({ref.phone || "No Phone"})
+              </Typography>
+            ))
+          ) : (
+            <Typography>No Referrals</Typography>
+          )}
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+            onClick={handleCloseModal}
+          >
+            Close
+          </Button>
+        </Box>
+      </Modal>
     </main>
   );
 }

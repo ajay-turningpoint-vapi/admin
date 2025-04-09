@@ -27,7 +27,7 @@ export const getProductsCount = (query) => {
 
 
 export const getReedemableProducts = (query) => {
-  return axios.get(`${redeemableProductsUrl}/?${query}`);
+  return axios.get(`${redeemableProductsUrl}/admin?${query}`);
 }
 
 export const addReedemableProduct = (formData) => {

@@ -46,7 +46,7 @@ function UserContestDashboard() {
   const [viewMode, setViewMode] = useState("winners");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
-   const [debouncedSearch] = useDebounce(filter, 500);
+  const [debouncedSearch] = useDebounce(filter, 500);
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [isBlocked, setIsBlocked] = useState(false);
@@ -254,7 +254,12 @@ function UserContestDashboard() {
     <main>
       <section className="product-category" style={{ minHeight: "75vh" }}>
         <div className="container-fluid p-0">
-          <h5 className="blue-1 mb-4">Contest: ({`${userContArr?.data[0]?.contestObj.name}` ||"User Contest Dashboard"})</h5>
+          <h5 className="blue-1 mb-4">
+            Contest: (
+            {`${userContArr?.data[0]?.contestObj.name}` ||
+              "User Contest Dashboard"}
+            )
+          </h5>
           <div className="row mb-3">
             <div className="col-3 gap-2 mb-3">
               <div className="row mx-1">
@@ -330,7 +335,6 @@ function UserContestDashboard() {
                   style={{ width: "70%" }}
                   onChange={(e) => setFilter(e.target.value)}
                 />
-
               </div>
             )}
           </div>
@@ -343,8 +347,8 @@ function UserContestDashboard() {
                   <DataTable
                     columns={points_columns}
                     data={userContArr.data}
-                    expandableRows
-                    expandableRowsComponent={ExpandedComponent}
+                    // expandableRows
+                    // expandableRowsComponent={ExpandedComponent}
                   />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <Pagination

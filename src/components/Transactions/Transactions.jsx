@@ -1,3 +1,517 @@
+// import React, { useEffect, useState } from "react";
+// import DataTable from "react-data-table-component";
+// import CustomButton from "../Utility/Button";
+// import { useDispatch, useSelector } from "react-redux";
+// import {
+//   TRANSACTIONGet,
+//   TransactionUpdateStatus,
+// } from "../../redux/actions/Transcaction/Transaction.actions";
+// import { getById } from "../../services/users.service";
+// import { Modal, Box, Pagination } from "@mui/material";
+// import SearchBox from "../Utility/SearchBox";
+// import { DashboardBox, DashboardTable } from "../Utility/DashboardBox";
+// import { isDisabled } from "@testing-library/user-event/dist/utils";
+// import moment from "moment";
+// import Loader from "../Utility/Loader.jsx";
+
+// export const Transactions = () => {
+//   const dispatch = useDispatch();
+//   const [loading, setLoading] = useState(true);
+//   const [ModalBox, setModalBox] = useState(false);
+//   const [modalData, setModalData] = useState(null);
+//   const transactionArr = useSelector((state) => state.transaction.transaction);
+//   const transactionArrTotalPages = useSelector(
+//     (state) => state.transaction.totalPages
+//   );
+//   const [transactionAllArr, setTransactionAllArr] = useState([]);
+//   const [successTransactionArr, setSuccessUsersArr] = useState([]);
+//   const [pendingTransactionArr, setPendingTransactionArr] = useState([]);
+//   const [rejectTransactionArr, setRejectTransactionArr] = useState("");
+//   const [pageLimit, setPageLimit] = useState(10);
+//   const [page, setPage] = useState(1);
+//   const [status, setStatus] = useState("");
+//   const [reason, setReason] = useState("");
+//   const [search, setSearch] = useState("");
+//   const [statusFilter, setStatusFilter] = useState("");
+//   const [transactionId, setTransactionId] = useState("");
+//   const [startDate, setStartDate] = useState("");
+//   const [endDate, setEndDate] = useState("");
+
+//   useEffect(() => {
+//     handleGet();
+//   }, []);
+
+//   const handleGet = () => {
+//     setLoading(true);
+//     let query = "transactions=true";
+//     if (page) {
+//       query += `&page=${page}`;
+//     }
+//     if (pageLimit) {
+//       query += `&limit=${pageLimit}`;
+//     }
+//     if (search) {
+//       query += `&q=${search}`;
+//     }
+//     if (statusFilter) {
+//       query += `&status=${statusFilter}`;
+//     }
+
+//     if (startDate) {
+//       query += `&startDate=${startDate}`;
+//     }
+//     if (endDate) {
+//       query += `&endDate=${endDate}`;
+//     }
+
+//     query += `&sort=createdAt&order=desc`;
+
+//     dispatch(TRANSACTIONGet(query)).then(() => setLoading(false));
+//   };
+
+//   useEffect(() => {
+//     handleGet();
+//   }, [page, search, statusFilter, startDate, endDate]);
+
+//   const handleModalSet = async (e, row) => {
+//     e.preventDefault();
+//     setModalBox(true);
+//     try {
+//       setModalData(row);
+//       setStatus(row?.status);
+//       setReason(row?.reason ? row?.reason : "");
+//       setTransactionId(row?._id);
+//     } catch (err) {
+//       console.error(err.message);
+//       alert(err.message);
+//       setModalBox(false);
+//     }
+//   };
+
+//   const handleStatusUpdate = () => {
+//     try {
+//       let obj = { status, reason };
+
+//       dispatch(TransactionUpdateStatus(obj, transactionId)).then(() => {
+//         setModalBox(false);
+//         handleGet();
+//       });
+//     } catch (err) {
+//       console.error(err.message);
+//       alert(err.message);
+//       setModalBox(false);
+//     }
+//   };
+
+//   const transaction_columns = [
+//     {
+//       name: "ID",
+//       selector: (row, index) => (page - 1) * pageLimit + index + 1,
+//       sortable: true,
+//       width: "7%",
+//     },
+//     {
+//       name: "Transaction Id",
+//       cell: (row) => <p>{row.transactionId}</p>,
+//       sortable: true,
+//       width: "15%",
+//     },
+//     // { name: "Mobile", cell: (row) => <p>{row?.user?.phone} </p>, width: "10%" },
+//     // {
+//     //   name: "Transfer",
+//     //   selector: (row) => row?.additionalInfo?.transferType,
+//     //   width: "7%",
+//     // },
+//     {
+//       name: "Points",
+//       sortable: true,
+//       selector: (row) => row.amount,
+//       width: "10%",
+//     },
+//     {
+//       name: "Description",
+//       cell: (row) => (
+//         <p>
+//           {/\bdiamonds\b/i.test(row.description) ? "💎 " : ""}
+//           {row.description}
+//         </p>
+//       ),
+//       width: "40%",
+//     },
+
+//     {
+//       name: "Status",
+//       selector: (row) =>
+//         row.status === "success" ? (
+//           <CustomButton greenBtn btnName="Success" />
+//         ) : (
+//           <CustomButton redBtn btnName={row.status} />
+//         ),
+//       width: "10%",
+//     },
+//     {
+//       name: "Date Time",
+//       sortable: true,
+//       selector: (row) => `${moment(row.createdAt).format("DD-MM-YY, HH:mm")}`,
+//       width: "15%",
+//     },
+//     // {
+//     //   name: "Action",
+//     //   cell: (row) => (
+//     //     <CustomButton
+//     //       btntype="button"
+//     //       ClickEvent={(e) => handleModalSet(e, row)}
+//     //       isBtn
+//     //       iconName="fa-solid fa-check"
+//     //       btnName="View"
+//     //     />
+//     //   ),
+//     //   width: "10%",
+//     // },
+//   ];
+
+//   const [tabList, setTabList] = useState([
+//     { tabName: "All Transactions", status: "", active: true },
+//     { tabName: "Pending Transactions", status: "pending", active: false },
+//     { tabName: "Success Transactions", status: "success", active: false },
+//     { tabName: "Reject Transactions", status: "reject", active: false },
+//   ]);
+
+//   useEffect(() => {}, [transactionAllArr]);
+
+//   useEffect(() => {
+//     if (transactionArr) {
+//       let tempArr = transactionArr;
+//       setTransactionAllArr([...tempArr]);
+//       setSuccessUsersArr(tempArr.filter((el) => el.status === "success"));
+//       setPendingTransactionArr(tempArr.filter((el) => el.status === "pending"));
+//       setRejectTransactionArr(tempArr.filter((el) => el.status === "reject"));
+//     }
+//   }, [transactionArr, page, pageLimit]);
+
+//   const tabClick = (i, tabList, settabList) => {
+//     let temp = tabList.map((item, index) => {
+//       if (i === index) {
+//         item.active = true;
+//         setStatusFilter(item.status);
+//       } else {
+//         item.active = false;
+//       }
+//       return item;
+//     });
+//     settabList([...temp]);
+//   };
+
+//   const handlePageChange = (event, value) => {
+//     setLoading(true);
+//     setPage(value);
+//   };
+
+//   const handleGetTselectedTable = () => {
+//     let arr = [];
+//     if (tabList.find((el) => el.active).tabName === "All Transactions") {
+//       arr = transactionAllArr;
+//     } else if (
+//       tabList.find((el) => el.active).tabName === "Success Transactions"
+//     ) {
+//       arr = successTransactionArr;
+//     } else if (
+//       tabList.find((el) => el.active).tabName === "Reject Transactions"
+//     ) {
+//       arr = rejectTransactionArr;
+//     } else {
+//       arr = pendingTransactionArr;
+//     }
+//     return arr;
+//   };
+
+//   return (
+//     <main>
+//       <section className="product-category" style={{ minHeight: "75vh" }}>
+//         <div className="container-fluid p-0">
+//           <div className="row">
+//             <div className="col-12">
+//               <div className="d-flex align-items-center justify-content-between mb-4">
+//                 <h5 className="blue-1 m-0">Transactions</h5>
+//                 <div className="d-flex gap-3">
+//                   <ul className="dashboard-filter filters">
+//                     {tabList.map((item, i) => (
+//                       <li key={`${item.type}_${i}`}>
+//                         <CustomButton
+//                           navPills
+//                           btnName={item.tabName}
+//                           changeClass="filtering"
+//                           pillActive={item.active}
+//                           ClickEvent={() => tabClick(i, tabList, setTabList)}
+//                         />
+//                       </li>
+//                     ))}
+
+//                     <li>
+//                       {" "}
+//                       <input
+//                         className="form-control"
+//                         type={startDate ? "date" : "text"}
+//                         value={startDate}
+//                         style={{ width: "auto" }}
+//                         onChange={(e) => setStartDate(e.target.value)}
+//                         placeholder="Start Date"
+//                         onFocus={(e) => (e.target.type = "date")}
+//                       />{" "}
+//                     </li>
+//                     {/* End Date Selector */}
+//                     <li>
+//                       <input
+//                         className="form-control"
+//                         type={endDate ? "date" : "text"}
+//                         value={endDate}
+//                         style={{ width: "auto" }}
+//                         onChange={(e) => setEndDate(e.target.value)}
+//                         placeholder="End Date"
+//                         onFocus={(e) => (e.target.type = "date")}
+//                       />
+//                     </li>
+//                   </ul>
+//                   <div className="search-field">
+//                     <form action="#" className="form">
+//                       <div className="input-group bg-white">
+//                         <div className="input-group-text">
+//                           <i className="ion-ios-search-strong blue-1"></i>
+//                         </div>
+//                         <input
+//                           type="text"
+//                           className="form-control"
+//                           placeholder="Search"
+//                           onChange={(e) => setSearch(e.target.value)}
+//                         />
+//                       </div>
+//                     </form>
+//                   </div>
+//                 </div>
+//               </div>
+//               {loading ? (
+//                 <Loader />
+//               ) : (
+//                 <DashboardTable>
+//                   <DataTable
+//                     columns={transaction_columns}
+//                     data={handleGetTselectedTable()}
+//                   />
+//                   <div className="d-flex align-items-center justify-content-between mt-4">
+//                     <h5 className="blue-1 m-0"></h5>
+//                     <Pagination
+//                       count={transactionArrTotalPages}
+//                       onChange={handlePageChange}
+//                       page={page}
+//                       showFirstButton
+//                       showLastButton
+//                     />
+//                   </div>
+//                 </DashboardTable>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+//       </section>
+
+//       <Modal
+//         open={ModalBox}
+//         onClose={() => setModalBox(false)}
+//         aria-labelledby="modal-modal-title"
+//         aria-describedby="modal-modal-description"
+//       >
+//         <Box className="modal-box customer-modal">
+//           <div className="modal-container" style={{ width: 600 }}>
+//             <div className="modal-header">
+//               <h5>Transaction</h5>
+//               <CustomButton
+//                 isBtn
+//                 btntype="button"
+//                 iconName="ion-close-circled text-white"
+//                 changeClass="border-0 bg-transparent rounded-circle modal-close"
+//                 ClickEvent={(e) => {
+//                   e.preventDefault();
+//                   setModalBox(false);
+//                 }}
+//               />
+//             </div>
+//             <div className="modal-body">
+//               <section className="product-category">
+//                 <div className="container-fluid p-0">
+//                   {modalData && (
+//                     <DashboardBox className="mb-5">
+//                       <h5 className="blue-1 mb-4">Customer Profile</h5>
+//                       <div className="row">
+//                         <div className="col-12 col-md-12">
+//                           <div className="customer-profile">
+//                             <h6 className="blue-1 text-capitalize my-3">
+//                               {modalData?.user?.firstName}
+//                             </h6>
+//                             <ul className="blue-1 fs-14">
+//                               <li>
+//                                 <span className="fw-600">
+//                                   Name <span>:</span>
+//                                 </span>
+//                                 {modalData?.user?.name}
+//                               </li>
+//                               <li>
+//                                 <span className="fw-600">
+//                                   Email <span>:</span>
+//                                 </span>
+//                                 {modalData?.user?.email}
+//                               </li>
+//                               <li>
+//                                 <span className="fw-600">
+//                                   Phone <span>:</span>
+//                                 </span>
+//                                 {modalData?.user?.phone}
+//                               </li>
+//                               {modalData.additionalInfo?.transferDetails
+//                                 ?.couponCode && (
+//                                 <li>
+//                                   <span className="fw-600">
+//                                     Coupon Code <span>:</span>
+//                                   </span>
+//                                   {
+//                                     modalData.additionalInfo?.transferDetails
+//                                       ?.couponCode
+//                                   }
+//                                 </li>
+//                               )}
+//                             </ul>
+//                           </div>
+//                         </div>
+//                       </div>
+//                       <h5 className="blue-1 my-4">Transaction Information</h5>
+//                       <div className="row">
+//                         <div className="col-12 col-md-12">
+//                           <div>
+//                             <ul className="blue-1 fs-14">
+//                               {modalData.additionalInfo && (
+//                                 <>
+//                                   <li>
+//                                     <span className="fw-600">
+//                                       TransferType <span>:</span>
+//                                     </span>
+//                                     {modalData.additionalInfo?.transferType}
+//                                   </li>
+//                                   {(() => {
+//                                     switch (
+//                                       modalData.additionalInfo?.transferType
+//                                     ) {
+//                                       case "CASH":
+//                                         return null;
+//                                       case "BANK":
+//                                         return (
+//                                           <>
+//                                             <span className="fw-600">
+//                                               Bank :{" "}
+//                                               {
+//                                                 modalData.additionalInfo
+//                                                   ?.transferDetails?.bank
+//                                               }
+//                                             </span>
+//                                             <br />
+//                                             <span className="fw-600">
+//                                               Account No :{" "}
+//                                               {
+//                                                 modalData.additionalInfo
+//                                                   ?.transferDetails?.accountNo
+//                                               }
+//                                             </span>
+//                                             <br />
+//                                             <span className="fw-600">
+//                                               Account Name :{" "}
+//                                               {
+//                                                 modalData.additionalInfo
+//                                                   ?.transferDetails?.accountName
+//                                               }
+//                                             </span>
+//                                             <br />
+//                                             <span className="fw-600">
+//                                               IFSC Code :{" "}
+//                                               {
+//                                                 modalData.additionalInfo
+//                                                   ?.transferDetails?.ifsc
+//                                               }
+//                                             </span>
+//                                             <br />
+//                                           </>
+//                                         );
+//                                       case "UPI":
+//                                         return (
+//                                           <span className="fw-600">
+//                                             UPI Id :{" "}
+//                                             {
+//                                               modalData.additionalInfo
+//                                                 ?.transferDetails?.upiId
+//                                             }
+//                                           </span>
+//                                         );
+//                                       default:
+//                                         return null;
+//                                     }
+//                                   })()}
+//                                   <li>
+//                                     <span className="fw-600">
+//                                       Tranfer Information <span>:</span>
+//                                     </span>
+//                                     {modalData?.user?.email}
+//                                   </li>
+//                                   <li>
+//                                     <span className="fw-600">
+//                                       Update Status <span>:</span>
+//                                     </span>
+//                                     {modalData?.status}
+//                                     <select
+//                                       className="form-control my-2"
+//                                       value={status}
+//                                       onChange={(e) =>
+//                                         setStatus(e.target.value)
+//                                       }
+//                                     >
+//                                       <option>Select Status</option>
+//                                       <option value="success">Success</option>
+//                                       <option value="reject">Reject</option>
+//                                     </select>
+//                                   </li>
+//                                   <li>
+//                                     <span className="fw-600">
+//                                       Reason <span>:</span>
+//                                     </span>
+//                                     {modalData?.reason}
+//                                     <input
+//                                       value={reason}
+//                                       className="form-control mb-3"
+//                                       onChange={(e) =>
+//                                         setReason(e.target.value)
+//                                       }
+//                                     />
+//                                   </li>
+//                                   <button
+//                                     className="btn btn-success"
+//                                     onClick={handleStatusUpdate}
+//                                   >
+//                                     Update
+//                                   </button>
+//                                 </>
+//                               )}
+//                             </ul>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </DashboardBox>
+//                   )}
+//                 </div>
+//               </section>
+//             </div>
+//           </div>
+//         </Box>
+//       </Modal>
+//     </main>
+//   );
+// };
+
 import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
@@ -12,7 +526,7 @@ import SearchBox from "../Utility/SearchBox";
 import { DashboardBox, DashboardTable } from "../Utility/DashboardBox";
 import { isDisabled } from "@testing-library/user-event/dist/utils";
 import moment from "moment";
-import Loader from "../Utility/Loader.jsx";
+import { useDebounce } from "use-debounce";
 
 export const Transactions = () => {
   const dispatch = useDispatch();
@@ -26,42 +540,56 @@ export const Transactions = () => {
   const [transactionAllArr, setTransactionAllArr] = useState([]);
   const [successTransactionArr, setSuccessUsersArr] = useState([]);
   const [pendingTransactionArr, setPendingTransactionArr] = useState([]);
+
   const [rejectTransactionArr, setRejectTransactionArr] = useState("");
   const [pageLimit, setPageLimit] = useState(10);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("");
   const [reason, setReason] = useState("");
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebounce(search, 500);
   const [statusFilter, setStatusFilter] = useState("");
   const [transactionId, setTransactionId] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
     handleGet();
   }, []);
 
   const handleGet = () => {
-    setLoading(true);
     let query = "transactions=true";
     if (page) {
       query += `&page=${page}`;
     }
+
     if (pageLimit) {
       query += `&limit=${pageLimit}`;
     }
-    if (search) {
-      query += `&q=${search}`;
+    if (debouncedSearch) {
+      query += `&q=${debouncedSearch}`;
     }
     if (statusFilter) {
       query += `&status=${statusFilter}`;
     }
-    query += `&sort=createdAt&order=desc`;
 
+    if (startDate) {
+      query += `&startDate=${startDate}`;
+    }
+    if (endDate) {
+      query += `&endDate=${endDate}`;
+    }
+    // if (statusFilter) {
+    query += `&sort=createdAt`;
+    query += `&order=desc`;
+    // }
+    console.log("GET CALLED", query);
     dispatch(TRANSACTIONGet(query)).then(() => setLoading(false));
   };
 
   useEffect(() => {
     handleGet();
-  }, [page, search, statusFilter]);
+  }, [page, debouncedSearch, statusFilter, startDate, endDate]);
 
   const handleModalSet = async (e, row) => {
     e.preventDefault();
@@ -72,104 +600,154 @@ export const Transactions = () => {
       setReason(row?.reason ? row?.reason : "");
       setTransactionId(row?._id);
     } catch (err) {
-      console.error(err.message);
-      alert(err.message);
+      if (err.response.data.message) {
+        console.error(err.response.data.message);
+        alert(err.response.data.message);
+      } else {
+        console.error(err.message);
+        alert(err.message);
+      }
+
       setModalBox(false);
     }
   };
 
   const handleStatusUpdate = () => {
-    try {
-      let obj = { status, reason };
+    if (!status) {
+      alert("Please select a status.");
+      return;
+    }
 
-      dispatch(TransactionUpdateStatus(obj, transactionId)).then(() => {
-        setModalBox(false);
-        handleGet();
-      });
+    if ((status === "reject" || status === "delivered") && !reason.trim()) {
+      alert(`Please provide a reason for ${status}.`);
+      return;
+    }
+
+    if (status === modalData?.status) {
+      alert("The selected status is already set. No update needed.");
+      return;
+    }
+
+    try {
+      let obj = {
+        status: status,
+        reason,
+      };
+
+      dispatch(TransactionUpdateStatus(obj, transactionId));
+      setModalBox(false);
+      handleGet();
     } catch (err) {
-      console.error(err.message);
-      alert(err.message);
+      if (err.response.data.message) {
+        console.error(err.response.data.message);
+        alert(err.response.data.message);
+      } else {
+        console.error(err.message);
+        alert(err.message);
+      }
+
       setModalBox(false);
     }
   };
 
   const transaction_columns = [
     {
-      name: "ID",
-      selector: (row, index) => (page - 1) * pageLimit + index + 1,
-      sortable: true,
-      width: "7%",
-    },
-    {
       name: "Transaction Id",
       cell: (row) => <p>{row.transactionId}</p>,
+
       sortable: true,
-      width: "15%",
+      width: "12%",
     },
-    // { name: "Mobile", cell: (row) => <p>{row?.user?.phone} </p>, width: "10%" },
-    // {
-    //   name: "Transfer",
-    //   selector: (row) => row?.additionalInfo?.transferType,
-    //   width: "7%",
-    // },
     {
-      name: "Points",
-      sortable: true,
-      selector: (row) => row.amount,
+      name: "Mobile",
+      cell: (row) => <p>{row?.user?.phone} </p>,
       width: "10%",
+    },
+
+    {
+      name: "Amount",
+      selector: (row) => row.amount,
+      width: "7%",
     },
     {
       name: "Description",
       cell: (row) => <p>{row.description}</p>,
-      width: "40%",
+      width: "35%",
     },
     {
       name: "Status",
       selector: (row) =>
-        row.status === "success" ? (
+        row.status == "success"   ? (
           <CustomButton greenBtn btnName="Success" />
         ) : (
           <CustomButton redBtn btnName={row.status} />
         ),
       width: "10%",
     },
+
     {
       name: "Date Time",
-      sortable: true,
       selector: (row) => `${moment(row.createdAt).format("DD-MM-YY, HH:mm")}`,
       width: "15%",
     },
-    // {
-    //   name: "Action",
-    //   cell: (row) => (
-    //     <CustomButton
-    //       btntype="button"
-    //       ClickEvent={(e) => handleModalSet(e, row)}
-    //       isBtn
-    //       iconName="fa-solid fa-check"
-    //       btnName="View"
-    //     />
-    //   ),
-    //   width: "10%",
-    // },
+
+    {
+      name: "Action",
+      cell: (row) => (
+        <>
+          <CustomButton
+            btntype="button"
+            ClickEvent={(e) => handleModalSet(e, row)}
+            isBtn
+            iconName="fa-solid fa-check"
+            btnName="View"
+          />
+        </>
+      ),
+      width: "10%",
+    },
   ];
 
   const [tabList, setTabList] = useState([
-    { tabName: "All Transactions", status: "", active: true },
-    { tabName: "Pending Transactions", status: "pending", active: false },
-    { tabName: "Success Transactions", status: "success", active: false },
-    { tabName: "Reject Transactions", status: "reject", active: false },
+    {
+      tabName: "All Transactions",
+      status: "",
+      active: true,
+    },
+    {
+      tabName: "Pending",
+      status: "pending",
+      active: false,
+    },
+    {
+      tabName: "Success",
+      status: "success",
+      active: false,
+    },
+    {
+      tabName: "Delivered",
+      status: "delivered",
+      active: false,
+    },
+    {
+      tabName: "Reject",
+      status: "reject",
+      active: false,
+    },
   ]);
 
-  useEffect(() => {}, [transactionAllArr]);
+  useEffect(() => {
+    console.log(transactionAllArr, "transactionAllArr");
+  }, [transactionAllArr]);
 
   useEffect(() => {
     if (transactionArr) {
       let tempArr = transactionArr;
       setTransactionAllArr([...tempArr]);
-      setSuccessUsersArr(tempArr.filter((el) => el.status === "success"));
-      setPendingTransactionArr(tempArr.filter((el) => el.status === "pending"));
-      setRejectTransactionArr(tempArr.filter((el) => el.status === "reject"));
+      setSuccessUsersArr(tempArr.filter((el) => el.status == "success"));
+      setPendingTransactionArr(tempArr.filter((el) => el.status == "pending"));
+
+      setRejectTransactionArr(tempArr.filter((el) => el.status == "reject"));
     }
   }, [transactionArr, page, pageLimit]);
 
@@ -177,35 +755,42 @@ export const Transactions = () => {
     let temp = tabList.map((item, index) => {
       if (i === index) {
         item.active = true;
+        // if (item.status) {
         setStatusFilter(item.status);
+        // }
       } else {
         item.active = false;
       }
+
       return item;
     });
+
     settabList([...temp]);
   };
-
   const handlePageChange = (event, value) => {
-    setLoading(true);
     setPage(value);
   };
 
   const handleGetTselectedTable = () => {
     let arr = [];
-    if (tabList.find((el) => el.active).tabName === "All Transactions") {
+    if (tabList.filter((el) => el.active)[0].tabName == "All Transactions") {
       arr = transactionAllArr;
     } else if (
-      tabList.find((el) => el.active).tabName === "Success Transactions"
+      tabList.filter((el) => el.active)[0].tabName == "Success Transactions"
     ) {
       arr = successTransactionArr;
     } else if (
-      tabList.find((el) => el.active).tabName === "Reject Transactions"
+      tabList.filter((el) => el.active)[0].tabName == "Reject Transactions"
     ) {
       arr = rejectTransactionArr;
     } else {
       arr = pendingTransactionArr;
     }
+    console.log(
+      transactionAllArr.map((el) => el.status),
+      arr.map((el) => el.status),
+      tabList.filter((el) => el.active)[0].tabName == "All Transactions"
+    );
     return arr;
   };
 
@@ -219,18 +804,45 @@ export const Transactions = () => {
                 <h5 className="blue-1 m-0">Transactions</h5>
                 <div className="d-flex gap-3">
                   <ul className="dashboard-filter filters">
-                    {tabList.map((item, i) => (
-                      <li key={`${item.type}_${i}`}>
-                        <CustomButton
-                          navPills
-                          btnName={item.tabName}
-                          changeClass="filtering"
-                          pillActive={item.active}
-                          ClickEvent={() => tabClick(i, tabList, setTabList)}
-                        />
-                      </li>
-                    ))}
+                    {tabList.map((item, i) => {
+                      return (
+                        <li key={`${item.type}_${i}`}>
+                          <CustomButton
+                            navPills
+                            btnName={item.tabName}
+                            changeClass="filtering"
+                            pillActive={item.active ? true : false}
+                            ClickEvent={() => tabClick(i, tabList, setTabList)}
+                          />
+                        </li>
+                      );
+                    })}
+
+                    <li>
+                      <input
+                        className="form-control"
+                        type={startDate ? "date" : "text"}
+                        value={startDate}
+                        style={{ width: "auto" }}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        placeholder="Start Date"
+                        onFocus={(e) => (e.target.type = "date")}
+                      />{" "}
+                    </li>
+                    {/* End Date Selector */}
+                    <li>
+                      <input
+                        className="form-control"
+                        type={endDate ? "date" : "text"}
+                        value={endDate}
+                        style={{ width: "auto" }}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        placeholder="End Date"
+                        onFocus={(e) => (e.target.type = "date")}
+                      />
+                    </li>
                   </ul>
+
                   <div className="search-field">
                     <form action="#" className="form">
                       <div className="input-group bg-white">
@@ -241,32 +853,33 @@ export const Transactions = () => {
                           type="text"
                           className="form-control"
                           placeholder="Search"
-                          onChange={(e) => setSearch(e.target.value)}
+                          onChange={(e) => {
+                            setSearch(e.target.value);
+                          }}
                         />
                       </div>
                     </form>
                   </div>
                 </div>
               </div>
-              {loading ? (
-                <Loader />
-              ) : (
+              {transactionArr ? (
                 <DashboardTable>
                   <DataTable
                     columns={transaction_columns}
-                    data={handleGetTselectedTable()}
+                    data={transactionArr?.length ? transactionArr : []}
                   />
                   <div className="d-flex align-items-center justify-content-between mt-4">
                     <h5 className="blue-1 m-0"></h5>
                     <Pagination
                       count={transactionArrTotalPages}
                       onChange={handlePageChange}
-                      page={page}
                       showFirstButton
                       showLastButton
                     />
                   </div>
                 </DashboardTable>
+              ) : (
+                "Loading..."
               )}
             </div>
           </div>
@@ -299,20 +912,14 @@ export const Transactions = () => {
                 <div className="container-fluid p-0">
                   {modalData && (
                     <DashboardBox className="mb-5">
-                      <h5 className="blue-1 mb-4">Customer Profile</h5>
+                      <h5 className="blue-1 mb-4">Redeem Request By</h5>
                       <div className="row">
                         <div className="col-12 col-md-12">
                           <div className="customer-profile">
                             <h6 className="blue-1 text-capitalize my-3">
-                              {modalData?.user?.firstName}
+                              {modalData?.user?.name}
                             </h6>
                             <ul className="blue-1 fs-14">
-                              <li>
-                                <span className="fw-600">
-                                  Name <span>:</span>
-                                </span>
-                                {modalData?.user?.name}
-                              </li>
                               <li>
                                 <span className="fw-600">
                                   Email <span>:</span>
@@ -325,134 +932,90 @@ export const Transactions = () => {
                                 </span>
                                 {modalData?.user?.phone}
                               </li>
-                              {modalData.additionalInfo?.transferDetails
-                                ?.couponCode && (
-                                <li>
-                                  <span className="fw-600">
-                                    Coupon Code <span>:</span>
-                                  </span>
-                                  {
-                                    modalData.additionalInfo?.transferDetails
-                                      ?.couponCode
-                                  }
-                                </li>
-                              )}
                             </ul>
                           </div>
                         </div>
                       </div>
-                      <h5 className="blue-1 my-4">Transaction Information</h5>
+                      <h5 className="blue-1 my-4">
+                        Product Redeem Information
+                      </h5>
                       <div className="row">
                         <div className="col-12 col-md-12">
                           <div>
                             <ul className="blue-1 fs-14">
                               {modalData.additionalInfo && (
                                 <>
-                                  <li>
-                                    <span className="fw-600">
-                                      TransferType <span>:</span>
+                                  <li className="d-flex align-items-center mb-2">
+                                    <span className="fw-600 me-2">
+                                      Product Name:
                                     </span>
-                                    {modalData.additionalInfo?.transferType}
+                                    <span>{modalData?.product?.name}</span>
                                   </li>
-                                  {(() => {
-                                    switch (
-                                      modalData.additionalInfo?.transferType
-                                    ) {
-                                      case "CASH":
-                                        return null;
-                                      case "BANK":
-                                        return (
-                                          <>
-                                            <span className="fw-600">
-                                              Bank :{" "}
-                                              {
-                                                modalData.additionalInfo
-                                                  ?.transferDetails?.bank
-                                              }
-                                            </span>
-                                            <br />
-                                            <span className="fw-600">
-                                              Account No :{" "}
-                                              {
-                                                modalData.additionalInfo
-                                                  ?.transferDetails?.accountNo
-                                              }
-                                            </span>
-                                            <br />
-                                            <span className="fw-600">
-                                              Account Name :{" "}
-                                              {
-                                                modalData.additionalInfo
-                                                  ?.transferDetails?.accountName
-                                              }
-                                            </span>
-                                            <br />
-                                            <span className="fw-600">
-                                              IFSC Code :{" "}
-                                              {
-                                                modalData.additionalInfo
-                                                  ?.transferDetails?.ifsc
-                                              }
-                                            </span>
-                                            <br />
-                                          </>
-                                        );
-                                      case "UPI":
-                                        return (
-                                          <span className="fw-600">
-                                            UPI Id :{" "}
-                                            {
-                                              modalData.additionalInfo
-                                                ?.transferDetails?.upiId
-                                            }
-                                          </span>
-                                        );
-                                      default:
-                                        return null;
-                                    }
-                                  })()}
-                                  <li>
-                                    <span className="fw-600">
-                                      Tranfer Information <span>:</span>
+
+                                  <li className="d-flex align-items-center mb-2">
+                                    <span className="fw-600 me-2">
+                                      Diamond Cost:
                                     </span>
-                                    {modalData?.user?.email}
+                                    <span>{modalData?.product?.diamond}</span>
                                   </li>
-                                  <li>
-                                    <span className="fw-600">
-                                      Update Status <span>:</span>
+
+                                  <li className="d-flex align-items-center mb-2">
+                                    <span className="fw-600 me-2">
+                                      Product Image:
                                     </span>
-                                    {modalData?.status}
-                                    <select
-                                      className="form-control my-2"
-                                      value={status}
-                                      onChange={(e) =>
-                                        setStatus(e.target.value)
-                                      }
+                                    <div>
+                                      <img
+                                        src={modalData?.product?.image}
+                                        alt={modalData?.product?.name}
+                                        className="img-thumbnail"
+                                        style={{
+                                          width: "100px",
+                                          height: "100px",
+                                          objectFit: "cover",
+                                          borderRadius: "8px",
+                                        }}
+                                      />
+                                    </div>
+                                  </li>
+
+                                  <>
+                                    <li>
+                                      <span className="fw-600">Status :</span>
+
+                                      <select
+                                        className="form-control my-2"
+                                        value={status}
+                                        onChange={(e) =>
+                                          setStatus(e.target.value)
+                                        }
+                                      >
+                                        <option>Select Status</option>
+                                        <option value="delivered">
+                                          Delivered
+                                        </option>
+                                        <option value="reject">Reject</option>
+                                      </select>
+                                    </li>
+                                    <li>
+                                      <span className="fw-600">Reason :</span>
+
+                                      <input
+                                        value={reason}
+                                        className="form-control mb-3"
+                                        onChange={(e) =>
+                                          setReason(e.target.value)
+                                        }
+                                      />
+                                    </li>
+                                    <button
+                                      className="btn btn-success"
+                                      onClick={handleStatusUpdate}
                                     >
-                                      <option>Select Status</option>
-                                      <option value="success">Success</option>
-                                      <option value="reject">Reject</option>
-                                    </select>
-                                  </li>
-                                  <li>
-                                    <span className="fw-600">
-                                      Reason <span>:</span>
-                                    </span>
-                                    {modalData?.reason}
-                                    <input
-                                      value={reason}
-                                      className="form-control mb-3"
-                                      onChange={(e) =>
-                                        setReason(e.target.value)
-                                      }
-                                    />
-                                  </li>
-                                  <button
-                                    className="btn btn-success"
-                                    onClick={handleStatusUpdate}
-                                  >
-                                    Update
-                                  </button>
+                                      Update
+                                    </button>
+                                  </>
+                                  {/* )
+                                  } */}
                                 </>
                               )}
                             </ul>

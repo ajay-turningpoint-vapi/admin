@@ -27,6 +27,7 @@ import {
   blockUser,
   getAllContractors,
   getNotesByUser,
+  getOnlineUsersCount,
   updateUserKycStatus,
   updateUserProfileAdmin,
   updateUserStatus,
@@ -55,6 +56,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 function Customer() {
   const dispatch = useDispatch();
+  const [onlineCount, setOnlineCount] = useState(0);
   const [openAddNote, setOpenAddNote] = useState(false);
   const [addScheduler, setAddScheduler] = useState(false);
   const [selectedAction, setSelectedAction] = useState("");
@@ -89,7 +91,18 @@ function Customer() {
   const fetchData = async () => {
     try {
       const response = await getAllContractors();
+
       setAllContractor(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const fetchOnlineUserCount = async () => {
+    try {
+      const response = await getOnlineUsersCount();
+
+      setOnlineCount(response.data?.onlineUsers);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -124,6 +137,7 @@ function Customer() {
 
   useEffect(() => {
     handleGetAllUsers();
+    fetchOnlineUserCount();
   }, [
     debouncedSearch,
     page,
@@ -586,12 +600,18 @@ function Customer() {
                   <div
                     style={{
                       backgroundColor: "#c6efce",
-                      width: "50px",
+                      width: "70px",
                       height: "20px",
                       marginLeft: "10px",
+                      display: "flex",
+                      justifyContent: "center", // Centers horizontally
+                      alignItems: "center", // Centers vertically
                     }}
-                  ></div>
+                  >
+                    {onlineCount}
+                  </div>
                 </div>
+
                 <label>KYC</label>
                 <select
                   className="form-control"
