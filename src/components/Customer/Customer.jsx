@@ -411,7 +411,10 @@ function Customer() {
       name: "NAME",
       cell: (row) => (
         <p>
-          {row.isVerified && <VerifiedIcon style={{ marginRight: "5px" }} />}
+          {row.isVerified && <VerifiedIcon style={{
+            marginRight: "5px",
+            color: "#24C47B",
+          }} />}
           {row.name}
         </p>
       ),
@@ -934,8 +937,8 @@ function Customer() {
                         <span>
                           {selectedData?.isActiveDate
                             ? moment(selectedData.isActiveDate).format(
-                                "DD-MM-YYYY hh:mm A"
-                              )
+                              "DD-MM-YYYY hh:mm A"
+                            )
                             : "N/A"}
                         </span>
                       </li>
@@ -1179,7 +1182,7 @@ function Customer() {
                           <span>
                             {selectedData?.kycStatus
                               ? selectedData.kycStatus.charAt(0).toUpperCase() +
-                                selectedData.kycStatus.slice(1)
+                              selectedData.kycStatus.slice(1)
                               : "No Status"}
                           </span>
                         )}
