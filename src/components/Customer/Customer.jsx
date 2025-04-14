@@ -15,7 +15,7 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
 import { DashboardTable } from "../Utility/DashboardBox";
@@ -56,6 +56,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 function Customer() {
   const dispatch = useDispatch();
+  const callCount = useRef(0);
   const [onlineCount, setOnlineCount] = useState(0);
   const [openAddNote, setOpenAddNote] = useState(false);
   const [addScheduler, setAddScheduler] = useState(false);
@@ -117,6 +118,9 @@ function Customer() {
   }, [selectedData]);
 
   const handleGetAllUsers = () => {
+    callCount.current += 1;
+    console.log(`handleGetAllUsers called ${callCount.current} times`);
+
     const params = new URLSearchParams();
     if (debouncedSearch) params.append("search", debouncedSearch);
     if (page) params.append("page", page);
@@ -167,11 +171,10 @@ function Customer() {
 
   const handleSort = (column, direction) => {
     if (!column?.selector) {
-      console.warn("Sorting triggered with an undefined column!");
       setSortBy("createdAt");
       return;
     }
-    console.log("Sorting triggered:", column.selector, direction);
+
     setSortBy(column.selector);
     setSortOrder(direction);
   };
@@ -179,7 +182,6 @@ function Customer() {
   const fetchNotesofUser = async (userId) => {
     try {
       const response = await getNotesByUser(userId);
-      console.log("response1", response.data);
 
       setUserNote(response.data);
     } catch (error) {
@@ -188,8 +190,6 @@ function Customer() {
   };
 
   const handleEditChange = (field, value, bankIndex = null) => {
-    console.log("handleEditChange called with:", field, value);
-
     setEditedData((prev) => {
       if (bankIndex !== null) {
         const updatedBankDetails = [...prev.bankDetails];
@@ -223,8 +223,6 @@ function Customer() {
       // Prepare user update data
       const { _id: userId, role, ...otherFields } = editedData;
 
-      console.log("editedData", editedData);
-
       const dataToSend = {
         userId,
         role,
@@ -242,11 +240,12 @@ function Customer() {
 
       if (userUpdateResponse?.data && noteResponse) {
         toast.success("Changes saved successfully");
-        handleGetAllUsers();
+
         setNote(""); // Clear the note after saving
         setEditedData({});
         setIsEditMode(false);
         setDialogOpen(false);
+        handleGetAllUsers();
       }
     } catch (error) {
       console.error("Error saving changes:", error);
@@ -278,8 +277,8 @@ function Customer() {
     if (result.isConfirmed) {
       setSelectedUser({ userId: id, isActive: value });
 
+      setOpenAddNote(true);
       setSelectedUserId(id);
-      setOpenAddNote(true); // Open AddNote dialog
     }
   };
 
@@ -303,14 +302,48 @@ function Customer() {
     }
   };
 
+  // const handleNoteSubmit = async () => {
+  //   if (!selectedUser) return;
+
+  //   try {
+  //     handleGetAllUsers();
+  //     setOpenAddNote(false);
+  //     setSelectedUser(null);
+  //     setSelectedAction("");
+  //   } catch (err) {
+  //     console.error(err.response?.data?.message || err.message);
+  //     alert(err.response?.data?.message || err.message);
+  //   }
+  // };
+
   const handleNoteSubmit = async () => {
     if (!selectedUser) return;
 
     try {
-      handleGetAllUsers();
+      // Simulate update (you may call an API here if needed)
+
+      // Update local user list to reflect the change
+      setUsersArr((prevUsers) =>
+        prevUsers.map((user) => {
+          if (user._id === selectedUser.userId) {
+            return {
+              ...user,
+              ...(selectedAction === "blockedActivity"
+                ? { isBlocked: selectedUser.isBlocked }
+                : { isActive: selectedUser.isActive }),
+            };
+          }
+          return user;
+        })
+      );
+
+      // Clear and close note dialog
       setOpenAddNote(false);
       setSelectedUser(null);
       setSelectedAction("");
+
+      // You can still call handleGetAllUsers if necessary
+      // handleGetAllUsers(); // Optional, for sync with backend
     } catch (err) {
       console.error(err.response?.data?.message || err.message);
       alert(err.response?.data?.message || err.message);
@@ -564,7 +597,10 @@ function Customer() {
             <Button
               onClick={() => setAddScheduler((prev) => !prev)}
               sx={{
-                backgroundColor: "black",
+                backgroundColor: (theme) =>
+                  addScheduler
+                    ? theme.palette.error.main
+                    : theme.palette.primary.main, // Use error color when "Close Scheduler"
                 color: "white",
                 borderRadius: "50px", // Pill shape
                 height: "35px", // Set height
@@ -572,7 +608,10 @@ function Customer() {
                 padding: "0 20px", // Adjust padding (no vertical padding)
                 fontSize: "10px", // Adjust font size to fit within 15px height
                 "&:hover": {
-                  backgroundColor: "#333", // Slightly lighter black on hover
+                  backgroundColor: (theme) =>
+                    addScheduler
+                      ? theme.palette.error.dark
+                      : theme.palette.primary.dark, // Darker shade on hover based on state
                 },
               }}
             >

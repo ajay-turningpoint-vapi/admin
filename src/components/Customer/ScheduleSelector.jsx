@@ -193,6 +193,10 @@ const ScheduleSelector = () => {
         autoHideDuration={3000}
         onClose={() => setSnackbar({ open: false, message: "" })}
         message={snackbar.message}
+        anchorOrigin={{
+          vertical: 'top', // Position it at the top
+          horizontal: 'center', // Center it horizontally
+        }}
       />
     </div>
   );

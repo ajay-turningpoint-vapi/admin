@@ -37,9 +37,7 @@ export const GET_ACTIVE_COUPONS = "GET_ACTIVE_COUPONS";
 export const GET_ACTIVE_COUPONS_SUCCESS = "GET_ACTIVE_COUPONS_SUCCESS";
 export const GET_ACTIVE_COUPONS_FAIL = "GET_ACTIVE_COUPONS_FAIL";
 
-
 export const COUPONGetActive = (formData, navigate) => async (dispatch) => {
-
   try {
     // Dispatch action to indicate that we're fetching the active coupons
     dispatch({ type: GET_ACTIVE_COUPONS });
@@ -55,6 +53,7 @@ export const COUPONGetActive = (formData, navigate) => async (dispatch) => {
           totalPages: response.totalPages, // Ensure totalPages is returned from the API
         },
       });
+
       navigate("/Coupon/ViewCoupons");
     }
   } catch (err) {

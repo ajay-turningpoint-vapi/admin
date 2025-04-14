@@ -24,6 +24,35 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import Loader from "../Utility/Loader.jsx";
 import { url } from "../../services/url.service.js";
+import jsPDF from "jspdf";
+import QRCode from "qrcode";
+
+const downloadPdf = async (query) => {
+  try {
+    const response = await fetch(`${url}/active-coupons/pdf?${query}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "active_coupons.pdf"); // Specify the file name
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      throw new Error("Failed to download PDF");
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 function Coupons() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -102,7 +131,7 @@ function Coupons() {
     if (selectedProduct) {
       let query = "";
       if (selectedProduct.name) query += `productName=${selectedProduct.name}`;
-      dispatch(COUPONGetActive(query, navigate));
+      downloadPdf(query); 
     }
   };
 
