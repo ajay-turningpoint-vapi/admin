@@ -6,4 +6,4 @@
 
 // export const url = "https://api.turningpointvapi.com/api";
 
-export const url="http://3.7.46.178/api/"
+export const url="http://3.7.46.178/api"
