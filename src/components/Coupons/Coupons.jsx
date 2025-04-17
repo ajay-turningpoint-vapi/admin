@@ -27,21 +27,25 @@ import { url } from "../../services/url.service.js";
 import jsPDF from "jspdf";
 import QRCode from "qrcode";
 
-const downloadPdf = async (query) => {
+const downloadPdf = async (queryObj) => {
+ 
+  console.log("Downloading PDF with query:", queryObj); // Should show %20 not +
+
   try {
-    const response = await fetch(`${url}/active-coupons/pdf?${query}`, {
+    const response = await fetch(`${url}/active-coupons/pdf?${queryObj}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
     });
+    
 
     if (response.ok) {
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "active_coupons.pdf"); // Specify the file name
+      link.href = blobUrl;
+      link.setAttribute("download", "active_coupons.pdf");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -49,9 +53,11 @@ const downloadPdf = async (query) => {
       throw new Error("Failed to download PDF");
     }
   } catch (error) {
-    console.error(error);
+    console.error("Download failed:", error);
   }
 };
+
+
 
 function Coupons() {
   const dispatch = useDispatch();
