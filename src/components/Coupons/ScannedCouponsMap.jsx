@@ -147,9 +147,11 @@ const ScannedCouponsMap = () => {
   const fetchCouponsByEmail = async () => {
     try {
       const response = await axios.get(
-        url + `/coupon/getScannedCouponsByEmail?scannedEmail=${couponData}`,
+        url + `/coupon/getScannedCouponsByCarpenterId?carpenterId=${couponData}`,
         { params: { productName: selectedProduct } }
       );
+      console.log("Response:", response.data.data.scannedCoupons);
+      
       const scannedCoupons = response.data.data.scannedCoupons || [];
       setAllCoupons(scannedCoupons);
       setCoupons(scannedCoupons);
@@ -169,46 +171,7 @@ const ScannedCouponsMap = () => {
     setProductTotals(productCounts);
   };
 
-  // Place coupons on the map as markers
-  // const placeCouponsOnMap = (coupons) => {
-  //   markers.forEach((marker) => marker.setMap(null)); // Clear existing markers
-
-  //   const newMarkers = coupons
-  //     .filter((coupon) => coupon.location?.coordinates?.length === 2)
-  //     .map((coupon) => {
-  //       const {
-  //         location,
-  //         productName,
-  //         value,
-  //         scannedUserName,
-  //         updatedAt,
-  //         name,
-  //       } = coupon;
-  //       const [longitude, latitude] = location.coordinates;
-  //       const position = { lat: latitude, lng: longitude };
-
-  //       const marker = new window.google.maps.Marker({
-  //         map,
-  //         position,
-  //         title: `${scannedUserName} - ${name} ${productName} - ${value} Time:${moment(
-  //           updatedAt
-  //         ).format("DD-MM-YYYY hh:mm A")}`,
-  //       });
-
-  //       marker.addListener("click", () => {
-  //         alert(
-  //           `The coupon for ${name} ${productName} worth ${value} was scanned by ${scannedUserName} (Time: ${moment(
-  //             updatedAt
-  //           ).format("DD-MM-YYYY hh:mm A")})`
-  //         );
-  //       });
-
-  //       return marker;
-  //     });
-
-  //   setMarkers(newMarkers);
-  // };
-
+ 
   const placeCouponsOnMap = (coupons) => {
     // Clear existing markers
     markers.forEach((marker) => marker.setMap(null));
@@ -220,24 +183,30 @@ const ScannedCouponsMap = () => {
           location,
           productName,
           value,
-          scannedUserName,
+          carpenterId,
           updatedAt,
           name,
         } = coupon;
+        console.log("Coupon:", coupon);
+        
         const [longitude, latitude] = location.coordinates;
         const position = { lat: latitude, lng: longitude };
   
+        const capitalizeWords = (str) =>
+          str?.replace(/\b\w/g, (char) => char.toUpperCase());
+        
         const marker = new window.google.maps.Marker({
           position,
-          map, // Ensure it's attached to the map
-          title: `${scannedUserName} - ${name} ${productName} - ${value} Time:${moment(
+          map,
+          title: `(${capitalizeWords(carpenterId?.name)})  ${productName} - ${name}  ${value} Point Time: ${moment(
             updatedAt
           ).format("DD-MM-YYYY hh:mm A")}`,
         });
+        
   
         marker.addListener("click", () => {
           alert(
-            `The coupon for ${name} ${productName} worth ${value} was scanned by ${scannedUserName} (Time: ${moment(
+            `${productName} - ${name}  worth ${value} point was scanned by ${carpenterId?.name}  (Time: ${moment(
               updatedAt
             ).format("DD-MM-YYYY hh:mm A")})`
           );

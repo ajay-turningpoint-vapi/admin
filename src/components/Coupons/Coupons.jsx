@@ -9,6 +9,7 @@ import {
   SetCOUPONObj,
 } from "../../redux/actions/Coupon/Coupon.actions";
 import { PRODUCTGet } from "../../redux/actions/Product/Product.actions";
+import DownloadIcon from '@mui/icons-material/Download';
 import {
   downloadCouponsExcel,
   downloadCouponsLink,
@@ -28,17 +29,18 @@ import jsPDF from "jspdf";
 import QRCode from "qrcode";
 
 const downloadPdf = async (queryObj) => {
- 
   console.log("Downloading PDF with query:", queryObj); // Should show %20 not +
 
   try {
-    const response = await fetch(`${url}/active-coupons/pdf?${queryObj}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    
+    const response = await fetch(
+      `${url}/coupon/active-coupons/pdf?${queryObj}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (response.ok) {
       const blob = await response.blob();
@@ -56,8 +58,6 @@ const downloadPdf = async (queryObj) => {
     console.error("Download failed:", error);
   }
 };
-
-
 
 function Coupons() {
   const dispatch = useDispatch();
@@ -137,7 +137,7 @@ function Coupons() {
     if (selectedProduct) {
       let query = "";
       if (selectedProduct.name) query += `productName=${selectedProduct.name}`;
-      downloadPdf(query); 
+      downloadPdf(query);
     }
   };
 
@@ -152,7 +152,7 @@ function Coupons() {
   }, [page, endDate, sortOrder]);
 
   useEffect(() => {
-    if (filterType !== "activeCoupons" && filterType !== "productName") {
+    if (filterType !== "productName") {
       handleGetAllCoupons();
     }
   }, [usedCoupon, productId, filterType, searchQuery]);
@@ -214,8 +214,8 @@ function Coupons() {
       name: "ScannedBy",
       sortable: true,
       cell: (row) =>
-        row?.scannedUserName ? (
-          <p>{row.scannedUserName}</p>
+        row?.carpenterId ? (
+          <p>{row.carpenterId?.name}</p>
         ) : (
           <p>Not Scanned</p>
         ),
@@ -226,8 +226,8 @@ function Coupons() {
       name: "Scanned On",
       sortable: true,
       cell: (row) => (
-        <p className={row?.scannedUserName ? "badge bg-danger" : ""}>
-          {row?.scannedUserName
+        <p className={row?.carpenterId?.name ? "badge bg-danger" : ""}>
+          {row?.carpenterId?.name
             ? new Date(row?.updatedAt).toDateString()
             : "Not Scanned"}
         </p>
@@ -293,9 +293,6 @@ function Coupons() {
                   onChange={handleFilterChange}
                 >
                   <option value="">Please Select</option>
-                  <option value="activeCoupons" style={{ fontWeight: "500" }}>
-                    View Active Coupons
-                  </option>
                   <option value="productName">Select Product</option>
                   <option value="search">Search by Name</option>
                 </select>
@@ -369,7 +366,7 @@ function Coupons() {
                   Total Coupons ({couponArrCount || 0})
                 </Button>
 
-                <a
+                {/* <a
                   href={`${url}/coupon/exportCouponReport`}
                   download="coupon-report.xlsx"
                   target="_blank"
@@ -384,7 +381,28 @@ function Coupons() {
                   }}
                 >
                   Excel Report
-                </a>
+                </a> */}
+
+                <Button
+                  variant="contained"
+                component="a"
+                  href={`${url}/coupon/exportCouponReport`}
+                  download="coupon-report.xlsx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    backgroundColor: "black",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#333" },
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    padding: "7px 16px", // similar padding to your original style
+                    textTransform: "none", // optional: prevents all caps
+                  }}
+                >
+                   <DownloadIcon sx={{ fontSize: 19,marginRight:1}} />
+                  EXCEL REPORT
+                </Button>
 
                 <CustomButton
                   isLink

@@ -37,6 +37,7 @@ import { useNavigate } from "react-router-dom";
 import { url } from "../../services/url.service";
 import axios from "axios";
 import { pink } from "@mui/material/colors";
+import moment from "moment";
 
 const UserActivityAnalysis = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const UserActivityAnalysis = () => {
 
   const handleDoubleClick = (row) => {
     if (window.confirm("Are you sure you want to view scanned coupons?")) {
-      navigate("/scanned-coupons", { state: { couponData: row.email } });
+      navigate("/scanned-coupons", { state: { couponData: row._id } });
     }
   };
 
@@ -313,7 +314,7 @@ const UserActivityAnalysis = () => {
                     <TableRow key={index}>
                       <TableCell>{contest.name}</TableCell>
                       <TableCell>
-                        {new Date(contest.endDate).toLocaleDateString()}
+                        {moment(contest.endDate).format("DD/MM/YYYY")}
                       </TableCell>
                       <TableCell>{contest.endTime}</TableCell>
                       <TableCell>

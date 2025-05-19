@@ -15,6 +15,8 @@ import {
   Switch,
   TextField,
 } from "@mui/material";
+import DownloadIcon from "@mui/icons-material/Download";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import React, { useEffect, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
@@ -411,10 +413,14 @@ function Customer() {
       name: "NAME",
       cell: (row) => (
         <p>
-          {row.isVerified && <VerifiedIcon style={{
-            marginRight: "5px",
-            color: "#24C47B",
-          }} />}
+          {row.isVerified && (
+            <VerifiedIcon
+              style={{
+                marginRight: "5px",
+                color: "#24C47B",
+              }}
+            />
+          )}
           {row.name}
         </p>
       ),
@@ -580,21 +586,29 @@ function Customer() {
         <div className="container-fluid p-0">
           <div className="d-flex align-items-center justify-content-end mb-3">
             <div style={{ marginRight: "30px" }}>
-              <a
+              <Button
+                variant="contained"
+                component="a"
                 href={`${url}/users/getExcelReportOfUser`}
                 download="users-report.xlsx"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
+                sx={{
                   backgroundColor: "black",
                   color: "white",
-                  padding: "11px",
+                  "&:hover": { backgroundColor: "#333" },
                   borderRadius: "20px",
-                  fontSize: "11px",
+                  fontSize: "12px",
+                  padding: "7px 18px",
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
                 }}
               >
-                Excel Report
-              </a>
+                <DownloadIcon sx={{ fontSize: 16 }} />
+                EXCEL REPORT
+              </Button>
             </div>
 
             <Button
@@ -609,7 +623,7 @@ function Customer() {
                 height: "35px", // Set height
                 minHeight: "35px", // Ensure height is enforced
                 padding: "0 20px", // Adjust padding (no vertical padding)
-                fontSize: "10px", // Adjust font size to fit within 15px height
+                fontSize: "12px", // Adjust font size to fit within 15px height
                 "&:hover": {
                   backgroundColor: (theme) =>
                     addScheduler
@@ -618,6 +632,7 @@ function Customer() {
                 },
               }}
             >
+               <AccessTimeIcon sx={{ fontSize: 18, marginRight:1 }} />
               {addScheduler ? "Close Scheduler" : "Add Scheduler"}
             </Button>
 
@@ -937,8 +952,8 @@ function Customer() {
                         <span>
                           {selectedData?.isActiveDate
                             ? moment(selectedData.isActiveDate).format(
-                              "DD-MM-YYYY hh:mm A"
-                            )
+                                "DD-MM-YYYY hh:mm A"
+                              )
                             : "N/A"}
                         </span>
                       </li>
@@ -1182,7 +1197,7 @@ function Customer() {
                           <span>
                             {selectedData?.kycStatus
                               ? selectedData.kycStatus.charAt(0).toUpperCase() +
-                              selectedData.kycStatus.slice(1)
+                                selectedData.kycStatus.slice(1)
                               : "No Status"}
                           </span>
                         )}
