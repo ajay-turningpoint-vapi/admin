@@ -207,6 +207,11 @@ function SideBar() {
           icon: "fa-solid fa-map",
           children: [],
         },
+         {
+          name: "Top Scan Users",
+          path: "/users-scan",
+          active: false,
+        },
       ],
     },
     {
@@ -493,6 +498,7 @@ function SideBar() {
         <br />
         <span>Beta v1.0.0</span>
       </div>
+      
       <ul className="sidebar-menu" id="sidebarMenu">
         {sidebar_item.map((item, i) => {
           if (typeof array === "undefined" && item.children.length === 0) {

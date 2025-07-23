@@ -13,6 +13,7 @@ import {
   SetPRODUCTObj,
 } from "../../redux/actions/Product/Product.actions";
 import { generateFilePath } from "../Utility/utils";
+
 function ProductList() {
   const dispatch = useDispatch();
   const productArr = useSelector((state) => state.product.products);
@@ -117,6 +118,7 @@ function ProductList() {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
+     
           <div className="row">
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">

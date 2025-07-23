@@ -54,26 +54,53 @@ function PointHistory() {
     if (startDate) query += `&startDate=${startDate}`; // Include startDate
     if (endDate) query += `&endDate=${endDate}`; // Include endDate
     const response = await getUserPointHistoryById(query);
+    console.log("response", response);
+    
     setPointHistoriesArr(response.data.data);
     setTotalPagesCount(response.data.totalPages);
     setLoading(false);
   };
 
-  useEffect(() => {
-    if (pointHistoryArr && pointHistoryArr.length) {
-      setPointHistoriesArr(pointHistoryArr);
-    }
-  }, [pointHistoryArr]);
+  // useEffect(() => {
+  //   if (pointHistoryArr && pointHistoryArr.length) {
+  //     setPointHistoriesArr(pointHistoryArr);
+  //   }
+  // }, [pointHistoryArr]);
+
+  // useEffect(() => {
+  //   handlePointHistory();
+  //   HandleGetUserStatsReport(userId);
+  //   handleGetAllUserPointHistoryByUserId(userId);
+  // }, [userId]);
+
+  // useEffect(() => {
+  //   handlePointHistory();
+  // }, [search, page, sortBy, endDate]);
+
+
 
   useEffect(() => {
-    handlePointHistory();
+  if (
+    pointHistoryArr &&
+    pointHistoryArr.length &&
+    JSON.stringify(pointHistoryArr) !== JSON.stringify(pointHistoriesArr)
+  ) {
+    setPointHistoriesArr(pointHistoryArr);
+  }
+}, [pointHistoryArr]);
+
+useEffect(() => {
+  if (userId) {
     HandleGetUserStatsReport(userId);
     handleGetAllUserPointHistoryByUserId(userId);
-  }, [userId]);
+  }
+}, [userId]);
 
-  useEffect(() => {
+useEffect(() => {
+  if (userId) {
     handlePointHistory();
-  }, [search, page, sortBy, endDate]);
+  }
+}, [userId, search, page, sortBy, endDate]);
 
   const HandleGetUserStatsReport = async (userIdValue) => {
     try {

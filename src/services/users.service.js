@@ -1,9 +1,11 @@
 import axios from "axios";
 import { url } from "./url.service";
+import apiClient from "./apiClient";
 
 const serverUrl = url + "/users";
 const serverNoteUrl = url + "/notes";
 const serverPointUrl = url + "/points";
+const serverConetstUrl = url + "/contest";
 
 export const login = (formData) => {
   return axios.post(serverUrl + "/loginAdmin", formData);
@@ -22,7 +24,7 @@ export const bulkupdateWinnersBlockStatus = (formData) => {
 };
 
 export const getUser = (query) => {
-  return axios.get(`${serverUrl}/getUsers${query}`);
+  return apiClient.get(`${serverUrl}/getUsers${query}`);
 };
 
 export const getOnlineUsersCount = () => {
@@ -36,6 +38,11 @@ export const getAllUser = () => {
 export const getUsersAnalytics = (queryParams = "") => {
   return axios.get(`${serverUrl}/getUsersAnalytics${queryParams}`);
 };
+
+export const getUsersKycAnalytics = () => {
+  return axios.get(`${serverUrl}/getUsersKycAnalytics`);
+};
+
 
 export const getContestsJoinedByUser = (userId) => {
   return axios.get(`${serverUrl}/getContestsJoinedByUser/${userId}`);
@@ -126,12 +133,18 @@ export const getUserContestsCount = (id) => {
   return axios.get(`${serverUrl}/getUserContestsCount/${id}`);
 };
 
+export const downloadExcelOfContestWinners = (contestId) => {
+  return axios.get(
+    `${serverConetstUrl}/excel-currentContestRewards/${contestId}`
+  );
+};
+
 export const getAllContractors = () => {
   return axios.get(`${serverUrl}/getAllContractors`);
 };
 
-export const getAllContractorsByNameAdmin = (name) => {
-  return axios.get(`${serverUrl}/getCaprentersByContractorNameAdmin/${name}`);
+export const getAllContractorsByNameAdmin = (phone) => {
+  return apiClient.get(`${serverUrl}/getCaprentersByContractorNameAdmin/${phone}`);
 };
 export const notListedContractors = () => {
   return axios.get(`${serverUrl}/not-listed-contractors`);

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { url } from "./url.service";
+import apiClient from "./apiClient";
 
 const serverUrl = url + "/contest";
 
@@ -12,7 +13,7 @@ export const addUserContestNote = (formData) => {
 };
 
 export const getContest = (query) => {
-  return axios.get(`${serverUrl}/getContestAdmin?${query}`);
+  return apiClient.get(`${serverUrl}/getContestAdmin?${query}`);
 };
 
 export const deleteContest = (id) => {

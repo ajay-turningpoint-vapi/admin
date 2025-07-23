@@ -31,6 +31,9 @@ export const getReelsAnalytics = () => {
   return axios.get(`${serverUrl}/getReelsAnalytics`);
 };
 
+
+
+
 export const getReelsLikeAnalytics = () => {
   return axios.get(`${serverReelLikeUrl}/getReelsLikeAnalytics`);
 };

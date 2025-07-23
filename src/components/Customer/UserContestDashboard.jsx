@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { userPointHistory } from "../../redux/actions/Users/users.actions";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import DownloadIcon from "@mui/icons-material/Download";
 import moment from "moment";
 import {
   bulkupdateWinnersBlockStatus,
@@ -17,6 +18,7 @@ import {
 } from "../../services/users.service";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import {
+  Button,
   FormControlLabel,
   IconButton,
   Input,
@@ -31,10 +33,14 @@ import { addUserContestNote } from "../../services/contest.service.js";
 import toast from "react-hot-toast";
 import { use } from "react";
 import { useDebounce } from "use-debounce";
+import useAdminStatus from "../../hooks/useAdminStatus.js";
+import { url } from "../../services/url.service.js";
+
 function UserContestDashboard() {
+  const isAdmin = useAdminStatus();
   const dispatch = useDispatch();
   const { contestId } = useParams();
-
+  const baseUrl = `${url}/contest/excel-currentContestRewards/${contestId}`;
   // States
   const [pageLimit] = useState(10);
   const [loading, setLoading] = useState(true);
@@ -159,6 +165,7 @@ function UserContestDashboard() {
       );
     }
   };
+
   const ExpandedComponent = ({ data }) => (
     <div style={{ padding: "10px", background: "#f9f9f9" }}>
       <p>
@@ -174,7 +181,7 @@ function UserContestDashboard() {
       name: "Rank",
       selector: (row) => row.rankAsNumber,
       sortable: true,
-      width: "10%",
+      width: "8%",
       cell: (row) =>
         row.status === "win" ? (
           <span style={{ color: "green", fontWeight: "bold" }}>
@@ -201,7 +208,7 @@ function UserContestDashboard() {
       name: "Phone",
       selector: (row) => row.userObj?.phone,
       sortable: true,
-      width: "15%",
+      width: "13%",
     },
 
     {
@@ -212,6 +219,22 @@ function UserContestDashboard() {
           row?.createdAt
         ).format("hh:mm A")}`}</p>
       ),
+    },
+    {
+      name: "Total Entries",
+      width: "10%",
+      selector: (row) => row?.totalEntries,
+    },
+    {
+      name: "Total Coupons",
+      width: "10%",
+      selector: (row) => row?.totalScannedCoupons,
+    },
+
+    {
+      name: "Total Scanned Points",
+      width: "15%",
+      selector: (row) => row?.totalScannedPoints,
     },
 
     {
@@ -305,6 +328,7 @@ function UserContestDashboard() {
                         <Switch
                           checked={isBlocked}
                           onChange={handleToggle}
+                          disabled={!isAdmin}
                           color="error"
                         />
                       }
@@ -326,15 +350,40 @@ function UserContestDashboard() {
 
             {enableMode === true && (
               <div
-                className="col-3 gap-2 mb-3"
+                className="col-5 gap-2 mb-3"
                 style={{ display: "flex", alignSelf: "flex-end" }}
               >
                 <Input
                   type="text"
                   placeholder="Search..."
-                  style={{ width: "70%" }}
+                  style={{ width: "100%" }}
                   onChange={(e) => setFilter(e.target.value)}
                 />
+
+                <Button
+                  variant="contained"
+                  component="a"
+                  href={baseUrl}
+                  download="contest-report.xlsx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  fullWidth
+                  size="small"
+                  sx={{
+                    backgroundColor: "black",
+                    color: "white",
+                    "&:hover": { backgroundColor: "#333" },
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    padding: "7px 16px",
+                    textTransform: "none",
+                    marginLeft: "8px", // to separate from Input
+                    width: "50%",
+                  }}
+                >
+                  <DownloadIcon sx={{ fontSize: 19, marginRight: 1 }} />
+                  EXCEL REPORT
+                </Button>
               </div>
             )}
           </div>

@@ -16,7 +16,7 @@ import {
   TextField,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import React, { useEffect, useRef, useState } from "react";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
@@ -24,6 +24,7 @@ import { DashboardTable } from "../Utility/DashboardBox";
 import { useDispatch, useSelector } from "react-redux";
 import { usersGet } from "../../redux/actions/Users/users.actions";
 import DiamondIcon from "@mui/icons-material/Diamond";
+
 import {
   addNotes,
   blockUser,
@@ -53,10 +54,14 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { url } from "../../services/url.service";
 import { useDebounce } from "use-debounce";
+import useAdminStatus from "../../hooks/useAdminStatus";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
 function Customer() {
+  const isAdmin = useAdminStatus();
+
   const dispatch = useDispatch();
   const callCount = useRef(0);
   const [onlineCount, setOnlineCount] = useState(0);
@@ -468,6 +473,7 @@ function Customer() {
         <Switch
           onChange={(e) => handleChangeActiveStatus(row._id, e.target.checked)}
           checked={row.isActive}
+          disabled={!isAdmin}
         />
       ),
       width: "8%",
@@ -482,11 +488,13 @@ function Customer() {
         <Switch
           onChange={(e) => handleChangeBlockUser(row._id, e.target.checked)}
           checked={row.isBlocked}
+          disabled={!isAdmin}
           color="error"
         />
       ),
       width: "8%",
     },
+
     {
       name: "KYC Status",
       cell: (row) => {
@@ -584,6 +592,7 @@ function Customer() {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
+        
           <div className="d-flex align-items-center justify-content-end mb-3">
             <div style={{ marginRight: "30px" }}>
               <Button
@@ -611,30 +620,32 @@ function Customer() {
               </Button>
             </div>
 
-            <Button
-              onClick={() => setAddScheduler((prev) => !prev)}
-              sx={{
-                backgroundColor: (theme) =>
-                  addScheduler
-                    ? theme.palette.error.main
-                    : theme.palette.primary.main, // Use error color when "Close Scheduler"
-                color: "white",
-                borderRadius: "50px", // Pill shape
-                height: "35px", // Set height
-                minHeight: "35px", // Ensure height is enforced
-                padding: "0 20px", // Adjust padding (no vertical padding)
-                fontSize: "12px", // Adjust font size to fit within 15px height
-                "&:hover": {
+            {isAdmin && (
+              <Button
+                onClick={() => setAddScheduler((prev) => !prev)}
+                sx={{
                   backgroundColor: (theme) =>
                     addScheduler
-                      ? theme.palette.error.dark
-                      : theme.palette.primary.dark, // Darker shade on hover based on state
-                },
-              }}
-            >
-               <AccessTimeIcon sx={{ fontSize: 18, marginRight:1 }} />
-              {addScheduler ? "Close Scheduler" : "Add Scheduler"}
-            </Button>
+                      ? theme.palette.error.main
+                      : theme.palette.primary.main,
+                  color: "white",
+                  borderRadius: "50px",
+                  height: "35px",
+                  minHeight: "35px",
+                  padding: "0 20px",
+                  fontSize: "12px",
+                  "&:hover": {
+                    backgroundColor: (theme) =>
+                      addScheduler
+                        ? theme.palette.error.dark
+                        : theme.palette.primary.dark,
+                  },
+                }}
+              >
+                <AccessTimeIcon sx={{ fontSize: 18, marginRight: 1 }} />
+                {addScheduler ? "Close Scheduler" : "Add Scheduler"}
+              </Button>
+            )}
 
             {addScheduler && (
               <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -731,19 +742,21 @@ function Customer() {
             >
               <DialogTitle style={{ background: "#E5E4E2" }}>
                 Customer Information
-                <Button
-                  onClick={() => {
-                    if (isEditMode) {
-                      handleSave(); // Call the save function when in edit mode
-                    } else {
-                      setIsEditMode(true); // Switch to edit mode when in view mode
-                    }
-                  }}
-                  color="primary"
-                  style={{ float: "right" }}
-                >
-                  {isEditMode ? "Save" : "Edit"}
-                </Button>
+                {isAdmin && (
+                  <Button
+                    onClick={() => {
+                      if (isEditMode) {
+                        handleSave();
+                      } else {
+                        setIsEditMode(true);
+                      }
+                    }}
+                    color="primary"
+                    style={{ float: "right" }}
+                  >
+                    {isEditMode ? "Save" : "Edit"}
+                  </Button>
+                )}
               </DialogTitle>
               <DialogContent>
                 <div className="dialog-content-flex">
@@ -948,7 +961,7 @@ function Customer() {
                       </li>
 
                       <li>
-                        <span className="fw-600">Approved Date : </span>
+                        <span className="fw-600">Activated Date : </span>
                         <span>
                           {selectedData?.isActiveDate
                             ? moment(selectedData.isActiveDate).format(
@@ -1201,6 +1214,17 @@ function Customer() {
                               : "No Status"}
                           </span>
                         )}
+                      </li>
+
+                      <li>
+                        <span className="fw-600">KYC Approved Date : </span>
+                        <span>
+                          {selectedData?.kycApprovedDate
+                            ? moment(selectedData.kycApprovedDate).format(
+                                "DD-MM-YYYY hh:mm A"
+                              )
+                            : "N/A"}
+                        </span>
                       </li>
                     </ul>
                   </div>

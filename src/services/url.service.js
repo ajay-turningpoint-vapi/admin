@@ -1,5 +1,5 @@
-// export const url = "http://192.168.1.120:4023";
-// export const SOCKET_URL = "ws://192.168.1.152:4023";
+// export const url = "http://192.168.1.127:4023";
+
 
 //live url
 export const url = "http://13.126.184.197";

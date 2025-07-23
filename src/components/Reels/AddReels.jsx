@@ -37,28 +37,28 @@ const AddReels = () => {
     // Check the video type and generate points within the specified range
     switch (value) {
       case "Entertainment":
-        randomPoints = Math.floor(Math.random() * (20 - 5 + 1)) + 5; // Range 5-20
+        randomPoints = Math.floor(Math.random() * (15 - 5 + 1)) + 5; // Range 5–15
         break;
       case "Knowledge Social Media":
-        randomPoints = Math.floor(Math.random() * (30 - 10 + 1)) + 10; // Range 10-30
+        randomPoints = Math.floor(Math.random() * (25 - 5 + 1)) + 5; // Range 5–25
         break;
       case "Knowledge Community Member":
-        randomPoints = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // Range 50-100
+        randomPoints = Math.floor(Math.random() * (60 - 30 + 1)) + 30; // Range 30–60
         break;
       case "Skills Social Media":
-        randomPoints = Math.floor(Math.random() * (30 - 10 + 1)) + 10; // Range 10-30
+        randomPoints = Math.floor(Math.random() * (25 - 5 + 1)) + 5; // Range 5–25
         break;
       case "Skills Community Member":
-        randomPoints = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // Range 50-100
+        randomPoints = Math.floor(Math.random() * (60 - 30 + 1)) + 30; // Range 30–60
         break;
       case "Promotion":
-        randomPoints = Math.floor(Math.random() * (100 - 70 + 1)) + 70; // Range 70-100
+        randomPoints = Math.floor(Math.random() * (70 - 30 + 1)) + 30; // Range 30–70
         break;
       case "Special Event":
-        randomPoints = Math.floor(Math.random() * (100 - 70 + 1)) + 70; // Range 70-100
+        randomPoints = Math.floor(Math.random() * (70 - 30 + 1)) + 30; // Range 30–70
         break;
       default:
-        randomPoints = 0; // Default points if no type matches
+        randomPoints = 0;
     }
 
     // Assign the calculated random points

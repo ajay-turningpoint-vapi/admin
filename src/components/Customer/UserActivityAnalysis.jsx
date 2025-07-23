@@ -38,6 +38,8 @@ import { url } from "../../services/url.service";
 import axios from "axios";
 import { pink } from "@mui/material/colors";
 import moment from "moment";
+import apiClient from "../../services/apiClient.js";
+
 
 const UserActivityAnalysis = () => {
   const navigate = useNavigate();
@@ -64,7 +66,7 @@ const UserActivityAnalysis = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${url}/users/getUserActivityAnalysis`, {
+      const response = await apiClient.get(`${url}/users/getUserActivityAnalysis`, {
         params: {
           search,
           page,
@@ -152,10 +154,18 @@ const UserActivityAnalysis = () => {
       cell: (row, index) => <p>{index + 1}</p>,
       width: "5%",
     },
-    { name: "Name", selector: (row) => row.name, sortable: true },
-    { name: "Phone", selector: (row) => row.phone },
-    { name: "Email", selector: (row) => row.email },
-    { name: "Role", selector: (row) => row.role },
+    { name: "Name", selector: (row) => row.name, sortable: true, width: "12%", },
+    { name: "Phone", selector: (row) => row.phone, width: "9%", },
+   
+    { name: "Role", selector: (row) => row.role,width: "9%", },
+    {
+      name: "Register",
+      selector: (row) => {
+        return `${moment(row?.createdAt).format("DD-MM-YYYY")} - ${moment(
+          row?.createdAt
+        ).format("hh:mm A")}`;
+      },
+    },
     {
       name: "Reel View Qty",
       selector: (row) => "totalReelsLikeCount",
@@ -213,6 +223,7 @@ const UserActivityAnalysis = () => {
 
   return (
     <div style={{ padding: "20px" }}>
+     
       <DashboardTable>
         <div
           style={{

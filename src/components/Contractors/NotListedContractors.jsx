@@ -4,6 +4,7 @@ import { notListedContractors } from "../../services/users.service";
 import DataTable from "react-data-table-component";
 import CustomButton from "../Utility/Button";
 
+
 export default function NotListedContractors() {
   const [state, setState] = React.useState([]);
   const [filteredData, setFilteredData] = React.useState([]);
@@ -60,10 +61,12 @@ export default function NotListedContractors() {
   ];
 
   return (
+   
     <div
       className="dashboard-table dashboard-box"
       style={{ maxWidth: "1500px", marginLeft: "20px" }}
     >
+     
       <div
         style={{
           display: "flex",

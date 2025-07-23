@@ -33,6 +33,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { sendPromotion } from "../../services/promotions.service.js";
 import { set } from "lodash";
+import JobManager from "./JobManager.jsx";
+
 const Promotions = () => {
   const dispatch = useDispatch();
   const { promotions, loading, error } = useSelector(
@@ -46,6 +48,10 @@ const Promotions = () => {
     videoUrl: "",
   });
   const [selectedRoles, setSelectedRoles] = React.useState({});
+
+  const [selectedPromotionId, setSelectedPromotionId] = useState(null);
+  const [jobModalOpen, setJobModalOpen] = useState(false);
+  const [notifyLoading, setNotifyLoading] = useState(false);
   const [open, setOpen] = useState(false); // State to control the modal visibility
   const [editingPromotion, setEditingPromotion] = useState(null); // State to manage editing
   const [file, setFile] = useState(null);
@@ -70,7 +76,6 @@ const Promotions = () => {
       formData.append("images", selectedFile); // Use correct field name
 
       try {
-
         setIsUploading(true);
         const response = await axios.post(`${url}/upload`, formData, {
           headers: {
@@ -97,8 +102,7 @@ const Promotions = () => {
           error.response?.data || error.message
         );
         alert("File upload failed. Please try again.");
-      }
-      finally {
+      } finally {
         setIsUploading(false); // Stop loader
       }
     }
@@ -279,7 +283,7 @@ const Promotions = () => {
                 },
               }}
             >
-              <SendIcon />
+              <SendIcon fontSize="small"/>
             </IconButton>
           </div>
 
@@ -292,6 +296,7 @@ const Promotions = () => {
                 borderRadius: "50%",
                 width: 40,
                 height: 40,
+                fontSize: "small",
                 color: "black",
                 "&:hover": {
                   backgroundColor: "rgba(0, 0, 0, 0.1)",
@@ -299,7 +304,7 @@ const Promotions = () => {
               }}
               aria-label="edit"
             >
-              <EditIcon />
+              <EditIcon fontSize="small"/>
             </IconButton>
             <IconButton
               onClick={() => handleDelete(row._id)}
@@ -308,6 +313,7 @@ const Promotions = () => {
                 borderRadius: "50%",
                 width: 40,
                 height: 40,
+                fontSize: "small",
                 color: "black",
                 "&:hover": {
                   backgroundColor: "rgba(0, 0, 0, 0.1)",
@@ -315,7 +321,30 @@ const Promotions = () => {
               }}
               aria-label="delete"
             >
-              <DeleteIcon />
+              <DeleteIcon fontSize="small"/>
+            </IconButton>
+          </div>
+
+          <div>
+            <IconButton
+              onClick={() => {
+                setSelectedPromotionId({ id: row._id, title: row.title });
+                setJobModalOpen(true);
+              }}
+              sx={{
+                backgroundColor: "#edeae8",
+                borderRadius: "50%",
+                width: 40,
+                height: 40,
+                fontSize: "small",
+                color: "black",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.1)",
+                },
+              }}
+              aria-label="manage job"
+            >
+              <i className="fa-solid fa-clock-rotate-left fa-lg"  ></i>
             </IconButton>
           </div>
         </div>
@@ -334,7 +363,7 @@ const Promotions = () => {
 
   const handleSend = async (row) => {
     const selectedRole = selectedRoles[row._id] || "All"; // Default to "All" if not set
-    const { title, message, imageUrl,videoPromotion } = row;
+    const { title, message, imageUrl, videoPromotion } = row;
     const formData = {
       title,
       message,
@@ -342,6 +371,7 @@ const Promotions = () => {
       videoPromotion,
       role: selectedRole !== "All" ? selectedRole : undefined, // Include role if not "All"
     };
+    setNotifyLoading(true);
 
     try {
       const response = await sendPromotion(formData);
@@ -352,6 +382,8 @@ const Promotions = () => {
         error.response?.data || error.message
       );
       toast.error("Failed to send promotion. Please try again.");
+    } finally {
+      setNotifyLoading(false); // Stop loading no matter what
     }
   };
 
@@ -363,7 +395,7 @@ const Promotions = () => {
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <h5 className="blue-1 m-0">Promotions list</h5>
-
+                {notifyLoading && <Loader />}
                 <Button
                   variant="contained"
                   style={{
@@ -379,7 +411,7 @@ const Promotions = () => {
                 </Button>
               </div>
               {isUploading && <p>Uploading file, please wait...</p>}
-             
+
               {loading ? (
                 <Loader />
               ) : error ? (
@@ -435,7 +467,7 @@ const Promotions = () => {
               />
               {previewUrl && (
                 <Box mt={2} textAlign="center">
-                  {previewUrl.match(/\.(jpeg|jpg|png|gif)$/i) ? (
+                  {previewUrl.match(/\.(jpeg|jpg|png|webp)$/i) ? (
                     <img
                       src={previewUrl}
                       alt="Preview"
@@ -445,7 +477,7 @@ const Promotions = () => {
                         objectFit: "contain",
                       }}
                     />
-                  ) : previewUrl.match(/\.(mp4|webm|ogg)$/i) ? (
+                  ) : previewUrl.match(/\.(mp4|webm|ogg|mkv|mov)$/i) ? (
                     <video
                       src={previewUrl}
                       controls
@@ -479,6 +511,21 @@ const Promotions = () => {
           >
             {editingPromotion ? "Update Promotion" : "Create Promotion"}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={jobModalOpen}
+        onClose={() => setJobModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Manage Cron Job</DialogTitle>
+        <DialogContent>
+          <JobManager promotionId={selectedPromotionId} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setJobModalOpen(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </main>

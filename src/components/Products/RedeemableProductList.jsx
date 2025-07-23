@@ -20,6 +20,7 @@ import DiamondIcon from "@mui/icons-material/Diamond";
 import toast from "react-hot-toast";
 import AddRedeemableProduct from "./AddProduct/AddRedeemableProduct";
 
+
 const RedeemableProductList = ({ userId }) => {
   const dispatch = useDispatch();
   const { products, loading, error } = useSelector(
@@ -156,6 +157,7 @@ const RedeemableProductList = ({ userId }) => {
 
   return (
     <div style={{ padding: "20px" }}>
+
       <DashboardTable>
         <div
           style={{

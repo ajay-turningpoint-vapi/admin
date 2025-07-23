@@ -34,6 +34,7 @@ import {
 import {
   getDashboardCount,
   getUsersAnalytics,
+  getUsersKycAnalytics,
 } from "../../services/users.service";
 import {
   getReelsAnalytics,
@@ -41,7 +42,10 @@ import {
 } from "../../services/reels.service";
 import { getAllJoinedUserContest } from "../../services/contest.service";
 import { getProductsCount } from "../../services/product.service";
-
+import DailyKycBarChart from "./DailyKycBarChart";
+import DrilldownBarChart from "../DrilldownBarChart";
+import { url } from "../../services/url.service";
+import TopUsersSideBySide from "../Coupons/Top50Coupons";
 
 ChartJS.register(
   ArcElement,
@@ -88,11 +92,9 @@ const aggregateAndSumDataByMonth = (data) => {
 };
 
 function Dashboard() {
-
-
   const dispatch = useDispatch();
   const [dashboardData, setDashboardData] = useState({});
-  const [userAnalytics, setUserAnalytics] = useState([]);
+
   const [reelLikeUserAnalytics, setReelLikeUserAnalytics] = useState([]);
   const [couponAnalytics, setCouponAnalytics] = useState([]);
   const [reelsAnalytics, setReelsAnalytics] = useState([]);
@@ -111,22 +113,17 @@ function Dashboard() {
   const fetchAnalyticsData = async () => {
     try {
       const [
-        userAnalyticsData,
         reelsLikeAnalyticsData,
         couponAnalyticsData,
         reelsAnalyticsData,
         userContestData,
       ] = await Promise.allSettled([
-        getUsersAnalytics(),
         getReelsLikeAnalytics(),
         getAllCouponsAnalytics(),
         getReelsAnalytics(),
         getAllJoinedUserContest(),
       ]);
 
-      // Ensure only successful API responses are processed
-      if (userAnalyticsData.status === "fulfilled")
-        setUserAnalytics(userAnalyticsData.value.data?.data || []);
       if (reelsLikeAnalyticsData.status === "fulfilled")
         setReelLikeUserAnalytics(reelsLikeAnalyticsData.value.data?.data || []);
       if (couponAnalyticsData.status === "fulfilled")
@@ -147,18 +144,15 @@ function Dashboard() {
     fetchAnalyticsData();
   }, []);
 
- 
-
-
-  const aggregatedData = useMemo(
-    () => aggregateAndSumDataByMonth(userAnalytics),
-    [userAnalytics]
-  );
   const aggregatedReelLikeData = useMemo(
     () => aggregateAndSumDataByMonth(reelLikeUserAnalytics),
     [reelLikeUserAnalytics]
   );
   const aggregatedReelsData = useMemo(
+    () => aggregateAndSumDataByMonth(reelsAnalytics),
+    [reelsAnalytics]
+  );
+  const aggregatedKYCData = useMemo(
     () => aggregateAndSumDataByMonth(reelsAnalytics),
     [reelsAnalytics]
   );
@@ -170,11 +164,6 @@ function Dashboard() {
     ],
   });
 
-  const data = chartData(
-    "User Registered",
-    aggregatedData,
-    "rgba(53, 162, 235, 0.5)"
-  );
   const data1 = chartData(
     "User Reels Like",
     aggregatedReelLikeData,
@@ -290,10 +279,25 @@ function Dashboard() {
           <div className="row">
             <div className="col-12 col-md-4 mb-5" style={{ width: "auto" }}>
               <DashboardChart>
-                <h5 className="blue-1 mb-4">All Users</h5>
-                <Bar options={options} data={data} />
+                <h5 className="blue-1 mb-4">Registered Users</h5>
+                <DrilldownBarChart
+                  apiBaseUrl={`${url}/users/getUsersAnalytics`}
+                  titlePrefix="User Registrations"
+                />
               </DashboardChart>
             </div>
+
+            <div className="col-12 col-md-4 mb-5" style={{ width: "auto" }}>
+              <DashboardChart>
+                <h5 className="blue-1 mb-4">User KYC Approvals</h5>
+                <DrilldownBarChart
+                  apiBaseUrl={`${url}/users/getUsersKycAnalytics`}
+                  titlePrefix="User KYC Approvals"
+                  color="rgb(241, 62, 12)"
+                />
+              </DashboardChart>
+            </div>
+
             <div className="col-12 col-md-4 mb-5" style={{ width: "auto" }}>
               <DashboardChart>
                 <h5 className="blue-1 mb-4">Contest participants</h5>
@@ -312,6 +316,7 @@ function Dashboard() {
                 <Bar options={options} data={data2} />
               </DashboardChart>
             </div>
+
             <div className="col-12 col-md-4 mb-5" style={{ width: "auto" }}>
               <DashboardChart>
                 <h5 className="blue-1 mb-4">Coupons Qty</h5>

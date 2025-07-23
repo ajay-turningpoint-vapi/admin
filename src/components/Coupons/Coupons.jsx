@@ -9,7 +9,7 @@ import {
   SetCOUPONObj,
 } from "../../redux/actions/Coupon/Coupon.actions";
 import { PRODUCTGet } from "../../redux/actions/Product/Product.actions";
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   downloadCouponsExcel,
   downloadCouponsLink,
@@ -25,8 +25,7 @@ import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import Loader from "../Utility/Loader.jsx";
 import { url } from "../../services/url.service.js";
-import jsPDF from "jspdf";
-import QRCode from "qrcode";
+
 
 const downloadPdf = async (queryObj) => {
   console.log("Downloading PDF with query:", queryObj); // Should show %20 not +
@@ -214,11 +213,7 @@ function Coupons() {
       name: "ScannedBy",
       sortable: true,
       cell: (row) =>
-        row?.carpenterId ? (
-          <p>{row.carpenterId?.name}</p>
-        ) : (
-          <p>Not Scanned</p>
-        ),
+        row?.carpenterId ? <p>{row.carpenterId?.name}</p> : <p>Not Scanned</p>,
       width: "15%",
     },
 
@@ -246,6 +241,7 @@ function Coupons() {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
+         
           <div className="row">
             <div className="col-12">
               <h5 className="blue-1 mb-2">Coupon List</h5>
@@ -385,7 +381,7 @@ function Coupons() {
 
                 <Button
                   variant="contained"
-                component="a"
+                  component="a"
                   href={`${url}/coupon/exportCouponReport`}
                   download="coupon-report.xlsx"
                   target="_blank"
@@ -400,7 +396,7 @@ function Coupons() {
                     textTransform: "none", // optional: prevents all caps
                   }}
                 >
-                   <DownloadIcon sx={{ fontSize: 19,marginRight:1}} />
+                  <DownloadIcon sx={{ fontSize: 19, marginRight: 1 }} />
                   EXCEL REPORT
                 </Button>
 
@@ -427,7 +423,7 @@ function Coupons() {
                     defaultSortAsc={sortOrder === "asc"}
                   />
                   <div className="d-flex align-items-center justify-content-between mt-4">
-                    <h5 className="blue-1 m-0"></h5>
+                    {/* <h5 className="blue-1 m-0"></h5> */}
                     <Pagination
                       count={couponArrTotalPages}
                       onChange={handlePageChange}

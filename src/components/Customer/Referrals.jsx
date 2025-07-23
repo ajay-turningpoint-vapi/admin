@@ -14,6 +14,7 @@ import {
 import { useEffect } from "react";
 import { useState } from "react";
 
+
 export default function Referrals() {
   const [state, setState] = useState([]);
   const [total, setTotal] = useState(0);
@@ -97,6 +98,7 @@ export default function Referrals() {
         <div className="container-fluid p-0">
           <div className="row">
             <div className="col-12">
+         
               <div className="d-flex align-items-center justify-content-between mb-4">
                 <h5 className="blue-1">All Referrals</h5>
                 <Card>

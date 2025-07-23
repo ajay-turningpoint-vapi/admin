@@ -11,6 +11,7 @@ import {
 import { DashboardTable } from "../Utility/DashboardBox";
 import { useDispatch, useSelector } from "react-redux";
 
+
 const Ticket = () => {
   const dispatch = useDispatch();
 
@@ -97,6 +98,7 @@ const Ticket = () => {
     <main>
       <section className="product-category" style={{ minHeight: "75vh" }}>
         <div className="container-fluid p-0">
+      
           <div className="row">
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">

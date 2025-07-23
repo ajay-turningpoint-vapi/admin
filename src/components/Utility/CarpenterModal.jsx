@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
-
 import Button from "@material-ui/core/Button";
-
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { Dialog, DialogActions, Slide } from "@mui/material";
 import DataTable from "react-data-table-component";
 import SendIcon from "@mui/icons-material/Send";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { getAllContractorsByNameAdmin } from "../../services/users.service";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
@@ -14,6 +13,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function CarpenterModal({ data }) {
   const [open, setOpen] = React.useState(false);
   const [state, setState] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -23,14 +24,19 @@ export default function CarpenterModal({ data }) {
   };
 
   const fetchData = async (data) => {
+    setIsLoading(true);
     try {
       const response = await getAllContractorsByNameAdmin(data);
-
+      console.log("Response:", response.data);
       setState(response.data);
     } catch (error) {
-      console.error("Error:", error); 
+      console.error("Error:", error);
+      setState([]); // fallback
+    } finally {
+      setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData(data);
   }, [data]);
@@ -78,16 +84,19 @@ export default function CarpenterModal({ data }) {
       width: "10%",
     },
   ];
+
   return (
     <React.Fragment>
       <Button
-        startIcon={<SendIcon />}
+        startIcon={<ArrowForwardIcon />}
         color="primary"
         onClick={handleClickOpen}
         style={{ marginRight: "15px" }}
+        disabled={!state || state.length === 0 || isLoading}
       >
         View Carpenters
       </Button>
+
       <Dialog
         fullWidth={true}
         maxWidth={"lg"}
@@ -121,3 +130,4 @@ export default function CarpenterModal({ data }) {
     </React.Fragment>
   );
 }
+

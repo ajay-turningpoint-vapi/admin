@@ -8,7 +8,11 @@ import { useLocation } from "react-router-dom";
 import { Box, Chip, CircularProgress, Snackbar } from "@material-ui/core";
 import moment from "moment";
 import { Alert } from "bootstrap";
-import { MarkerClusterer, SuperClusterAlgorithm } from "@googlemaps/markerclusterer";
+import {
+  MarkerClusterer,
+  SuperClusterAlgorithm,
+} from "@googlemaps/markerclusterer";
+
 
 const ScannedCouponsMap = () => {
   const location = useLocation();
@@ -147,11 +151,12 @@ const ScannedCouponsMap = () => {
   const fetchCouponsByEmail = async () => {
     try {
       const response = await axios.get(
-        url + `/coupon/getScannedCouponsByCarpenterId?carpenterId=${couponData}`,
+        url +
+          `/coupon/getScannedCouponsByCarpenterId?carpenterId=${couponData}`,
         { params: { productName: selectedProduct } }
       );
       console.log("Response:", response.data.data.scannedCoupons);
-      
+
       const scannedCoupons = response.data.data.scannedCoupons || [];
       setAllCoupons(scannedCoupons);
       setCoupons(scannedCoupons);
@@ -171,58 +176,53 @@ const ScannedCouponsMap = () => {
     setProductTotals(productCounts);
   };
 
- 
   const placeCouponsOnMap = (coupons) => {
     // Clear existing markers
     markers.forEach((marker) => marker.setMap(null));
-  
+
     const newMarkers = coupons
       .filter((coupon) => coupon.location?.coordinates?.length === 2)
       .map((coupon) => {
-        const {
-          location,
-          productName,
-          value,
-          carpenterId,
-          updatedAt,
-          name,
-        } = coupon;
-        console.log("Coupon:", coupon);
-        
+        const { location, productName, value, carpenterId, updatedAt, name } =
+          coupon;
+
         const [longitude, latitude] = location.coordinates;
         const position = { lat: latitude, lng: longitude };
-  
+
         const capitalizeWords = (str) =>
           str?.replace(/\b\w/g, (char) => char.toUpperCase());
-        
+
         const marker = new window.google.maps.Marker({
           position,
           map,
-          title: `(${capitalizeWords(carpenterId?.name)})  ${productName} - ${name}  ${value} Point Time: ${moment(
+          title: `(${capitalizeWords(carpenterId?.name)}),${
+            carpenterId?.phone
+          }  ${productName} - ${name}  ${value} Point Time: ${moment(
             updatedAt
           ).format("DD-MM-YYYY hh:mm A")}`,
         });
-        
-  
+
         marker.addListener("click", () => {
           alert(
-            `${productName} - ${name}  worth ${value} point was scanned by ${carpenterId?.name}  (Time: ${moment(
-              updatedAt
-            ).format("DD-MM-YYYY hh:mm A")})`
+            `${productName} - ${name}  worth ${value} point was scanned by ${
+              carpenterId?.name
+            }, phone ${carpenterId?.phone} (Time: ${moment(updatedAt).format(
+              "DD-MM-YYYY hh:mm A"
+            )})`
           );
         });
-  
+
         return marker;
       });
-  
+
     // Clear previous markers from state
     setMarkers(newMarkers);
-  
+
     // **Use Marker Clusterer and clear old clusters**
     if (window.markerCluster) {
       window.markerCluster.clearMarkers();
     }
-  
+
     // Reinitialize the marker cluster with new markers
     window.markerCluster = new MarkerClusterer({
       map,
@@ -230,7 +230,6 @@ const ScannedCouponsMap = () => {
       algorithm: new SuperClusterAlgorithm({ maxZoom: 15 }),
     });
   };
-  
 
   // Handle chip click to filter by product
   const handleChipClick = (product) => {
@@ -254,6 +253,7 @@ const ScannedCouponsMap = () => {
 
   return (
     <div style={{ marginLeft: "15px" }}>
+
       {loading && (
         <CircularProgress style={{ margin: "20px auto", display: "block" }} />
       )}

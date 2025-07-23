@@ -6,6 +6,7 @@ import CustomButton from "../Utility/Button";
 
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../../redux/actions/auth/auth.actions";
+import BackButton from "../BackButton";
 function Header() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
@@ -16,6 +17,7 @@ function Header() {
   return (
     <header>
       <div className="header print-none">
+        <BackButton/>
         <div className="d-flex align-items-center gap-4">
           {/* <SearchBox extraClass="" /> */}
         </div>

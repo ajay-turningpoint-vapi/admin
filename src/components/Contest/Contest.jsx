@@ -15,6 +15,7 @@ import { generateFilePath } from "../Utility/utils";
 import { Link } from "react-router-dom";
 import PrizeModal from "../Utility/PrizeModal";
 
+
 const Contest = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -152,6 +153,7 @@ const Contest = () => {
     <main>
       <section className="product-category" style={{ minHeight: "75vh" }}>
         <div className="container-fluid p-0">
+         
           <div className="row">
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">

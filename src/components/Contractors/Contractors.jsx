@@ -5,6 +5,7 @@ import CustomButton from "../Utility/Button";
 import CarpenterModal from "../Utility/CarpenterModal";
 import { Chip } from "@material-ui/core";
 
+
 export default function Contractors() {
   const [state, setState] = React.useState([]);
   const [filteredData, setFilteredData] = React.useState([]);
@@ -103,10 +104,7 @@ export default function Contractors() {
         return (
           <>
             {isModalOpen && (
-              <CarpenterModal
-                handleClose={toggleModal}
-                data={row.businessName}
-              />
+              <CarpenterModal handleClose={toggleModal} data={row.phone} />
             )}
           </>
         );
@@ -115,49 +113,51 @@ export default function Contractors() {
   ];
 
   return (
-    <div
-      className="dashboard-table dashboard-box"
-      style={{ maxWidth: "1200px", marginLeft: "20px" }}
-    >
+   
       <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignContent: "center",
-        }}
+        className="dashboard-table dashboard-box"
+        style={{ maxWidth: "1200px", marginLeft: "20px" }}
       >
-        <ul
-          className="nav nav-pills dashboard-pills justify-content-start"
-          id="pills-tab"
-          role="tablist"
-          style={{ marginBottom: "20px" }}
-        >
-          <li>
-            <CustomButton
-              navPills
-              btnName={"All Contractors"}
-              pillActive={true}
-            />
-          </li>
-        </ul>
-
-        <input
-          type="text"
-          placeholder="Search by name, business, or phone..."
-          value={searchTerm}
-          onChange={handleSearch}
+        <div
           style={{
-            width: "40%",
-            padding: "8px",
-            marginBottom: "10px",
-            border: "1px solid #ccc",
-            borderRadius: "5px",
-            height: "35px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignContent: "center",
           }}
-        />
-      </div>
+        >
+          <ul
+            className="nav nav-pills dashboard-pills justify-content-start"
+            id="pills-tab"
+            role="tablist"
+            style={{ marginBottom: "20px" }}
+          >
+            <li>
+              <CustomButton
+                navPills
+                btnName={"All Contractors"}
+                pillActive={true}
+              />
+            </li>
+          </ul>
 
-      <DataTable columns={columns} data={filteredData} pagination />
-    </div>
+          <input
+            type="text"
+            placeholder="Search by name, business, or phone..."
+            value={searchTerm}
+            onChange={handleSearch}
+            style={{
+              width: "40%",
+              padding: "8px",
+              marginBottom: "10px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+              height: "35px",
+            }}
+          />
+        </div>
+
+        <DataTable columns={columns} data={filteredData} pagination />
+      </div>
+   
   );
 }

@@ -76,6 +76,7 @@ import Ticket from "../components/Ticket/Ticket.js";
 import RedeemPoints from "../components/Customer/RedeemPoints.jsx";
 import RedeemableProductList from "../components/Products/RedeemableProductList.jsx";
 import AddRedeemableProduct from "../components/Products/AddProduct/AddRedeemableProduct.jsx";
+import Top50UsersTables from "../components/Coupons/Top50Coupons.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -275,6 +276,7 @@ export default function AuthorizedRoutes() {
             ></Route>
             <Route exact path="/Coupons" element={<Coupons />}></Route>
             <Route exact path="/scanned-coupons" element={<ScannedCouponsMap />}></Route>
+            <Route exact path="/users-scan" element={<Top50UsersTables />}></Route>
             <Route exact path="/Contests" element={<Contest />}></Route>
             <Route
               exact

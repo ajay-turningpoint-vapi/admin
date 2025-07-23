@@ -1,5 +1,6 @@
 import axios from "axios";
 import { url } from "./url.service";
+import apiClient from "./apiClient";
 
 const serverUrl = url + "/product";
 const redeemableProductsUrl = url + "/redeemableProduct";
@@ -27,7 +28,7 @@ export const getProductsCount = (query) => {
 
 
 export const getReedemableProducts = (query) => {
-  return axios.get(`${redeemableProductsUrl}/admin?${query}`);
+  return apiClient.get(`${redeemableProductsUrl}/admin?${query}`);
 }
 
 export const addReedemableProduct = (formData) => {

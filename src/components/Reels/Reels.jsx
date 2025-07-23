@@ -25,6 +25,7 @@ import {
 } from "../../services/reels.service";
 import toast from "react-hot-toast";
 
+
 const Reels = () => {
   const dispatch = useDispatch();
   const reelsArr = useSelector((state) => state.reels?.reels?.data) || [];
@@ -238,6 +239,7 @@ const Reels = () => {
     <main>
       <section className="product-category" style={{ minHeight: "75vh" }}>
         <div className="container-fluid p-0">
+        
           <div className="row">
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between mb-4">
