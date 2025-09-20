@@ -77,6 +77,7 @@ import RedeemPoints from "../components/Customer/RedeemPoints.jsx";
 import RedeemableProductList from "../components/Products/RedeemableProductList.jsx";
 import AddRedeemableProduct from "../components/Products/AddProduct/AddRedeemableProduct.jsx";
 import Top50UsersTables from "../components/Coupons/Top50Coupons.jsx";
+import DeleteUserRequest from "../components/Customer/DeleteUserRequest.jsx";
 export default function AuthorizedRoutes() {
   return (
     <section style={{ backgroundColor: "#ebebeb" }}>
@@ -237,6 +238,11 @@ export default function AuthorizedRoutes() {
               exact
               path="/Users-Activity-Analysis"
               element={<UserActivityAnalysis />}
+            ></Route>
+             <Route
+              exact
+              path="/users-delete-request"
+              element={<DeleteUserRequest />}
             ></Route>
             <Route
               exact

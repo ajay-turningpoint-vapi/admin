@@ -32,17 +32,19 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
+
+import { useLocation, useNavigate } from "react-router-dom";
 import { url } from "../../services/url.service";
-import axios from "axios";
-import { pink } from "@mui/material/colors";
+
 import moment from "moment";
 import apiClient from "../../services/apiClient.js";
 
 
 const UserActivityAnalysis = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -62,6 +64,29 @@ const UserActivityAnalysis = () => {
     totalContestJoinCount: "contestJoinCount",
     totalScannedCouponCount: "totalScannedCoupon",
   };
+
+
+useEffect(() => {
+  const queryParams = new URLSearchParams(location.search);
+  const currentPage = parseInt(queryParams.get("page"), 10);
+
+
+  if (!queryParams.has("page")) {
+    setPage(1);
+    navigate(`${location.pathname}?page=1`, { replace: true }); 
+  } else {
+    setPage(currentPage || 1);
+  }
+}, [location.search]);
+
+const handlePageChange = (newPage) => {
+  const queryParams = new URLSearchParams(location.search);
+  queryParams.set("page", newPage);
+
+  // 👇 IMPORTANT: use "replace: true" when it's the same page number
+  navigate(`${location.pathname}?${queryParams.toString()}`, { replace: false });
+};
+
 
   const fetchData = async () => {
     setLoading(true);
@@ -103,6 +128,9 @@ const UserActivityAnalysis = () => {
 
     setData(sortedData);
   };
+
+
+
 
   const handleDoubleClick = (row) => {
     if (window.confirm("Are you sure you want to view scanned coupons?")) {
@@ -270,7 +298,7 @@ const UserActivityAnalysis = () => {
           pagination
           paginationServer
           paginationTotalRows={totalRows}
-          onChangePage={setPage}
+          onChangePage={handlePageChange}
           onSort={handleSort}
           sortServer
           defaultSortAsc={false}

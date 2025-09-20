@@ -143,6 +143,11 @@ function SideBar() {
           path: "/Users-Activity-Analysis",
           active: false,
         },
+         {
+          name: "Users Delete Request",
+          path: "/users-delete-request",
+          active: false,
+        },
         {
           name: "Referrals",
           path: "/referrals",

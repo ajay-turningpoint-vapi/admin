@@ -28,7 +28,7 @@ const Top50UsersTables = () => {
     fetchTopUsers();
   }, []);
 
-  const renderTable = (data, title) => (
+  const renderTable = (data, title,scanLabel = "Scan") => (
     <div style={tableCardStyle}>
       <h4 style={titleStyle}>{title}</h4>
       <div style={{ overflowX: "auto" }}>
@@ -38,7 +38,7 @@ const Top50UsersTables = () => {
               <th style={thStyle}>#</th>
               <th style={thStyle}>Name</th>
               <th style={thStyle}>Phone</th>
-              <th style={thStyle}>Scan</th>
+              <th style={thStyle}>{scanLabel}</th>
               <th style={thStyle}>Points</th>
             </tr>
           </thead>
@@ -66,8 +66,8 @@ const Top50UsersTables = () => {
  
       <h2 style={{textAlign:"center"}}>Top Users Who Scanned Coupons After the Last Contest</h2>
       <div style={containerStyle}>
-        {renderTable(carpenters, "Top 50 Carpenters ")}
-        {renderTable(contractors, "Top 50 Contractors")}
+        {renderTable(carpenters, "Top 50 Carpenters", "Scan")}
+      {renderTable(contractors, "Top 50 Contractors", "Royalty")}
       </div>
     </div>
   );

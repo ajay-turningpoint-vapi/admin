@@ -27,7 +27,7 @@ export default function CarpenterModal({ data }) {
     setIsLoading(true);
     try {
       const response = await getAllContractorsByNameAdmin(data);
-      console.log("Response:", response.data);
+      
       setState(response.data);
     } catch (error) {
       console.error("Error:", error);

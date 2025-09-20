@@ -139,9 +139,16 @@ export const downloadExcelOfContestWinners = (contestId) => {
   );
 };
 
-export const getAllContractors = () => {
-  return axios.get(`${serverUrl}/getAllContractors`);
+// export const getAllContractors = () => {
+//   return axios.get(`${serverUrl}/getAllContractors`);
+// };
+
+export const getAllContractors = ({ page = 1, limit = 10, search = "" } = {}) => {
+  return axios.get(`${serverUrl}/getAllContractors`, {
+    params: { page, limit, search },
+  });
 };
+
 
 export const getAllContractorsByNameAdmin = (phone) => {
   return apiClient.get(`${serverUrl}/getCaprentersByContractorNameAdmin/${phone}`);
@@ -152,6 +159,10 @@ export const notListedContractors = () => {
 
 export const userReferrals = () => {
   return axios.get(`${serverUrl}/getUserReferralsReports`);
+};
+
+export const userDeletionRequests = () => {
+  return axios.get(`${serverUrl}/deletionRequests`);
 };
 
 export const userRefreshToken = (refreshToken) => {

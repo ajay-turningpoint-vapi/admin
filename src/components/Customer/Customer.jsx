@@ -38,7 +38,7 @@ import {
 import "../../assets/style.css";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import VerifiedIcon from "@mui/icons-material/Verified";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { generateFilePath } from "../Utility/utils";
 import Swal from "sweetalert2";
 import Slide from "@mui/material/Slide";
@@ -64,6 +64,8 @@ function Customer() {
 
   const dispatch = useDispatch();
   const callCount = useRef(0);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [onlineCount, setOnlineCount] = useState(0);
   const [openAddNote, setOpenAddNote] = useState(false);
   const [addScheduler, setAddScheduler] = useState(false);
@@ -116,6 +118,16 @@ function Customer() {
     }
   };
 
+   useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const currentPage = parseInt(params.get("page") || "1", 10);
+
+  if (page !== currentPage) {
+    setPage(currentPage);
+  }
+}, [location.search]);
+
+
   useEffect(() => {
     if (selectedData) {
       fetchData();
@@ -167,9 +179,25 @@ function Customer() {
     }
   }, [userArr]);
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-  };
+  // const handlePageChange = (newPage) => {
+  //   setPage(newPage);
+  // };
+
+const handlePageChange = (newPage) => {
+  const params = new URLSearchParams(location.search);
+
+  if (newPage === 1) {
+    params.delete("page"); // clean URL
+  } else {
+    params.set("page", newPage);
+  }
+
+  const newUrl = params.toString()
+    ? `${location.pathname}?${params.toString()}`
+    : location.pathname;
+
+  navigate(newUrl, { replace: false });
+};
 
   const handleRowsPerPageChange = (newPerPage, newPage) => {
     setLimit(newPerPage);
@@ -433,7 +461,7 @@ function Customer() {
     },
     {
       name: "EMAIL",
-      cell: (row) => <p>{row.email}</p>,
+      cell: (row) => <p>{row.email?row.email:"Iphone Signup"}</p>,
       width: "24%",
     },
     {
