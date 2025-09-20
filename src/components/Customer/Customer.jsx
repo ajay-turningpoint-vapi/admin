@@ -28,7 +28,7 @@ import DiamondIcon from "@mui/icons-material/Diamond";
 import {
   addNotes,
   blockUser,
-  getAllContractors,
+  getAllContractorsUserProfile,
   getNotesByUser,
   getOnlineUsersCount,
   updateUserKycStatus,
@@ -100,7 +100,7 @@ function Customer() {
 
   const fetchData = async () => {
     try {
-      const response = await getAllContractors();
+      const response = await getAllContractorsUserProfile();
 
       setAllContractor(response.data);
     } catch (error) {
@@ -118,15 +118,14 @@ function Customer() {
     }
   };
 
-   useEffect(() => {
-  const params = new URLSearchParams(location.search);
-  const currentPage = parseInt(params.get("page") || "1", 10);
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const currentPage = parseInt(params.get("page") || "1", 10);
 
-  if (page !== currentPage) {
-    setPage(currentPage);
-  }
-}, [location.search]);
-
+    if (page !== currentPage) {
+      setPage(currentPage);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     if (selectedData) {
@@ -183,21 +182,21 @@ function Customer() {
   //   setPage(newPage);
   // };
 
-const handlePageChange = (newPage) => {
-  const params = new URLSearchParams(location.search);
+  const handlePageChange = (newPage) => {
+    const params = new URLSearchParams(location.search);
 
-  if (newPage === 1) {
-    params.delete("page"); // clean URL
-  } else {
-    params.set("page", newPage);
-  }
+    if (newPage === 1) {
+      params.delete("page"); // clean URL
+    } else {
+      params.set("page", newPage);
+    }
 
-  const newUrl = params.toString()
-    ? `${location.pathname}?${params.toString()}`
-    : location.pathname;
+    const newUrl = params.toString()
+      ? `${location.pathname}?${params.toString()}`
+      : location.pathname;
 
-  navigate(newUrl, { replace: false });
-};
+    navigate(newUrl, { replace: false });
+  };
 
   const handleRowsPerPageChange = (newPerPage, newPage) => {
     setLimit(newPerPage);
@@ -461,7 +460,7 @@ const handlePageChange = (newPage) => {
     },
     {
       name: "EMAIL",
-      cell: (row) => <p>{row.email?row.email:"Iphone Signup"}</p>,
+      cell: (row) => <p>{row.email ? row.email : "Iphone Signup"}</p>,
       width: "24%",
     },
     {
@@ -620,7 +619,6 @@ const handlePageChange = (newPage) => {
     <main>
       <section className="product-category">
         <div className="container-fluid p-0">
-        
           <div className="d-flex align-items-center justify-content-end mb-3">
             <div style={{ marginRight: "30px" }}>
               <Button

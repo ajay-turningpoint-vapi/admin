@@ -139,9 +139,9 @@ export const downloadExcelOfContestWinners = (contestId) => {
   );
 };
 
-// export const getAllContractors = () => {
-//   return axios.get(`${serverUrl}/getAllContractors`);
-// };
+export const getAllContractorsUserProfile = () => {
+  return axios.get(`${serverUrl}/getAllContractors-user-profile`);
+};
 
 export const getAllContractors = ({ page = 1, limit = 10, search = "" } = {}) => {
   return axios.get(`${serverUrl}/getAllContractors`, {
